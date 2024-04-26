@@ -3,8 +3,9 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 	_ "github.com/mattn/go-sqlite3"
+	"golang.org/x/crypto/bcrypt"
 	"html/template"
 	"log"
 	"net/http"
@@ -81,14 +82,38 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("email")
 	password := r.FormValue("password")
 	gender := r.FormValue("gender")
-	userID := uuid.New().String()
+	uniqueId := uuid.Must(uuid.NewV4())
+	userID := uniqueId.String()
+
+	hashedPassword, er := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if er != nil {
+		http.Error(w, "Failed to hash password", http.StatusInternalServerError)
+		return
+	}
 
 	_, err := db.Exec("INSERT INTO users (id, name, surname, username, email, password, admin, gender) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-		userID, name, surname, username, email, password, false, gender)
+		userID, name, surname, username, email, hashedPassword, false, gender)
 	if err != nil {
 		http.Error(w, "Failed to register user", http.StatusInternalServerError)
 		return
 	}
+	/*g := gender == "male"
+	user := structs.User{uniqueId, name, surname, username, email, password, g, time.Now(), false}
+	jsonBytes, err := json.Marshal(user)
+	if err != nil {
+		fmt.Println("Couldn't save data")
+		return
+	}
+	file, err := os.Create("data.json")
+	if err != nil {
+		fmt.Println("Couldn't save data")
+		return
+	}
+	defer file.Close()
+	_, err = file.Write(jsonBytes)
+	if err != nil {
+		fmt.Println("Couldn't save data")
+	}*/
 
 	http.Redirect(w, r, "/login.html", http.StatusSeeOther)
 }
