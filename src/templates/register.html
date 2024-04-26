@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RollinSpot</title>
+</head>
+<body>
+<h2>Register</h2>
+<form action="/register" method="post">
+
+    <label for="name">Name</label>
+    <input type="text" id="name" name="name" placeholder="Your name.." required><br><br>
+    <label for="surname">Surname</label>
+    <input type="text" id="surname" name="surname" placeholder="Your surname.." required><br><br>
+
+    <label for="gender">Gender</label>
+    <select id="gender" name="gender" required>
+        <option value="" disabled selected>Select your gender</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+    </select><br><br>
+
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" placeholder="Your email.." required><br><br>
+    <span id="emailAvailability"></span><br><br>
+
+    <label for="username">Username</label>
+    <input type="text" id="username" name="username" placeholder="Your username.." required><br><br>
+    <span id="usernameAvailability"></span><br><br>
+
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" placeholder="Your password.." required><br><br>
+
+    <input type="submit" value="Register">
+</form>
+<p>You already have an account? <a href="login.html">Login to your account here</a>.</p>
+<script>
+    document.getElementById("username").addEventListener("input", function() {
+        var username = this.value;
+        var usernameAvailabilitySpan = document.getElementById("usernameAvailability");
+
+        // Send AJAX request to check username availability
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/check-username?username=" + username, true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var response = xhr.responseText;
+                if (response === "available") {
+                    usernameAvailabilitySpan.textContent = "Username available";
+                    usernameAvailabilitySpan.style.color = "green";
+                } else {
+                    usernameAvailabilitySpan.textContent = "Username not available";
+                    usernameAvailabilitySpan.style.color = "red";
+                }
+            }
+        };
+        xhr.send();
+    });
+    document.getElementById("email").addEventListener("input", function() {
+        var email = this.value;
+        var emailAvailabilitySpan = document.getElementById("emailAvailability");
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/check-email?email=" + email, true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var response = xhr.responseText;
+                if (response !== "available") {
+                    emailAvailabilitySpan.textContent = "That email is already taken";
+                    emailAvailabilitySpan.style.color = "red";
+                } else {
+                    emailAvailabilitySpan.textContent = " ";
+                }
+            }
+        };
+        xhr.send();
+    });
+</script>
+</body>
+</html>
