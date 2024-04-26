@@ -9,9 +9,10 @@
 <form action="/register" method="post">
 
     <label for="name">Name</label>
-    <input type="text" id="name" name="name" placeholder="Your name.." required><br><br>
+    <input type="text" id="name" name="name" placeholder="Your name.." required>
     <label for="surname">Surname</label>
-    <input type="text" id="surname" name="surname" placeholder="Your surname.." required><br><br>
+    <input type="text" id="surname" name="surname" placeholder="Your surname.." required>
+    <span id="namesurnameAvailability"></span><br><br>
 
     <label for="gender">Gender</label>
     <select id="gender" name="gender" required>
@@ -21,26 +22,68 @@
     </select><br><br>
 
     <label for="email">Email</label>
-    <input type="email" id="email" name="email" placeholder="Your email.." required><br><br>
+    <input type="email" id="email" name="email" placeholder="Your email.." required>
     <span id="emailAvailability"></span><br><br>
 
     <label for="username">Username</label>
-    <input type="text" id="username" name="username" placeholder="Your username.." required><br><br>
+    <input type="text" id="username" name="username" placeholder="Your username.." required>
     <span id="usernameAvailability"></span><br><br>
 
     <label for="password">Password</label>
-    <input type="password" id="password" name="password" placeholder="Your password.." required><br><br>
+    <input type="password" id="password" name="password" placeholder="Your password.." required><br>
+    <input type="checkbox" id="showPasswordCheckbox">
+    <label for="showPasswordCheckbox">Show Password</label><br>
+    <span id="password8min"></span><br>
+    <span id="passwordNumber"></span><br>
+    <span id="passwordSpecialChar"></span><br>
+    <span id="passwordNoSpaces"></span><br><br>
 
-    <input type="submit" value="Register">
+    <button type="submit" id="registerButton" disabled>Register</button>
 </form>
 <p>You already have an account? <a href="login.html">Login to your account here</a>.</p>
 
 <script>
-    document.getElementById("username").addEventListener("input", function() {
+
+    let nameGood = false
+    let surnameGood = false
+    let usernameGood = false
+    let emailGood = false
+    let passwordGood = false
+
+    const nameInput = document.getElementById('name');
+    const surnameInput = document.getElementById('surname');
+    const usernameInput = document.getElementById('username');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const showPasswordCheckbox = document.getElementById('showPasswordCheckbox');
+    const genderInput = document.getElementById('gender');
+    const registerButton = document.getElementById('registerButton');
+
+    function checkAll() {
+        return nameGood && surnameGood && usernameGood && emailGood && passwordGood && genderInput.checkValidity();
+    }
+
+    function isValidUsername(username) {
+        const usernameRegex = /^[a-zA-Z0-9_.-]+$/;
+        return usernameRegex.test(username) && username.length >= 3;
+    }
+    function isValidNameOrSurname(nameOrSurname) {
+        const nameOrSurnamePattern = /^[a-zA-Z-]+$/;
+        return nameOrSurnamePattern.test(nameOrSurname);
+    }
+
+    function togglePasswordVisibility() {
+        if (showPasswordCheckbox.checked) {
+            passwordInput.type = "text";
+        } else {
+            passwordInput.type = "password";
+        }
+    }
+    showPasswordCheckbox.addEventListener('change', togglePasswordVisibility);
+
+    usernameInput.addEventListener('input', function() {
         var username = this.value;
         var usernameAvailabilitySpan = document.getElementById("usernameAvailability");
-
-        // Send AJAX request to check username availability
         var xhr = new XMLHttpRequest();
         xhr.open("GET", "/check-username?username=" + username, true);
         xhr.onreadystatechange = function() {
@@ -49,33 +92,130 @@
                 if (response === "available") {
                     usernameAvailabilitySpan.textContent = "Username available";
                     usernameAvailabilitySpan.style.color = "green";
+                    if (!isValidUsername(username)) {
+                        usernameAvailabilitySpan.textContent = "Username can only contain letters, numbers, underscores, dashes and dots. Atleast 3 characters needed";
+                        usernameAvailabilitySpan.style.color = "red";
+                        usernameGood = false
+                    } else {
+                        usernameGood = true
+                    }
                 } else {
                     usernameAvailabilitySpan.textContent = "Username not available";
                     usernameAvailabilitySpan.style.color = "red";
+                    usernameGood = false
                 }
+                registerButton.disabled = !checkAll();
             }
         };
         xhr.send();
     });
-    document.getElementById("email").addEventListener("input", function() {
+    surnameInput.addEventListener('input', function() {
+        var surname = this.value;
+        var surnameAvailabilitySpan = document.getElementById("namesurnameAvailability");
+        if (isValidNameOrSurname(surname)) {
+            surnameAvailabilitySpan.textContent = "";
+            surnameGood = true
+        } else {
+            surnameAvailabilitySpan.textContent = "Name and surname can only contain letters and dashes";
+            surnameAvailabilitySpan.style.color = "red";
+            surnameGood = false
+        }
+        registerButton.disabled = !checkAll();
+    });
+    genderInput.addEventListener('input', function () {
+        registerButton.disabled = !checkAll();
+    });
+    nameInput.addEventListener('input', function() {
+        var name = this.value;
+        var nameAvailabilitySpan = document.getElementById("namesurnameAvailability");
+        if (isValidNameOrSurname(name)) {
+            nameAvailabilitySpan.textContent = " ";
+            nameGood = true
+        } else {
+            nameAvailabilitySpan.textContent = "Name and surname can only contain letters and dashes";
+            nameAvailabilitySpan.style.color = "red";
+            nameGood = false
+        }
+        registerButton.disabled = !checkAll();
+    });
+    emailInput.addEventListener('input', function() {
         var email = this.value;
         var emailAvailabilitySpan = document.getElementById("emailAvailability");
-
         var xhr = new XMLHttpRequest();
         xhr.open("GET", "/check-email?email=" + email, true);
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 var response = xhr.responseText;
-                if (response !== "available") {
+                if (response === "available") {
+                    emailAvailabilitySpan.textContent = "";
+                    emailGood = true
+                } else {
                     emailAvailabilitySpan.textContent = "That email is already taken";
                     emailAvailabilitySpan.style.color = "red";
-                } else {
-                    emailAvailabilitySpan.textContent = " ";
+                    emailGood = false
                 }
+                registerButton.disabled = !checkAll();
             }
         };
         xhr.send();
     });
+
+    function checkPassword(password) {
+        var password8min = document.getElementById("password8min");
+        var passwordNumber = document.getElementById("passwordNumber");
+        var passwordSpecialChar = document.getElementById("passwordSpecialChar");
+        var passwordNoSpaces = document.getElementById("passwordNoSpaces");
+        var min8
+        if (password.length >= 8) {
+            password8min.textContent = "✓ At least 8 characters";
+            password8min.style.color = "green";
+            min8 = true
+        } else {
+            password8min.textContent = "✗ At least 8 characters";
+            password8min.style.color = "red";
+            min8 = false
+        }
+        var number
+        if (/\d/.test(password)) {
+            passwordNumber.textContent = "✓ Contains at least one number";
+            passwordNumber.style.color = "green";
+            number = true
+        } else {
+            passwordNumber.textContent = "✗ Contains at least one number";
+            passwordNumber.style.color = "red";
+            number = false
+        }
+
+        var specialChar
+        if (/[^a-zA-Z0-9]/.test(password)) {
+            passwordSpecialChar.textContent = "✓ Contains at least one special character";
+            passwordSpecialChar.style.color = "green";
+            specialChar = true
+        } else {
+            passwordSpecialChar.textContent = "✗ Contains at least one special character";
+            passwordSpecialChar.style.color = "red";
+            specialChar = false
+        }
+        var noSpaces
+        if (/\s/.test(password)) {
+            passwordNoSpaces.textContent = "Password must not contain spaces";
+            passwordNoSpaces.style.color = "red";
+            noSpaces = false
+        } else {
+            passwordNoSpaces.textContent = "";
+            passwordNoSpaces.style.color = "green";
+            noSpaces = true
+        }
+        passwordGood = min8 && number && specialChar && noSpaces;
+    }
+
+    passwordInput.addEventListener('input', function () {
+        var password = this.value;
+        checkPassword(password)
+        registerButton.disabled = !checkAll();
+    });
+    checkPassword("")
+
 </script>
 </body>
 </html>
