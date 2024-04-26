@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"strings"
 )
 
 func main() {
@@ -20,9 +21,9 @@ type exportData struct {
 var ExportData exportData
 
 func index(w http.ResponseWriter, r *http.Request) {
-	/*if strings.Contains(r.URL.Path, "favicon.ico") {
+	if strings.Contains(r.URL.Path, "favicon.ico") {
 		return
-	}*/
+	}
 	tmpl := template.Must(template.ParseFiles("src/templates/index.html"))
 	tmpl.Execute(w, ExportData)
 }
