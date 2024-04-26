@@ -8,5 +8,6 @@ type User struct {
 	Email        string
 	Password     string
 	CreationDate time.Time
+	Admin        bool
 	Gender       bool
 }

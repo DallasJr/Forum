@@ -30,6 +30,7 @@ func main() {
 			email TEXT NOT NULL UNIQUE,
 			password TEXT NOT NULL,
 			gender TEXT NOT NULL,
+        	admin BOOLEAN NOT NULL DEFAULT FALSE,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 		)
 	`)
@@ -37,7 +38,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	http.Handle("/src/", http.StripPrefix("/src/", http.FileServer(http.Dir("src"))))
+	http.Handle("/src/templates/", http.StripPrefix("/src/templates/", http.FileServer(http.Dir("src/templates"))))
 	http.HandleFunc("/", index)
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/check-username", checkUsernameAvailability)
@@ -82,8 +83,8 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	gender := r.FormValue("gender")
 	userID := uuid.New().String()
 
-	_, err := db.Exec("INSERT INTO users (id, name, surname, username, email, password, gender) VALUES (?, ?, ?, ?, ?, ?, ?)",
-		userID, name, surname, username, email, password, gender)
+	_, err := db.Exec("INSERT INTO users (id, name, surname, username, email, password, admin, gender) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+		userID, name, surname, username, email, password, false, gender)
 	if err != nil {
 		http.Error(w, "Failed to register user", http.StatusInternalServerError)
 		return
