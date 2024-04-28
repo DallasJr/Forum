@@ -30,13 +30,13 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to hash password", http.StatusInternalServerError)
 		return
 	}
-
-	_, err := src.Db.Exec("INSERT INTO users (id, name, surname, username, email, password, admin, gender) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+	_, err := src.Db.Exec("INSERT INTO accounts (id, name, surname, username, email, password, admin, gender) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
 		userID, name, surname, username, email, hashedPassword, false, gender)
 	if err != nil {
 		http.Error(w, "Failed to register user", http.StatusInternalServerError)
 		return
 	}
+
 	/*g := gender == "male"
 	user := structs.User{uniqueId, name, surname, username, email, password, g, time.Now(), false}
 	jsonBytes, err := json.Marshal(user)
@@ -65,7 +65,7 @@ func serveLoginPage(w http.ResponseWriter, r *http.Request) {
 func checkUsernameAvailability(w http.ResponseWriter, r *http.Request) {
 	username := r.URL.Query().Get("username")
 	var count int
-	err := src.Db.QueryRow("SELECT COUNT(*) FROM users WHERE username = ?", username).Scan(&count)
+	err := src.Db.QueryRow("SELECT COUNT(*) FROM accounts WHERE username = ?", username).Scan(&count)
 	if err != nil {
 		http.Error(w, "Failed to check username availability", http.StatusInternalServerError)
 		return
@@ -80,7 +80,7 @@ func checkUsernameAvailability(w http.ResponseWriter, r *http.Request) {
 func checkEmailAvailability(w http.ResponseWriter, r *http.Request) {
 	email := r.URL.Query().Get("email")
 	var count int
-	err := src.Db.QueryRow("SELECT COUNT(*) FROM users WHERE email = ?", email).Scan(&count)
+	err := src.Db.QueryRow("SELECT COUNT(*) FROM accounts WHERE email = ?", email).Scan(&count)
 	if err != nil {
 		http.Error(w, "Failed to check email availability", http.StatusInternalServerError)
 		return

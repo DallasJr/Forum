@@ -9,13 +9,12 @@ var Db *sql.DB
 
 func SetupDatabase() *sql.DB {
 	var err error
-	Db, err = sql.Open("sqlite3", "users.Db")
+	Db, err = sql.Open("sqlite3", "accounts.db")
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	_, err = Db.Exec(`
-		CREATE TABLE IF NOT EXISTS users (
+		CREATE TABLE IF NOT EXISTS accounts (
 			id TEXT PRIMARY KEY,
 			name TEXT NOT NULL,
 			surname TEXT NOT NULL,
