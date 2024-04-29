@@ -36,7 +36,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, errorMessage, http.StatusUnauthorized)
 		return
 	}
-	http.Redirect(w, r, "/index.html", http.StatusSeeOther)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func returnError(w http.ResponseWriter, r *http.Request) {
@@ -137,6 +137,12 @@ func serveLoginPage(w http.ResponseWriter, r *http.Request) {
 
 func serveErrorPage(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "src/templates/error.html")
+}
+
+func serveRegisterPage(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "src/templates/register.html")
+	/*tmpl := template.Must(template.ParseFiles("src/templates/register.html"))
+	tmpl.Execute(w, ExportData)*/
 }
 
 func checkUsernameAvailability(w http.ResponseWriter, r *http.Request) {

@@ -20,6 +20,8 @@ func SetupHandlers() {
 	http.HandleFunc("/check-email", checkEmailAvailability)
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/login.html", serveLoginPage)
+	http.HandleFunc("/register.html", serveRegisterPage)
+
 	http.HandleFunc("/error.html", serveErrorPage)
 }
 
@@ -27,6 +29,6 @@ func index(w http.ResponseWriter, r *http.Request) {
 	if strings.Contains(r.URL.Path, "favicon.ico") {
 		return
 	}
-	tmpl := template.Must(template.ParseFiles("src/templates/register.html"))
+	tmpl := template.Must(template.ParseFiles("src/templates/index.html"))
 	tmpl.Execute(w, ExportData)
 }
