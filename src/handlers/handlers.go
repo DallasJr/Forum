@@ -20,6 +20,7 @@ func SetupHandlers() {
 	http.HandleFunc("/check-email", checkEmailAvailability)
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/login.html", serveLoginPage)
+	http.HandleFunc("/error.html", serveErrorPage)
 }
 
 func index(w http.ResponseWriter, r *http.Request) {

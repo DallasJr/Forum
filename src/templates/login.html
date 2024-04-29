@@ -7,15 +7,46 @@
 <body>
 <h2>Login</h2>
 <form action="/login" method="post">
-
     <label for="username">Username</label>
     <input type="text" id="username" name="username" placeholder="Your username.." required><br><br>
 
     <label for="password">Password</label>
-    <input type="password" id="password" name="password" placeholder="Your password.." required><br><br>
+    <input type="password" id="password" name="password" placeholder="Your password.." required><br>
+
+        <span id="redMessage"></span><br>
 
     <input type="submit" value="Login">
 </form>
 <p>You don't have an account? <a href="register.html">Create your account here</a>.</p>
+<script>
+    const usernameInput = document.getElementById('username');
+    usernameInput.addEventListener('input', function() {
+        usernameInput.value = this.value.toLowerCase()
+    })
+
+    function handleLoginError(errorMessage) {
+        document.getElementById('redMessage').innerText = errorMessage;
+    }
+
+    document.querySelector('form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const formData = new FormData(this);
+        fetch(this.action, {
+            method: this.method,
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(text);
+                    });
+                }
+                window.location.href = response.url;
+            })
+            .catch(error => {
+                handleLoginError(error.message);
+            });
+    });
+</script>
 </body>
 </html>

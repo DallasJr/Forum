@@ -9,9 +9,9 @@
 <form action="/register" method="post">
 
     <label for="name">Name</label>
-    <input type="text" id="name" name="name" placeholder="Your name.." required>
+    <input type="text" id="name" name="name" placeholder="Your name.." maxlength="32" required>
     <label for="surname">Surname</label>
-    <input type="text" id="surname" name="surname" placeholder="Your surname.." required>
+    <input type="text" id="surname" name="surname" placeholder="Your surname.." maxlength="32" required>
     <span id="namesurnameAvailability"></span><br><br>
 
     <label for="gender">Gender</label>
@@ -22,15 +22,15 @@
     </select><br><br>
 
     <label for="email">Email</label>
-    <input type="email" id="email" name="email" placeholder="Your email.." required>
+    <input type="email" id="email" name="email" placeholder="Your email.." maxlength="32" required>
     <span id="emailAvailability"></span><br><br>
 
     <label for="username">Username</label>
-    <input type="text" id="username" name="username" placeholder="Your username.." required>
+    <input type="text" id="username" name="username" placeholder="Your username.." maxlength="16" required>
     <span id="usernameAvailability"></span><br><br>
 
     <label for="password">Password</label>
-    <input type="password" id="password" name="password" placeholder="Your password.." required><br>
+    <input type="password" id="password" name="password" placeholder="Your password.." maxlength="32" required><br>
     <input type="checkbox" id="showPasswordCheckbox">
     <label for="showPasswordCheckbox">Show Password</label><br>
     <span id="password8min"></span><br>
@@ -65,7 +65,7 @@
 
     function isValidUsername(username) {
         const usernameRegex = /^[a-zA-Z0-9_.-]+$/;
-        return usernameRegex.test(username) && username.length >= 3;
+        return usernameRegex.test(username) && username.length >= 3 && username.length <= 16;
     }
     function isValidNameOrSurname(nameOrSurname) {
         const nameOrSurnamePattern = /^[a-zA-Z-]+$/;
@@ -82,18 +82,20 @@
     showPasswordCheckbox.addEventListener('change', togglePasswordVisibility);
 
     usernameInput.addEventListener('input', function() {
-        var username = this.value;
-        var usernameAvailabilitySpan = document.getElementById("usernameAvailability");
-        var xhr = new XMLHttpRequest();
+        let username = this.value;
+        usernameInput.value = username.toLowerCase()
+        username = username.toLowerCase()
+        let usernameAvailabilitySpan = document.getElementById("usernameAvailability");
+        let xhr = new XMLHttpRequest();
         xhr.open("GET", "/check-username?username=" + username, true);
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
-                var response = xhr.responseText;
+                let response = xhr.responseText;
                 if (response === "available") {
                     usernameAvailabilitySpan.textContent = "Username available";
                     usernameAvailabilitySpan.style.color = "green";
                     if (!isValidUsername(username)) {
-                        usernameAvailabilitySpan.textContent = "Username can only contain letters, numbers, underscores, dashes and dots. Atleast 3 characters needed";
+                        usernameAvailabilitySpan.textContent = "Username can only contain letters, numbers, underscores, dashes and dots. 3 to 16 characters only";
                         usernameAvailabilitySpan.style.color = "red";
                         usernameGood = false
                     } else {
@@ -110,8 +112,8 @@
         xhr.send();
     });
     surnameInput.addEventListener('input', function() {
-        var surname = this.value;
-        var surnameAvailabilitySpan = document.getElementById("namesurnameAvailability");
+        let surname = this.value;
+        let surnameAvailabilitySpan = document.getElementById("namesurnameAvailability");
         if (isValidNameOrSurname(surname)) {
             surnameAvailabilitySpan.textContent = "";
             surnameGood = true
@@ -126,8 +128,8 @@
         registerButton.disabled = !checkAll();
     });
     nameInput.addEventListener('input', function() {
-        var name = this.value;
-        var nameAvailabilitySpan = document.getElementById("namesurnameAvailability");
+        let name = this.value;
+        let nameAvailabilitySpan = document.getElementById("namesurnameAvailability");
         if (isValidNameOrSurname(name)) {
             nameAvailabilitySpan.textContent = " ";
             nameGood = true
@@ -139,13 +141,13 @@
         registerButton.disabled = !checkAll();
     });
     emailInput.addEventListener('input', function() {
-        var email = this.value;
-        var emailAvailabilitySpan = document.getElementById("emailAvailability");
-        var xhr = new XMLHttpRequest();
+        let email = this.value;
+        let emailAvailabilitySpan = document.getElementById("emailAvailability");
+        let xhr = new XMLHttpRequest();
         xhr.open("GET", "/check-email?email=" + email, true);
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
-                var response = xhr.responseText;
+                let response = xhr.responseText;
                 if (response === "available") {
                     emailAvailabilitySpan.textContent = "";
                     emailGood = true
@@ -161,11 +163,11 @@
     });
 
     function checkPassword(password) {
-        var password8min = document.getElementById("password8min");
-        var passwordNumber = document.getElementById("passwordNumber");
-        var passwordSpecialChar = document.getElementById("passwordSpecialChar");
-        var passwordNoSpaces = document.getElementById("passwordNoSpaces");
-        var min8
+        let password8min = document.getElementById("password8min");
+        let passwordNumber = document.getElementById("passwordNumber");
+        let passwordSpecialChar = document.getElementById("passwordSpecialChar");
+        let passwordNoSpaces = document.getElementById("passwordNoSpaces");
+        let min8
         if (password.length >= 8) {
             password8min.textContent = "✓ At least 8 characters";
             password8min.style.color = "green";
@@ -175,7 +177,7 @@
             password8min.style.color = "red";
             min8 = false
         }
-        var number
+        let number
         if (/\d/.test(password)) {
             passwordNumber.textContent = "✓ Contains at least one number";
             passwordNumber.style.color = "green";
@@ -186,7 +188,7 @@
             number = false
         }
 
-        var specialChar
+        let specialChar
         if (/[^a-zA-Z0-9]/.test(password)) {
             passwordSpecialChar.textContent = "✓ Contains at least one special character";
             passwordSpecialChar.style.color = "green";
@@ -196,7 +198,7 @@
             passwordSpecialChar.style.color = "red";
             specialChar = false
         }
-        var noSpaces
+        let noSpaces
         if (/\s/.test(password)) {
             passwordNoSpaces.textContent = "Password must not contain spaces";
             passwordNoSpaces.style.color = "red";
