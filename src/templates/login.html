@@ -2,10 +2,35 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RollinSpot</title>
+    <link rel="stylesheet" type="text/css" href="../static/css/style.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/login.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/navbar.css">
+    <script src="../static/javascript/navbar.js"></script>
 </head>
 <body>
+
+<nav class="navbar">
+    <div class="container">
+        <a href="/" class="brand">Home</a>
+        <div class="menu-icon" onclick="toggleMenu()">
+            &#9776;
+        </div>
+        <div class="nav-links" id="nav-links">
+            <a href="login.html" class="nav-item" id="login">Login</a>
+            <a href="register.html" class="nav-item" id="register">Register</a>
+        </div>
+    </div>
+
+    <div class="mobile-links" id="mobile-links">
+        <a href="login.html" class="nav-item" id="login-m">Login</a>
+        <a href="register.html" class="nav-item" id="register-m">Register</a>
+    </div>
+</nav>
+
 <h2>Login</h2>
+
 <form action="/login" method="post">
     <label for="username">Username</label>
     <input type="text" id="username" name="username" placeholder="Your username.." required><br><br>
@@ -14,8 +39,11 @@
     <input type="password" id="password" name="password" placeholder="Your password.." required><br>
 
         <span id="redMessage"></span><br>
-
-    <input type="submit" value="Login">
+    <div class="submit">
+        <input type="checkbox" id="keeplogin">
+        <label for="keeplogin">Stay connected on this device</label><br>
+        <input type="submit" value="Login">
+    </div>
 </form>
 <p>You don't have an account? <a href="register.html">Create your account here</a>.</p>
 <script>

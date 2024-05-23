@@ -2,14 +2,33 @@ package handlers
 
 import (
 	"Forum/src"
+	"crypto/rand"
 	"database/sql"
+	"encoding/base64"
+	"errors"
 	"fmt"
 	"github.com/gofrs/uuid/v5"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"regexp"
 	"strings"
+	"sync"
 )
+
+var (
+	sessions = make(map[string]string)
+	mutex    sync.Mutex
+)
+
+// Generate a random session ID
+func generateSessionID() string {
+	b := make([]byte, 32)
+	_, err := rand.Read(b)
+	if err != nil {
+		panic(err)
+	}
+	return base64.URLEncoding.EncodeToString(b)
+}
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -36,6 +55,22 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, errorMessage, http.StatusUnauthorized)
 		return
 	}
+
+	// Authentication successful, generate session ID
+	sessionID := generateSessionID()
+
+	// Store the session ID in the map
+	mutex.Lock()
+	sessions[sessionID] = username
+	mutex.Unlock()
+
+	// Set session ID as a cookie
+	http.SetCookie(w, &http.Cookie{
+		Name:     "sessionID",
+		Value:    sessionID,
+		SameSite: http.SameSiteStrictMode,
+	})
+
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
@@ -110,7 +145,22 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/login.html", http.StatusSeeOther)
+	// Authentication successful, generate session ID
+	sessionID := generateSessionID()
+
+	// Store the session ID in the map
+	mutex.Lock()
+	sessions[sessionID] = username
+	mutex.Unlock()
+
+	// Set session ID as a cookie
+	http.SetCookie(w, &http.Cookie{
+		Name:     "sessionID",
+		Value:    sessionID,
+		SameSite: http.SameSiteStrictMode,
+	})
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 /*g := gender == "male"
@@ -131,7 +181,22 @@ if err != nil {
 	fmt.Println("Couldn't save data")
 }*/
 
+func cookieExists(r *http.Request, cookieName string) bool {
+	_, err := r.Cookie(cookieName)
+	return !errors.Is(err, http.ErrNoCookie)
+}
+
 func serveLoginPage(w http.ResponseWriter, r *http.Request) {
+	if cookieExists(r, "sessionID") {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	// Prevent caching
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
+
 	http.ServeFile(w, r, "src/templates/login.html")
 }
 
@@ -139,10 +204,31 @@ func serveErrorPage(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "src/templates/error.html")
 }
 
+func logoutHandler(w http.ResponseWriter, r *http.Request) {
+	http.SetCookie(w, &http.Cookie{
+		Name:   "sessionID",
+		Value:  "",
+		MaxAge: -1,  // Set MaxAge to -1 to delete the cookie
+		Path:   "/", // Same path as the session cookie
+	})
+
+	// Redirect the user to the login page or any other page
+	http.Redirect(w, r, "/login.html", http.StatusSeeOther)
+}
+
 func serveRegisterPage(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "src/templates/register.html")
+	if cookieExists(r, "sessionID") {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
 	/*tmpl := template.Must(template.ParseFiles("src/templates/register.html"))
 	tmpl.Execute(w, ExportData)*/
+
+	http.ServeFile(w, r, "src/templates/register.html")
 }
 
 func checkUsernameAvailability(w http.ResponseWriter, r *http.Request) {

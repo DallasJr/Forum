@@ -1,0 +1,10 @@
+* {
+    /*border-style: dashed;
+    border-width: 1px;
+    border-color: blue;*/
+}
+
+.submit {
+    display: flex;
+    flex-wrap: wrap;
+}

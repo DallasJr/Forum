@@ -11,6 +11,7 @@ type exportData struct{}
 var ExportData exportData
 
 func SetupHandlers() {
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("src/static"))))
 	http.Handle("/src/templates/", http.StripPrefix("/src/templates/", http.FileServer(http.Dir("src/templates"))))
 	http.HandleFunc("/", index)
 
@@ -21,6 +22,7 @@ func SetupHandlers() {
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/login.html", serveLoginPage)
 	http.HandleFunc("/register.html", serveRegisterPage)
+	http.HandleFunc("/logout", logoutHandler)
 
 	http.HandleFunc("/error.html", serveErrorPage)
 }
@@ -30,5 +32,10 @@ func index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	tmpl := template.Must(template.ParseFiles("src/templates/index.html"))
+
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
+
 	tmpl.Execute(w, ExportData)
 }

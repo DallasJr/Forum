@@ -9,7 +9,7 @@ var Db *sql.DB
 
 func SetupDatabase() *sql.DB {
 	var err error
-	Db, err = sql.Open("sqlite3", "accounts.db")
+	Db, err = sql.Open("sqlite3", "data.db")
 	if err != nil {
 		log.Fatal(err)
 	}

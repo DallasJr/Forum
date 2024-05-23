@@ -2,9 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RollinSpot</title>
+    <link rel="stylesheet" type="text/css" href="../static/css/style.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/navbar.css">
+    <script src="../static/javascript/navbar.js"></script>
 </head>
 <body>
+
+<nav class="navbar">
+    <div class="container">
+        <a href="/" class="brand">Home</a>
+        <div class="menu-icon" onclick="toggleMenu()">
+            &#9776;
+        </div>
+        <div class="nav-links" id="nav-links">
+            <a href="login.html" class="nav-item">Login</a>
+            <a href="register.html" class="nav-item">Register</a>
+        </div>
+    </div>
+
+    <div class="mobile-links" id="mobile-links">
+        <a href="login.html" class="nav-item">Login</a>
+        <a href="register.html" class="nav-item">Register</a>
+    </div>
+</nav>
+
 <h2>Register</h2>
 <form action="/register" method="post">
 
