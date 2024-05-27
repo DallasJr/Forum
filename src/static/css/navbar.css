@@ -41,7 +41,8 @@
 .nav-links a {
     color: #E06B22;
     text-decoration: none;
-    padding: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
     font-size: 18px;
     border-radius: 10px;
 }

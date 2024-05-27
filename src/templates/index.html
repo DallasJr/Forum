@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="../static/css/style.css">
     <link rel="stylesheet" type="text/css" href="../static/css/navbar.css">
+    <script src="../static/javascript/navbar.js"></script>
 </head>
     <body>
     <script>
@@ -22,15 +23,18 @@
             const loginElement = document.getElementById("login");
             const registerElement = document.getElementById("register");
             const logoutElement = document.getElementById("logout");
+            const accountElement = document.getElementById("account");
 
             if (sessionID) {
                 if (loginElement) loginElement.style.display = 'none';
                 if (registerElement) registerElement.style.display = 'none';
                 if (logoutElement) logoutElement.style.display = 'block';
+                if (accountElement) accountElement.style.display = 'block';
             } else {
                 if (loginElement) loginElement.style.display = 'block';
                 if (registerElement) registerElement.style.display = 'block';
                 if (logoutElement) logoutElement.style.display = 'none';
+                if (accountElement) accountElement.style.display = 'none';
             }
         });
 
@@ -45,12 +49,16 @@
             <div class="nav-links" id="nav-links">
                 <a href="login.html" class="nav-item" id="login">Login</a>
                 <a href="register.html" class="nav-item" id="register">Register</a>
+                <a href="account.html" class="nav-item" id="account">Account</a>
+                <a href="/logout" class="nav-item" id="logout">Logout</a>
             </div>
         </div>
 
         <div class="mobile-links" id="mobile-links">
             <a href="login.html" class="nav-item" id="login-m">Login</a>
             <a href="register.html" class="nav-item" id="register-m">Register</a>
+            <a href="account.html" class="nav-item" id="account-m">Account</a>
+            <a href="/logout" class="nav-item" id="logout-m">Logout</a>
         </div>
     </nav>
 
@@ -72,7 +80,6 @@
                         <li><a href="">Services</a></li>
                         <li><a href="">Project</a></li>
                         <li><a href="">Contact</a></li>
-                        <li id="logout"><a href="/logout">Disconnect</a></li>
                     </ul>
                     <div class ="article">
                         <h1>Welcome to RollingSpot, a forum for all type of bikers !</h1>

@@ -200,10 +200,6 @@ func serveLoginPage(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "src/templates/login.html")
 }
 
-func serveErrorPage(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "src/templates/error.html")
-}
-
 func logoutHandler(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:   "sessionID",
@@ -259,4 +255,8 @@ func checkEmailAvailability(w http.ResponseWriter, r *http.Request) {
 	} else {
 		fmt.Fprintf(w, "not available")
 	}
+}
+
+func serveErrorPage(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "src/templates/error.html")
 }

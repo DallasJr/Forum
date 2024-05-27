@@ -6,10 +6,6 @@ import (
 	"strings"
 )
 
-type exportData struct{}
-
-var ExportData exportData
-
 func SetupHandlers() {
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("src/static"))))
 	http.Handle("/src/templates/", http.StripPrefix("/src/templates/", http.FileServer(http.Dir("src/templates"))))
@@ -23,6 +19,7 @@ func SetupHandlers() {
 	http.HandleFunc("/login.html", serveLoginPage)
 	http.HandleFunc("/register.html", serveRegisterPage)
 	http.HandleFunc("/logout", logoutHandler)
+	http.HandleFunc("/account.html", serveAccountPage)
 
 	http.HandleFunc("/error.html", serveErrorPage)
 }
@@ -37,5 +34,5 @@ func index(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Pragma", "no-cache")
 	w.Header().Set("Expires", "0")
 
-	tmpl.Execute(w, ExportData)
+	tmpl.Execute(w, nil)
 }

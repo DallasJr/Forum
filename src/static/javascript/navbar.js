@@ -32,6 +32,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const loginmElement = document.getElementById("login-m");
     const registermElement = document.getElementById("register-m");
     const logoutElement = document.getElementById("logout");
+    const logoutmElement = document.getElementById("logout-m");
+    const accountElement = document.getElementById("account");
+    const accountmElement = document.getElementById("account-m");
 
     if (sessionID) {
         if (loginElement) loginElement.style.display = 'none';
@@ -39,11 +42,17 @@ document.addEventListener("DOMContentLoaded", function() {
         if (registerElement) registerElement.style.display = 'none';
         if (registermElement) registermElement.style.display = 'none';
         if (logoutElement) logoutElement.style.display = 'block';
+        if (logoutmElement) logoutmElement.style.display = 'block';
+        if (accountElement) accountElement.style.display = 'block';
+        if (accountmElement) accountmElement.style.display = 'block';
     } else {
         if (loginElement) loginElement.style.display = 'block';
         if (loginmElement) loginmElement.style.display = 'block';
         if (registerElement) registerElement.style.display = 'block';
         if (registermElement) registermElement.style.display = 'block';
         if (logoutElement) logoutElement.style.display = 'none';
+        if (logoutmElement) logoutmElement.style.display = 'none';
+        if (accountElement) accountElement.style.display = 'none';
+        if (accountmElement) accountmElement.style.display = 'none';
     }
 });
