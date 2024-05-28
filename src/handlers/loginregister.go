@@ -26,7 +26,8 @@ func generateSessionID() string {
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		//http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		http.Redirect(w, r, "/error.html", http.StatusSeeOther)
 		return
 	}
 	username := r.FormValue("username")
@@ -75,7 +76,8 @@ func returnError(w http.ResponseWriter, r *http.Request) {
 
 func registerHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		//http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		http.Redirect(w, r, "/error.html", http.StatusSeeOther)
 		return
 	}
 
@@ -132,8 +134,8 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to hash password", http.StatusInternalServerError)
 		return
 	}
-	_, err := src.Db.Exec("INSERT INTO accounts (id, name, surname, username, email, password, admin, gender) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-		userID, name, surname, strings.ToLower(username), email, hashedPassword, false, gender)
+	_, err := src.Db.Exec("INSERT INTO accounts (id, name, surname, username, email, password, power, gender) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+		userID, name, surname, strings.ToLower(username), email, hashedPassword, 0, gender)
 	if err != nil {
 		returnError(w, r)
 		http.Error(w, "Failed to register user", http.StatusInternalServerError)

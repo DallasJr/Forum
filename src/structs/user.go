@@ -14,5 +14,5 @@ type User struct {
 	Password     string
 	Gender       string
 	CreationDate time.Time
-	Admin        bool
+	Power        int
 }

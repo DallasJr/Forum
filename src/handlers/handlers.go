@@ -9,7 +9,8 @@ import (
 )
 
 type exportData struct {
-	User structs.User
+	User       structs.User
+	Categories structs.Categories
 }
 
 func SetupHandlers() {

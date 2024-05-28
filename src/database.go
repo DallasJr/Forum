@@ -23,6 +23,8 @@ func SetupDatabase() *sql.DB {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// Accounts
 	_, err = Db.Exec(`
 		CREATE TABLE IF NOT EXISTS accounts (
 			id TEXT PRIMARY KEY,
@@ -32,8 +34,19 @@ func SetupDatabase() *sql.DB {
 			email TEXT NOT NULL UNIQUE,
 			password TEXT NOT NULL,
 			gender TEXT NOT NULL,
-			admin BOOLEAN NOT NULL DEFAULT FALSE,
+			power INTEGER NOT NULL DEFAULT 0,
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+		)
+	`)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Categories
+	_, err = Db.Exec(`
+		CREATE TABLE IF NOT EXISTS categories (
+			name TEXT PRIMARY KEY,
+			description TEXT NOT NULL
 		)
 	`)
 	if err != nil {
@@ -50,10 +63,10 @@ func GetUserFromSessionID(sessionID string) (structs.User, error) {
 		return structs.User{}, nil // Session found
 	}
 	var user structs.User
-	query := `SELECT id, name, surname, username, email, gender, created_at, admin FROM accounts WHERE id = ?`
+	query := `SELECT id, name, surname, username, email, gender, created_at, power FROM accounts WHERE id = ?`
 	err := Db.QueryRow(query, userID).Scan(
 		&user.Uuid, &user.Name, &user.Surname, &user.Username,
-		&user.Email, &user.Gender, &user.CreationDate, &user.Admin,
+		&user.Email, &user.Gender, &user.CreationDate, &user.Power,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
