@@ -17,18 +17,36 @@
                 &#9776;
             </div>
             <div class="nav-links" id="nav-links">
-                <a href="login.html" class="nav-item" id="login">Login</a>
-                <a href="register.html" class="nav-item" id="register">Register</a>
-                <a href="account.html" class="nav-item" id="account">{{.User.Username}}</a>
-                <a href="/logout" class="nav-item" id="logout">Logout</a>
+                {{if gt .User.Power 0}}
+                    <a href="account.html" class="nav-item" id="moderation">Mod panel</a>
+                {{end}}
+                {{if eq .User.Power 2}}
+                    <a href="account.html" class="nav-item" id="administration">Admin panel</a>
+                {{end}}
+                {{if eq .User.Username ""}}
+                    <a href="login.html" class="nav-item" id="login">Login</a>
+                    <a href="register.html" class="nav-item" id="register">Register</a>
+                {{else}}
+                    <a href="account.html" class="nav-item" id="account">{{.User.Username}}</a>
+                    <a href="/logout" class="nav-item" id="logout">Logout</a>
+                {{end}}
             </div>
         </div>
 
         <div class="mobile-links" id="mobile-links">
-            <a href="login.html" class="nav-item" id="login-m">Login</a>
-            <a href="register.html" class="nav-item" id="register-m">Register</a>
-            <a href="account.html" class="nav-item" id="account-m">{{.User.Username}}</a>
-            <a href="/logout" class="nav-item" id="logout-m">Logout</a>
+            {{if gt .User.Power 0}}
+                <a href="account.html" class="nav-item" id="moderation-m">Mod panel</a>
+            {{end}}
+            {{if eq .User.Power 2}}
+                <a href="account.html" class="nav-item" id="administration-m">Admin panel</a>
+            {{end}}
+            {{if eq .User.Username ""}}
+                <a href="login.html" class="nav-item" id="login-m">Login</a>
+                <a href="register.html" class="nav-item" id="register-m">Register</a>
+            {{else}}
+                <a href="account.html" class="nav-item" id="account-m">{{.User.Username}}</a>
+                <a href="/logout" class="nav-item" id="logout-m">Logout</a>
+            {{end}}
         </div>
     </nav>
 

@@ -42,11 +42,61 @@ func SetupDatabase() *sql.DB {
 		log.Fatal(err)
 	}
 
+	// Posts
+	_, err = Db.Exec(`
+		CREATE TABLE IF NOT EXISTS posts (
+			uuid TEXT PRIMARY KEY,
+			creator TEXT NOT NULL,
+			creation_date TIMESTAMP NOT NULL,
+			FOREIGN KEY (creator) REFERENCES accounts(id)
+		)
+	`)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Answers
+	_, err = Db.Exec(`
+		CREATE TABLE IF NOT EXISTS answers (
+			uuid TEXT PRIMARY KEY,
+			creator TEXT NOT NULL,
+			creation_date TIMESTAMP NOT NULL,
+			FOREIGN KEY (creator) REFERENCES accounts(id)
+		)
+	`)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Posts answers
+	_, err = Db.Exec(`
+		CREATE TABLE IF NOT EXISTS posts_answers (
+			post_id TEXT NOT NULL,
+			answer_id TEXT NOT NULL,
+			FOREIGN KEY (post_id) REFERENCES posts(uuid),
+			FOREIGN KEY (answer_id) REFERENCES answers(uuid)
+		)
+	`)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Categories
 	_, err = Db.Exec(`
 		CREATE TABLE IF NOT EXISTS categories (
-			name TEXT PRIMARY KEY,
-			description TEXT NOT NULL
+    		name TEXT PRIMARY KEY,
+    		description TEXT
+		)
+	`)
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = Db.Exec(`
+		CREATE TABLE IF NOT EXISTS categories_posts (
+			category_name TEXT NOT NULL,
+			post_id TEXT NOT NULL,
+			FOREIGN KEY (category_name) REFERENCES categories(name),
+			FOREIGN KEY (post_id) REFERENCES posts(id)
 		)
 	`)
 	if err != nil {
