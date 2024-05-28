@@ -12,12 +12,6 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
-	"sync"
-)
-
-var (
-	sessions = make(map[string]string)
-	mutex    sync.Mutex
 )
 
 // Generate a random session ID
@@ -60,10 +54,10 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	sessionID := generateSessionID()
 
 	// Store the session ID in the map
-	mutex.Lock()
-	sessions[sessionID] = id
+	src.Mutex.Lock()
+	src.Sessions[sessionID] = id
 	fmt.Println("logged: " + id)
-	mutex.Unlock()
+	src.Mutex.Unlock()
 
 	// Set session ID as a cookie
 	http.SetCookie(w, &http.Cookie{
@@ -150,9 +144,9 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	sessionID := generateSessionID()
 
 	// Store the session ID in the map
-	mutex.Lock()
-	sessions[sessionID] = userID
-	mutex.Unlock()
+	src.Mutex.Lock()
+	src.Sessions[sessionID] = userID
+	src.Mutex.Unlock()
 
 	// Set session ID as a cookie
 	http.SetCookie(w, &http.Cookie{
@@ -164,39 +158,13 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-/*g := gender == "male"
-user := structs.User{uniqueId, name, surname, username, email, password, g, time.Now(), false}
-jsonBytes, err := json.Marshal(user)
-if err != nil {
-	fmt.Println("Couldn't save data")
-	return
-}
-file, err := os.Create("data.json")
-if err != nil {
-	fmt.Println("Couldn't save data")
-	return
-}
-defer file.Close()
-_, err = file.Write(jsonBytes)
-if err != nil {
-	fmt.Println("Couldn't save data")
-}*/
-
 func cookieExists(r *http.Request, cookieName string) bool {
 	_, err := r.Cookie(cookieName)
 	return !errors.Is(err, http.ErrNoCookie)
 }
-func isValidSession(r *http.Request) bool {
-	c, _ := r.Cookie("sessionID")
-	if sessions[c.Value] == "" {
-		return false
-	} else {
-		return true
-	}
-}
 
 func serveLoginPage(w http.ResponseWriter, r *http.Request) {
-	if cookieExists(r, "sessionID") && isValidSession(r) {
+	if cookieExists(r, "sessionID") && src.GetValidSession(r) != "" {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -222,7 +190,7 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func serveRegisterPage(w http.ResponseWriter, r *http.Request) {
-	if cookieExists(r, "sessionID") && isValidSession(r) {
+	if cookieExists(r, "sessionID") && src.GetValidSession(r) != "" {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}

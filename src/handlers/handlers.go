@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"Forum/src"
 	"Forum/src/structs"
 	"html/template"
 	"net/http"
@@ -8,10 +9,8 @@ import (
 )
 
 type exportData struct {
-	user structs.User
+	User structs.User
 }
-
-var ExportData exportData
 
 func SetupHandlers() {
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("src/static"))))
@@ -41,10 +40,17 @@ func index(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Pragma", "no-cache")
 	w.Header().Set("Expires", "0")
 
+	ExportData := exportData{}
+
 	if cookieExists(r, "sessionID") {
-		if !isValidSession(r) {
+		sessionID := src.GetValidSession(r)
+		if sessionID == "" {
 			logoutHandler(w, r)
 			return
+		}
+		user, _ := src.GetUserFromSessionID(sessionID)
+		if user.Username != "" {
+			ExportData.User = user
 		}
 	}
 
