@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>RollinSpot</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../static/css/style.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/navbar.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/settings.css">
+    <script src="../static/javascript/navbar.js"></script>
+</head>
+    <body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="/" class="brand">Home</a>
+            <div class="menu-icon" onclick="toggleMenu()">
+                &#9776;
+            </div>
+            <div class="nav-links" id="nav-links">
+                {{if eq .User.Power 2}}
+                <a href="error.html" class="nav-item" id="administration">Admin panel</a>
+                {{end}}
+                {{if eq .User.Username ""}}
+                <a href="login.html" class="nav-item" id="login">Login</a>
+                <a href="register.html" class="nav-item" id="register">Register</a>
+                {{else}}
+                <a href="error.html" class="nav-item" id="notifications">Notifications</a>
+                <a href="error.html" class="nav-item" id="messages">Messages</a>
+                <a href="error.html" class="nav-item" id="profile">{{.User.Username}}</a>
+                <a href="settings.html" class="nav-item" id="settings">Settings</a>
+                <a href="/logout" class="nav-item" id="logout">Logout</a>
+                {{end}}
+            </div>
+        </div>
+
+        <div class="mobile-links" id="mobile-links">
+            {{if eq .User.Power 2}}
+            <a href="error.html" class="nav-item" id="administration-m">Admin panel</a>
+            {{end}}
+            {{if eq .User.Username ""}}
+            <a href="login.html" class="nav-item" id="login-m">Login</a>
+            <a href="register.html" class="nav-item" id="register-m">Register</a>
+            {{else}}
+            <a href="error.html" class="nav-item" id="notifications-m">Notifications</a>
+            <a href="error.html" class="nav-item" id="messages-m">Messages</a>
+            <a href="error.html" class="nav-item" id="profile-m">{{.User.Username}}</a>
+            <a href="settings.html" class="nav-item" id="settings-m">Settings</a>
+            <a href="/logout" class="nav-item" id="logout-m">Logout</a>
+            {{end}}
+        </div>
+    </nav>
+    <div class="settings-container">
+        <h1 class="settings-title">Settings</h1>
+        <nav class="settings-nav">
+            <ul>
+                <li><a href="#" data-section="account-informations-section" onclick="showSection('account-informations-section')">Account informations</a></li>
+                <li><a href="#" data-section="username-section" onclick="showSection('username-section')">Change Username</a></li>
+                <li><a href="#" data-section="password-section" onclick="showSection('password-section')">Change Password</a></li>
+            </ul>
+        </nav>
+        <div class="settings-content">
+            <div id="account-informations-section" class="settings-section">
+                <h2>Account informations</h2>
+                <form>
+                    <div class="large-button">
+                        <div class="two-row">
+                            <label for="name">Name:</label>
+                            <label for="surname">Surname:</label>
+                            <input type="text" id="name" name="name">
+                            <input type="text" id="surname" name="surname">
+                        </div>
+                        <button type="submit">Save</button>
+                    </div>
+                </form>
+                <form>
+                    <label for="gender">Gender:</label>
+                    <div class="one-row">
+                        <select id="gender" name="gender">
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                        <button type="submit">Save</button>
+                    </div>
+                </form>
+                <form>
+                    <label for="email">Email:</label>
+                    <div class="one-row">
+                        <input type="email" id="email" name="email">
+                        <button type="submit">Save</button>
+                    </div>
+                </form>
+            </div>
+            <div id="username-section" class="settings-section">
+                <h2>Change Username</h2>
+                <form>
+                    <label for="username">New Username:</label>
+                    <input type="text" id="username" name="username">
+                    <button type="submit">Save</button>
+                </form>
+            </div>
+            <div id="password-section" class="settings-section">
+                <h2>Change Password</h2>
+                <form>
+                    <label for="password">New Password:</label>
+                    <input type="password" id="password" name="password">
+                    <button type="submit">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    </body>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            showSection('account-informations-section');
+        });
+
+        function showSection(sectionId) {
+            const sections = document.querySelectorAll('.settings-section');
+            const navLinks = document.querySelectorAll('.settings-nav a');
+            sections.forEach(section => {
+                if (section.id === sectionId) {
+                    section.classList.add('active');
+                } else {
+                    section.classList.remove('active');
+                }
+            });
+            navLinks.forEach(link => {
+                if (link.getAttribute('data-section') === sectionId) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+    </script>
+
+</html>

@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-type exportData struct {
+type mainPageData struct {
 	User       structs.User
 	Categories structs.Categories
 }
@@ -26,7 +26,7 @@ func SetupHandlers() {
 	http.HandleFunc("/login.html", serveLoginPage)
 	http.HandleFunc("/register.html", serveRegisterPage)
 	http.HandleFunc("/logout", logoutHandler)
-	http.HandleFunc("/account.html", serveAccountPage)
+	http.HandleFunc("/settings.html", serveSettingsPage)
 	http.HandleFunc("/categories/", serveAllCategories)
 
 	http.HandleFunc("/error.html", serveErrorPage)
@@ -42,7 +42,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Pragma", "no-cache")
 	w.Header().Set("Expires", "0")
 
-	ExportData := exportData{}
+	ExportData := mainPageData{}
 
 	if cookieExists(r, "sessionID") {
 		sessionID := src.GetValidSession(r)
@@ -68,7 +68,7 @@ func serveAllCategories(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Pragma", "no-cache")
 	w.Header().Set("Expires", "0")
 
-	ExportData := exportData{}
+	ExportData := mainPageData{}
 
 	if cookieExists(r, "sessionID") {
 		sessionID := src.GetValidSession(r)
