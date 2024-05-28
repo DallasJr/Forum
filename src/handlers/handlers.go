@@ -27,6 +27,7 @@ func SetupHandlers() {
 	http.HandleFunc("/register.html", serveRegisterPage)
 	http.HandleFunc("/logout", logoutHandler)
 	http.HandleFunc("/account.html", serveAccountPage)
+	http.HandleFunc("/categories/", serveAllCategories)
 
 	http.HandleFunc("/error.html", serveErrorPage)
 }
@@ -36,6 +37,32 @@ func index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	tmpl := template.Must(template.ParseFiles("src/templates/index.html"))
+
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
+
+	ExportData := exportData{}
+
+	if cookieExists(r, "sessionID") {
+		sessionID := src.GetValidSession(r)
+		if sessionID == "" {
+			logoutHandler(w, r)
+			return
+		}
+		user, _ := src.GetUserFromSessionID(sessionID)
+		if user.Username != "" {
+			ExportData.User = user
+		}
+	}
+
+	tmpl.Execute(w, ExportData)
+}
+func serveAllCategories(w http.ResponseWriter, r *http.Request) {
+	if strings.Contains(r.URL.Path, "favicon.ico") {
+		return
+	}
+	tmpl := template.Must(template.ParseFiles("src/templates/allcategories.html"))
 
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 	w.Header().Set("Pragma", "no-cache")
