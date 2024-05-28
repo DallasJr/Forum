@@ -61,7 +61,8 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Store the session ID in the map
 	mutex.Lock()
-	sessions[sessionID] = username
+	sessions[sessionID] = id
+	fmt.Println("logged: " + id)
 	mutex.Unlock()
 
 	// Set session ID as a cookie
@@ -150,7 +151,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Store the session ID in the map
 	mutex.Lock()
-	sessions[sessionID] = username
+	sessions[sessionID] = userID
 	mutex.Unlock()
 
 	// Set session ID as a cookie
@@ -185,9 +186,17 @@ func cookieExists(r *http.Request, cookieName string) bool {
 	_, err := r.Cookie(cookieName)
 	return !errors.Is(err, http.ErrNoCookie)
 }
+func isValidSession(r *http.Request) bool {
+	c, _ := r.Cookie("sessionID")
+	if sessions[c.Value] == "" {
+		return false
+	} else {
+		return true
+	}
+}
 
 func serveLoginPage(w http.ResponseWriter, r *http.Request) {
-	if cookieExists(r, "sessionID") {
+	if cookieExists(r, "sessionID") && isValidSession(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -213,7 +222,7 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func serveRegisterPage(w http.ResponseWriter, r *http.Request) {
-	if cookieExists(r, "sessionID") {
+	if cookieExists(r, "sessionID") && isValidSession(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}

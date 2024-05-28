@@ -5,10 +5,6 @@ import (
 	"net/http"
 )
 
-type exportData struct{}
-
-var ExportData exportData
-
 func serveAccountPage(w http.ResponseWriter, r *http.Request) {
 
 	// Prevent caching
