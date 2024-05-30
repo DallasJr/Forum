@@ -131,8 +131,14 @@ form button {
     margin-bottom: 20px;
 }
 
-form button:hover {
+form button:hover:not(:disabled) {
     background-color: #af1b1b;
+}
+
+form button:disabled {
+    background-color: #333336;
+    color: #fff;
+    cursor: default;
 }
 
 form label {
@@ -147,4 +153,8 @@ form label {
 /* Hover effect should be disabled for active nav item */
 .settings-nav a.active:hover {
     background-color: #af1b1b;
+}
+
+#password-error {
+    margin-left: 20px;
 }

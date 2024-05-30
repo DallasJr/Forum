@@ -26,7 +26,15 @@ func SetupHandlers() {
 	http.HandleFunc("/login.html", serveLoginPage)
 	http.HandleFunc("/register.html", serveRegisterPage)
 	http.HandleFunc("/logout", logoutHandler)
+
+	//settings page
 	http.HandleFunc("/settings.html", serveSettingsPage)
+	http.HandleFunc("/change-password", passwordHandler)
+	http.HandleFunc("/change-email", emailHandler)
+	http.HandleFunc("/change-gender", genderHandler)
+	http.HandleFunc("/change-names", namesHandler)
+
+	//categories page
 	http.HandleFunc("/categories/", serveAllCategories)
 
 	http.HandleFunc("/error.html", serveErrorPage)

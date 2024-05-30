@@ -8,6 +8,7 @@
     <link rel="stylesheet" type="text/css" href="../static/css/navbar.css">
     <link rel="stylesheet" type="text/css" href="../static/css/settings.css">
     <script src="../static/javascript/navbar.js"></script>
+    <script src="../static/javascript/checkers.js"></script>
 </head>
     <body>
     <nav class="navbar">
@@ -61,49 +62,93 @@
         <div class="settings-content">
             <div id="account-informations-section" class="settings-section">
                 <h2>Account informations</h2>
-                <form>
+                <form id="names-form" action="/change-names" method="post">
                     <div class="large-button">
                         <div class="two-row">
-                            <label for="name">Name:</label>
-                            <label for="surname">Surname:</label>
-                            <input type="text" id="name" name="name">
-                            <input type="text" id="surname" name="surname">
+                            <label for="name">
+                                Name:
+                                <span id="name-error"></span>
+                            </label>
+                            <label for="surname">
+                                Surname:
+                                <span id="surname-error"></span>
+                            </label>
+                            <input type="text" id="name" name="name" placeholder="{{.User.Name}}" value="{{.User.Name}}">
+                            <input type="text" id="surname" name="surname" placeholder="{{.User.Surname}}" value="{{.User.Surname}}">
                         </div>
-                        <button type="submit">Save</button>
+                        <button id="names-button" type="submit" disabled>Save</button>
                     </div>
                 </form>
-                <form>
+                <form id="gender-form" action="/change-gender" method="post">
                     <label for="gender">Gender:</label>
+                    <span id="gender-error"></span>
                     <div class="one-row">
                         <select id="gender" name="gender">
-                            <option value="male">Male</option>
+                            {{if eq .User.Gender "male"}}
+                            <option value="male" selected>Male</option>
                             <option value="female">Female</option>
+                            {{else}}
+                            <option value="male">Male</option>
+                            <option value="female" selected>Female</option>
+                            {{end}}
                         </select>
-                        <button type="submit">Save</button>
+                        <button id="gender-button" type="submit" disabled>Save</button>
                     </div>
                 </form>
-                <form>
+                <form id="email-form" action="/change-email" method="post">
                     <label for="email">Email:</label>
+                    <span id="email-error"></span>
                     <div class="one-row">
-                        <input type="email" id="email" name="email">
-                        <button type="submit">Save</button>
+                        <input type="email" id="email" name="email" required placeholder="{{.User.Email}}" value="{{.User.Email}}">
+                        <button id="email-button" disabled type="submit">Save</button>
                     </div>
                 </form>
             </div>
             <div id="username-section" class="settings-section">
                 <h2>Change Username</h2>
                 <form>
-                    <label for="username">New Username:</label>
-                    <input type="text" id="username" name="username">
-                    <button type="submit">Save</button>
+                    <label for="username">Username:</label>
+                    <span id="username-availability"></span>
+                    <div class="one-row">
+                        <input type="text" id="username" name="username" placeholder="{{.User.Username}}" value="{{.User.Username}}">
+                        <button id="username-button" type="submit" disabled>Save</button>
+                    </div>
                 </form>
             </div>
             <div id="password-section" class="settings-section">
                 <h2>Change Password</h2>
-                <form>
-                    <label for="password">New Password:</label>
-                    <input type="password" id="password" name="password">
-                    <button type="submit">Save</button>
+                <form id="password-form" action="/change-password" method="post">
+
+                    <label for="current-password">Current password:</label>
+                    <input type="checkbox" id="current-password-checkbox" class="checkbox">
+                    <label for="current-password-checkbox">Show</label>
+                    <span id="password-error"></span>
+                    <div class="one-row">
+                        <input type="password" id="current-password" name="current-password" placeholder="••••••••••••••" required>
+                    </div>
+                    <br>
+                    <span id="password8min"></span><br>
+                    <span id="passwordNumber"></span><br>
+                    <span id="passwordSpecialChar"></span><br>
+                    <span id="password-identical"></span><br><br>
+
+                    <div class="large-button">
+                        <div class="two-row">
+                            <label for="new-password">
+                                New password:
+                                <input type="checkbox" id="new-password-checkbox">
+                                <label for="new-password-checkbox">Show</label>
+                            </label>
+                            <label for="confirm-new-password">
+                                Confirm new password:
+                                <input type="checkbox" id="confirm-new-password-checkbox">
+                                <label for="confirm-new-password-checkbox">Show</label>
+                            </label>
+                            <input type="password" id="new-password" name="new-password" placeholder="••••••••••••••" required>
+                            <input type="password" id="confirm-new-password" name="confirm-new-password" placeholder="••••••••••••••" required>
+                        </div>
+                        <button id="password-button" type="submit" disabled>Save</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -112,6 +157,327 @@
     </body>
 
     <script>
+
+        let inName = "{{.User.Name}}"
+        let inSurname = "{{.User.Surname}}"
+        let inGender = "{{.User.Gender}}"
+        let inEmail = "{{.User.Email}}"
+        
+        const nameError = document.getElementById('name-error')
+        const surnameError = document.getElementById('surname-error')
+
+        const emailError = document.getElementById('email-error')
+
+        const passwordError = document.getElementById('password-error')
+
+        const genderError = document.getElementById('gender-error')
+
+        function handleNamesError(errorMessage) {
+            if (errorMessage.includes("successfully")) {
+                nameError.style.color = "green";
+                surnameError.style.color = "green";
+                inName = nameInput.value
+                inSurname = surnameInput.value
+                namesButton.disabled = true
+            } else {
+                nameError.style.color = "red";
+                surnameError.style.color = "red";
+            }
+            nameError.textContent = errorMessage;
+            surnameError.textContent = errorMessage;
+        }
+
+        document.getElementById('names-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            fetch(this.action, {
+                method: this.method,
+                body: formData
+            }).then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(text);
+                    });
+                }
+                window.location.href = response.url;
+            })
+                .catch(error => {
+                    handleNamesError(error.message);
+                });
+        });
+
+        function handleEmailError(errorMessage) {
+            if (errorMessage.includes("successfully")) {
+                emailError.style.color = "green";
+                inEmail = emailInput.value
+                emailButton.disabled = true
+            } else {
+                emailError.style.color = "red";
+            }
+            emailError.textContent = errorMessage;
+        }
+
+        document.getElementById('email-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            fetch(this.action, {
+                method: this.method,
+                body: formData
+            }).then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(text);
+                    });
+                }
+                window.location.href = response.url;
+            })
+                .catch(error => {
+                    handleEmailError(error.message);
+                });
+        });
+
+        function handlePasswordError(errorMessage) {
+            if (errorMessage.includes("successfully")) {
+                passwordError.style.color = "green";
+            } else {
+                passwordError.style.color = "red";
+            }
+            passwordError.textContent = errorMessage;
+        }
+
+        document.getElementById('password-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            fetch(this.action, {
+                method: this.method,
+                body: formData
+            }).then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(text);
+                    });
+                }
+                window.location.href = response.url;
+            })
+                .catch(error => {
+                    handlePasswordError(error.message);
+                });
+        });
+
+        const usernameInput = document.getElementById('username');
+        const usernameButton = document.getElementById('username-button');
+
+        usernameInput.addEventListener('input', function() {
+            let username = this.value;
+            usernameInput.value = username.toLowerCase()
+            username = username.toLowerCase()
+            let usernameAvailabilitySpan = document.getElementById("username-availability");
+            if (username === "{{.User.Username}}") {
+                usernameAvailabilitySpan.textContent = "";
+                return
+            }
+            let xhr = new XMLHttpRequest();
+            xhr.open("GET", "/check-username?username=" + username, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    let response = xhr.responseText;
+                    if (response === "available") {
+                        usernameAvailabilitySpan.textContent = "Username available";
+                        usernameAvailabilitySpan.style.color = "green";
+                        usernameButton.disabled = false;
+                        if (!isValidUsername(username)) {
+                            usernameAvailabilitySpan.textContent = "Username can only contain letters, numbers, underscores, dashes and dots. 3 to 16 characters only";
+                            usernameAvailabilitySpan.style.color = "red";
+                            usernameButton.disabled = true;
+                        }
+                    } else {
+                        usernameAvailabilitySpan.textContent = "Username not available";
+                        usernameAvailabilitySpan.style.color = "red";
+                        usernameButton.disabled = true;
+                    }
+                }
+            };
+            xhr.send();
+        });
+
+
+        function handleGenderError(errorMessage) {
+            if (errorMessage.includes("successfully")) {
+                genderError.style.color = "green";
+                inGender = genderInput.value
+                genderButton.disabled = true
+            } else {
+                genderError.style.color = "red";
+            }
+            genderError.textContent = errorMessage;
+        }
+        document.getElementById('gender-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            fetch(this.action, {
+                method: this.method,
+                body: formData
+            }).then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(text);
+                    });
+                }
+                window.location.href = response.url;
+            })
+                .catch(error => {
+                    handleGenderError(error.message);
+                });
+        });
+
+        const genderInput = document.getElementById('gender');
+        const genderButton = document.getElementById('gender-button');
+
+        genderInput.addEventListener('input', function() {
+            if (inGender === genderInput.value) {
+                genderButton.disabled = true;
+                return
+            }
+            genderButton.disabled = false;
+        });
+
+        const nameInput = document.getElementById('name');
+        const surnameInput = document.getElementById('surname');
+        const namesButton = document.getElementById('names-button');
+
+        let nameGood = true
+        let surnameGood = true
+
+        function checkNames() {
+            return nameGood && surnameGood;
+        }
+        nameInput.addEventListener('input', function() {
+            let name = this.value;
+            let surname = surnameInput.value;
+            if (name === inName && surname === inSurname) {
+                namesButton.disabled = true
+                return
+            }
+            let nameAvailabilitySpan = nameError;
+            if (isValidNameOrSurname(name)) {
+                nameAvailabilitySpan.textContent = "";
+                nameGood = true
+            } else {
+                nameAvailabilitySpan.textContent = "Name and surname can only contain letters and dashes";
+                nameAvailabilitySpan.style.color = "red";
+                nameGood = false
+            }
+            namesButton.disabled = !checkNames();
+        });
+        surnameInput.addEventListener('input', function() {
+            let surname = this.value;
+            let name = nameInput.value;
+            if (name === inName && surname === inSurname) {
+                namesButton.disabled = true
+                return
+            }
+            let surnameAvailabilitySpan = surnameError;
+            if (isValidNameOrSurname(surname)) {
+                surnameAvailabilitySpan.textContent = "";
+                surnameGood = true
+            } else {
+                surnameAvailabilitySpan.textContent = "Name and surname can only contain letters and dashes";
+                surnameAvailabilitySpan.style.color = "red";
+                surnameGood = false
+            }
+            namesButton.disabled = !checkNames();
+        });
+
+        const emailInput = document.getElementById('email');
+        const emailButton = document.getElementById('email-button');
+
+        emailInput.addEventListener('input', function() {
+            let email = this.value;
+            let emailAvailabilitySpan = emailError;
+            if (inEmail === email) {
+                emailButton.disabled = true
+                return
+            }
+            let xhr = new XMLHttpRequest();
+            xhr.open("GET", "/check-email?email=" + email, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    let response = xhr.responseText;
+                    if (response === "available") {
+                        emailAvailabilitySpan.textContent = "";
+                        emailButton.disabled = false
+                    } else {
+                        emailAvailabilitySpan.textContent = "That email is already taken";
+                        emailAvailabilitySpan.style.color = "red";
+                        emailButton.disabled = true
+                    }
+                }
+            };
+            xhr.send();
+        });
+
+        const passwordButton = document.getElementById('password-button');
+
+        const currentPasswordInput = document.getElementById('current-password');
+        const newPasswordInput = document.getElementById('new-password');
+        const confirmNewPasswordInput = document.getElementById('confirm-new-password');
+        const passwordIdentical = document.getElementById('password-identical');
+
+        function checkPasswords() {
+            let good = checkPassword(newPasswordInput.value);
+            if (newPasswordInput.value !== confirmNewPasswordInput.value) {
+                passwordIdentical.textContent = " Passwords must be identical";
+                passwordIdentical.style.color = "red";
+                good = false
+            } else {
+                passwordIdentical.textContent = "";
+            }
+            if (currentPasswordInput.value === "") {
+                good = false
+            }
+            return good
+        }
+
+        currentPasswordInput.addEventListener('input', function () {
+            passwordButton.disabled = !checkPasswords();
+        });
+        newPasswordInput.addEventListener('input', function () {
+            passwordButton.disabled = !checkPasswords();
+        });
+        confirmNewPasswordInput.addEventListener('input', function () {
+            passwordButton.disabled = !checkPasswords();
+        });
+
+        const currentPasswordCheckbox = document.getElementById('current-password-checkbox');
+        const newPasswordCheckbox = document.getElementById('new-password-checkbox');
+        const confirmNewPasswordCheckbox = document.getElementById('confirm-new-password-checkbox');
+
+        currentPasswordCheckbox.addEventListener('change', toggleCurrentPasswordVisibility);
+        newPasswordCheckbox.addEventListener('change', toggleNewPasswordVisibility);
+        confirmNewPasswordCheckbox.addEventListener('change', toggleConfirmNewPasswordVisibility);
+
+        function toggleCurrentPasswordVisibility() {
+            if (currentPasswordCheckbox.checked) {
+                currentPasswordInput.type = "text";
+            } else {
+                currentPasswordInput.type = "password";
+            }
+        }
+        function toggleNewPasswordVisibility() {
+            if (newPasswordCheckbox.checked) {
+                newPasswordInput.type = "text";
+            } else {
+                newPasswordInput.type = "password";
+            }
+        }
+        function toggleConfirmNewPasswordVisibility() {
+            if (confirmNewPasswordCheckbox.checked) {
+                confirmNewPasswordInput.type = "text";
+            } else {
+                confirmNewPasswordInput.type = "password";
+            }
+        }
+
         document.addEventListener("DOMContentLoaded", function() {
             showSection('account-informations-section');
         });
@@ -134,6 +500,7 @@
                 }
             });
         }
+        passwordGood = checkPassword("")
     </script>
 
 </html>
