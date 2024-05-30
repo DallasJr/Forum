@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading...</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Get URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const categories = urlParams.getAll('categories');
+
+            // Join categories with commas
+            const title = categories.join(', ');
+
+            // Set the page title
+            if (title) {
+                document.title = title;
+            } else {
+                document.title = "No Categories Selected";
+            }
+        });
+    </script>
+</head>
+<body>
+<h1>Welcome to the Categories Page</h1>
+<p>Posts :</p>
+</body>
+</html>
