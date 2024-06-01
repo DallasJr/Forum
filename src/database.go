@@ -45,7 +45,7 @@ func SetupDatabase() *sql.DB {
 	// Posts
 	_, err = Db.Exec(`
 		CREATE TABLE IF NOT EXISTS posts (
-			uuid TEXT PRIMARY KEY,
+			id TEXT PRIMARY KEY,
 			creator TEXT NOT NULL,
 			creation_date TIMESTAMP NOT NULL,
 			FOREIGN KEY (creator) REFERENCES accounts(id)
@@ -58,7 +58,7 @@ func SetupDatabase() *sql.DB {
 	// Answers
 	_, err = Db.Exec(`
 		CREATE TABLE IF NOT EXISTS answers (
-			uuid TEXT PRIMARY KEY,
+			id TEXT PRIMARY KEY,
 			creator TEXT NOT NULL,
 			creation_date TIMESTAMP NOT NULL,
 			FOREIGN KEY (creator) REFERENCES accounts(id)
@@ -73,15 +73,15 @@ func SetupDatabase() *sql.DB {
 		CREATE TABLE IF NOT EXISTS posts_answers (
 			post_id TEXT NOT NULL,
 			answer_id TEXT NOT NULL,
-			FOREIGN KEY (post_id) REFERENCES posts(uuid),
-			FOREIGN KEY (answer_id) REFERENCES answers(uuid)
+			FOREIGN KEY (post_id) REFERENCES posts(id),
+			FOREIGN KEY (answer_id) REFERENCES answers(id)
 		)
 	`)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Categories
+	// Categorie
 	_, err = Db.Exec(`
 		CREATE TABLE IF NOT EXISTS categories (
     		name TEXT PRIMARY KEY,

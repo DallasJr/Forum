@@ -19,16 +19,16 @@
             </div>
             <div class="nav-links" id="nav-links">
                 {{if eq .User.Power 2}}
-                <a href="error.html" class="nav-item" id="administration">Admin panel</a>
+                <a href="/error.html" class="nav-item" id="administration">Admin panel</a>
                 {{end}}
                 {{if eq .User.Username ""}}
-                <a href="login.html" class="nav-item" id="login">Login</a>
-                <a href="register.html" class="nav-item" id="register">Register</a>
+                <a href="/login.html" class="nav-item" id="login">Login</a>
+                <a href="/register.html" class="nav-item" id="register">Register</a>
                 {{else}}
-                <a href="error.html" class="nav-item" id="notifications">Notifications</a>
-                <a href="error.html" class="nav-item" id="messages">Messages</a>
-                <a href="error.html" class="nav-item" id="profile">{{.User.Username}}</a>
-                <a href="settings.html" class="nav-item" id="settings">Settings</a>
+                <a href="/error.html" class="nav-item" id="notifications">Notifications</a>
+                <a href="/error.html" class="nav-item" id="messages">Messages</a>
+                <a href="/error.html" class="nav-item" id="profile">{{.User.Username}}</a>
+                <a href="/settings.html" class="nav-item" id="settings">Settings</a>
                 <a href="/logout" class="nav-item" id="logout">Logout</a>
                 {{end}}
             </div>
@@ -36,16 +36,16 @@
 
         <div class="mobile-links" id="mobile-links">
             {{if eq .User.Power 2}}
-            <a href="error.html" class="nav-item" id="administration-m">Admin panel</a>
+            <a href="/error.html" class="nav-item" id="administration-m">Admin panel</a>
             {{end}}
             {{if eq .User.Username ""}}
-            <a href="login.html" class="nav-item" id="login-m">Login</a>
-            <a href="register.html" class="nav-item" id="register-m">Register</a>
+            <a href="/login.html" class="nav-item" id="login-m">Login</a>
+            <a href="/register.html" class="nav-item" id="register-m">Register</a>
             {{else}}
-            <a href="error.html" class="nav-item" id="notifications-m">Notifications</a>
-            <a href="error.html" class="nav-item" id="messages-m">Messages</a>
-            <a href="error.html" class="nav-item" id="profile-m">{{.User.Username}}</a>
-            <a href="settings.html" class="nav-item" id="settings-m">Settings</a>
+            <a href="/error.html" class="nav-item" id="notifications-m">Notifications</a>
+            <a href="/error.html" class="nav-item" id="messages-m">Messages</a>
+            <a href="/error.html" class="nav-item" id="profile-m">{{.User.Username}}</a>
+            <a href="/settings.html" class="nav-item" id="settings-m">Settings</a>
             <a href="/logout" class="nav-item" id="logout-m">Logout</a>
             {{end}}
         </div>
