@@ -11,7 +11,7 @@ import (
 
 type categoriesPageData struct {
 	User       structs.User
-	Categories []structs.Categorie
+	Categories []structs.Category
 }
 
 func serveCategoriesPage(w http.ResponseWriter, r *http.Request) {
@@ -66,20 +66,53 @@ func categoriesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getAllCategories() ([]structs.Categorie, error) {
+func getAllCategories() ([]structs.Category, error) {
 	rows, err := src.Db.Query("SELECT name, description FROM categories")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var categories []structs.Categorie
+	var categories []structs.Category
 	for rows.Next() {
-		var category structs.Categorie
+		var category structs.Category
 		if err := rows.Scan(&category.Name, &category.Description); err != nil {
 			return nil, err
 		}
 		categories = append(categories, category)
 	}
+	return categories, nil
+}
+
+func getCategories(name string) (structs.Category, error) {
+	var categories structs.Category
+	/*var id string
+	var hashedPassword string
+	row := src.Db.QueryRow("SELECT id, password FROM accounts WHERE username = ?", name)
+	err := row.Scan(&id, &hashedPassword)
+	errorMessage := "Invalid username or password"
+	if err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(w, errorMessage, http.StatusUnauthorized)
+			return
+		}
+		http.Error(w, "Failed to fetch user data", http.StatusInternalServerError)
+		return
+	}*/
+
+	/*rows, err := src.Db.Query("SELECT description FROM Category WHERE name = ?", name)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var categories structs.Category
+	for rows.Next() {
+		var category structs.Category
+		if err := rows.Scan(&category.Name, &category.Description); err != nil {
+			return nil, err
+		}
+		categories = append(categories, category)
+	}*/
 	return categories, nil
 }

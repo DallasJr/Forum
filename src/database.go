@@ -24,10 +24,10 @@ func SetupDatabase() *sql.DB {
 		log.Fatal(err)
 	}
 
-	// Accounts
+	// Users
 	_, err = Db.Exec(`
-		CREATE TABLE IF NOT EXISTS accounts (
-			id TEXT PRIMARY KEY,
+		CREATE TABLE IF NOT EXISTS users (
+			uuid TEXT PRIMARY KEY,
 			name TEXT NOT NULL,
 			surname TEXT NOT NULL,
 			username TEXT NOT NULL UNIQUE,
@@ -45,10 +45,14 @@ func SetupDatabase() *sql.DB {
 	// Posts
 	_, err = Db.Exec(`
 		CREATE TABLE IF NOT EXISTS posts (
-			id TEXT PRIMARY KEY,
-			creator TEXT NOT NULL,
-			creation_date TIMESTAMP NOT NULL,
-			FOREIGN KEY (creator) REFERENCES accounts(id)
+			uuid TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			content TEXT NOT NULL,
+			owner_id TEXT NOT NULL,
+			category_name TEXT NOT NULL,
+			created_at TEXT NOT NULL,
+			FOREIGN KEY(owner_id) REFERENCES users(uuid),
+			FOREIGN KEY(category_name) REFERENCES categories(name)
 		)
 	`)
 	if err != nil {
@@ -58,45 +62,24 @@ func SetupDatabase() *sql.DB {
 	// Answers
 	_, err = Db.Exec(`
 		CREATE TABLE IF NOT EXISTS answers (
-			id TEXT PRIMARY KEY,
-			creator TEXT NOT NULL,
-			creation_date TIMESTAMP NOT NULL,
-			FOREIGN KEY (creator) REFERENCES accounts(id)
-		)
-	`)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Posts answers
-	_, err = Db.Exec(`
-		CREATE TABLE IF NOT EXISTS posts_answers (
+			uuid TEXT PRIMARY KEY,
+			content TEXT NOT NULL,
+			owner_id TEXT NOT NULL,
 			post_id TEXT NOT NULL,
-			answer_id TEXT NOT NULL,
-			FOREIGN KEY (post_id) REFERENCES posts(id),
-			FOREIGN KEY (answer_id) REFERENCES answers(id)
+			created_at TEXT NOT NULL,
+			FOREIGN KEY(owner_id) REFERENCES users(uuid),
+			FOREIGN KEY(post_id) REFERENCES posts(uuid)
 		)
 	`)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Categorie
+	// Categories
 	_, err = Db.Exec(`
 		CREATE TABLE IF NOT EXISTS categories (
     		name TEXT PRIMARY KEY,
     		description TEXT
-		)
-	`)
-	if err != nil {
-		log.Fatal(err)
-	}
-	_, err = Db.Exec(`
-		CREATE TABLE IF NOT EXISTS categories_posts (
-			category_name TEXT NOT NULL,
-			post_id TEXT NOT NULL,
-			FOREIGN KEY (category_name) REFERENCES categories(name),
-			FOREIGN KEY (post_id) REFERENCES posts(id)
 		)
 	`)
 	if err != nil {
@@ -113,7 +96,7 @@ func GetUserFromSessionID(sessionID string) (structs.User, error) {
 		return structs.User{}, nil // Session found
 	}
 	var user structs.User
-	query := `SELECT id, name, surname, username, email, gender, created_at, power FROM accounts WHERE id = ?`
+	query := `SELECT uuid, name, surname, username, email, gender, created_at, power FROM users WHERE uuid = ?`
 	err := Db.QueryRow(query, userID).Scan(
 		&user.Uuid, &user.Name, &user.Surname, &user.Username,
 		&user.Email, &user.Gender, &user.CreationDate, &user.Power,

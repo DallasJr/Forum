@@ -94,7 +94,7 @@ func passwordHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var hashedPassword string
-	row := src.Db.QueryRow("SELECT password FROM accounts WHERE id = ?", ExportData.User.Uuid)
+	row := src.Db.QueryRow("SELECT password FROM users WHERE uuid = ?", ExportData.User.Uuid)
 	err := row.Scan(&hashedPassword)
 	errorMessage := "An error occurred"
 
@@ -117,7 +117,7 @@ func passwordHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to hash password", http.StatusInternalServerError)
 		return
 	}
-	_, err = src.Db.Exec("UPDATE accounts SET password = ? WHERE id = ?", newHashedPassword, ExportData.User.Uuid)
+	_, err = src.Db.Exec("UPDATE users SET password = ? WHERE uuid = ?", newHashedPassword, ExportData.User.Uuid)
 	if err != nil {
 		http.Error(w, "Failed to update password", http.StatusInternalServerError)
 		return
@@ -145,7 +145,7 @@ func emailHandler(w http.ResponseWriter, r *http.Request) {
 
 	email := r.FormValue("email")
 	var dataEmail string
-	row := src.Db.QueryRow("SELECT email FROM accounts WHERE id = ?", ExportData.User.Uuid)
+	row := src.Db.QueryRow("SELECT email FROM users WHERE uuid = ?", ExportData.User.Uuid)
 	err := row.Scan(&dataEmail)
 	if err != nil {
 		http.Error(w, "An error occurred", http.StatusInternalServerError)
@@ -155,7 +155,7 @@ func emailHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No changes detected", http.StatusInternalServerError)
 		return
 	}
-	_, err = src.Db.Exec("UPDATE accounts SET email = ? WHERE id = ?", email, ExportData.User.Uuid)
+	_, err = src.Db.Exec("UPDATE users SET email = ? WHERE uuid = ?", email, ExportData.User.Uuid)
 	if err != nil {
 		http.Error(w, "Failed to update email", http.StatusInternalServerError)
 		return
@@ -198,7 +198,7 @@ func namesHandler(w http.ResponseWriter, r *http.Request) {
 
 	var dataName string
 	var dataSurname string
-	row := src.Db.QueryRow("SELECT name, surname FROM accounts WHERE id = ?", ExportData.User.Uuid)
+	row := src.Db.QueryRow("SELECT name, surname FROM users WHERE uuid = ?", ExportData.User.Uuid)
 	err := row.Scan(&dataName, &dataSurname)
 	if err != nil {
 		http.Error(w, "An error occurred", http.StatusInternalServerError)
@@ -209,7 +209,7 @@ func namesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = src.Db.Exec("UPDATE accounts SET name = ?, surname = ? WHERE id = ?", name, surname, ExportData.User.Uuid)
+	_, err = src.Db.Exec("UPDATE users SET name = ?, surname = ? WHERE uuid = ?", name, surname, ExportData.User.Uuid)
 	if err != nil {
 		http.Error(w, "Failed to update names", http.StatusInternalServerError)
 		return
@@ -242,7 +242,7 @@ func genderHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var dataGender string
-	row := src.Db.QueryRow("SELECT gender FROM accounts WHERE id = ?", ExportData.User.Uuid)
+	row := src.Db.QueryRow("SELECT gender FROM users WHERE uuid = ?", ExportData.User.Uuid)
 	err := row.Scan(&dataGender)
 	if err != nil {
 		http.Error(w, "An error occurred", http.StatusInternalServerError)
@@ -252,7 +252,7 @@ func genderHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No changes detected", http.StatusInternalServerError)
 		return
 	}
-	_, err = src.Db.Exec("UPDATE accounts SET gender = ? WHERE id = ?", gender, ExportData.User.Uuid)
+	_, err = src.Db.Exec("UPDATE users SET gender = ? WHERE uuid = ?", gender, ExportData.User.Uuid)
 	if err != nil {
 		http.Error(w, "Failed to update gender", http.StatusInternalServerError)
 		return

@@ -10,7 +10,7 @@ import (
 
 type mainPageData struct {
 	User       structs.User
-	Categories structs.Categorie
+	Categories []structs.Category
 }
 
 func SetupHandlers() {
