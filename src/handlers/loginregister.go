@@ -38,7 +38,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	err := row.Scan(&id, &hashedPassword)
 	errorMessage := "Invalid username or password"
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			http.Error(w, errorMessage, http.StatusUnauthorized)
 			return
 		}
@@ -184,9 +184,8 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 		MaxAge: -1,  // Set MaxAge to -1 to delete the cookie
 		Path:   "/", // Same path as the session cookie
 	})
-
-	// Redirect the user to the login page or any other page
-	http.Redirect(w, r, "/login.html", http.StatusSeeOther)
+	referrer := r.Header.Get("Referer")
+	http.Redirect(w, r, referrer, http.StatusSeeOther)
 }
 
 func serveRegisterPage(w http.ResponseWriter, r *http.Request) {

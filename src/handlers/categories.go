@@ -3,7 +3,6 @@ package handlers
 import (
 	"Forum/src"
 	"Forum/src/structs"
-	"fmt"
 	"html/template"
 	"net/http"
 	"strings"
@@ -12,6 +11,10 @@ import (
 type categoriesPageData struct {
 	User       structs.User
 	Categories []structs.Category
+}
+type categoryPageData struct {
+	User     structs.User
+	Category structs.Category
 }
 
 func serveCategoriesPage(w http.ResponseWriter, r *http.Request) {
@@ -33,9 +36,7 @@ func serveCategoriesPage(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		user, _ := src.GetUserFromSessionID(sessionID)
-		if user.Username != "" {
-			ExportData.User = user
-		}
+		ExportData.User = user
 	}
 
 	categories, err := getAllCategories()
@@ -50,12 +51,29 @@ func serveCategoriesPage(w http.ResponseWriter, r *http.Request) {
 
 func serveCategoryPage(w http.ResponseWriter, r *http.Request) {
 	// Remove the prefix "/categories/"
-	category := strings.TrimPrefix(r.URL.Path, "/categories/")
-	if category == "" {
+	name := strings.TrimPrefix(r.URL.Path, "/categories/")
+	if name == "" {
 		http.NotFound(w, r)
 		return
 	}
-	fmt.Fprintf(w, "You are viewing category: %s", category)
+	tmpl := template.Must(template.ParseFiles("src/templates/category.html"))
+
+	ExportData := categoryPageData{}
+
+	if cookieExists(r, "sessionID") {
+		sessionID := src.GetValidSession(r)
+		if sessionID == "" {
+			logoutHandler(w, r)
+			return
+		}
+		user, _ := src.GetUserFromSessionID(sessionID)
+		ExportData.User = user
+	}
+
+	category, _ := src.GetCategory(name)
+	ExportData.Category = category
+
+	tmpl.Execute(w, ExportData)
 }
 
 func categoriesHandler(w http.ResponseWriter, r *http.Request) {
@@ -81,38 +99,5 @@ func getAllCategories() ([]structs.Category, error) {
 		}
 		categories = append(categories, category)
 	}
-	return categories, nil
-}
-
-func getCategories(name string) (structs.Category, error) {
-	var categories structs.Category
-	/*var id string
-	var hashedPassword string
-	row := src.Db.QueryRow("SELECT id, password FROM accounts WHERE username = ?", name)
-	err := row.Scan(&id, &hashedPassword)
-	errorMessage := "Invalid username or password"
-	if err != nil {
-		if err == sql.ErrNoRows {
-			http.Error(w, errorMessage, http.StatusUnauthorized)
-			return
-		}
-		http.Error(w, "Failed to fetch user data", http.StatusInternalServerError)
-		return
-	}*/
-
-	/*rows, err := src.Db.Query("SELECT description FROM Category WHERE name = ?", name)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var categories structs.Category
-	for rows.Next() {
-		var category structs.Category
-		if err := rows.Scan(&category.Name, &category.Description); err != nil {
-			return nil, err
-		}
-		categories = append(categories, category)
-	}*/
 	return categories, nil
 }

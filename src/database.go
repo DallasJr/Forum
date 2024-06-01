@@ -122,3 +122,38 @@ func GetValidSession(r *http.Request) string {
 		return c.Value
 	}
 }
+
+func GetCategory(name string) (structs.Category, error) {
+	var category structs.Category
+
+	query := `SELECT name, description FROM categories WHERE name = ?`
+	err := Db.QueryRow(query, name).Scan(
+		&category.Name, &category.Description,
+	)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return structs.Category{}, nil // No user found
+		}
+		fmt.Println("query error:", err)
+		return structs.Category{}, err
+	}
+	return category, nil
+}
+
+func GetPostsByCategory(categoryName string) ([]structs.Post, error) {
+	rows, err := Db.Query("SELECT uuid, title, content, owner_id, category_name, created_at FROM posts WHERE category_name = ?", categoryName)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []structs.Post
+	for rows.Next() {
+		var post structs.Post
+		if err := rows.Scan(&post.Uuid, &post.Title, &post.Content, &post.Creator, &post.Category, &post.CreationDate); err != nil {
+			return nil, err
+		}
+		posts = append(posts, post)
+	}
+	return posts, nil
+}

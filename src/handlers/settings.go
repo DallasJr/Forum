@@ -4,6 +4,7 @@ import (
 	"Forum/src"
 	"Forum/src/structs"
 	"database/sql"
+	"errors"
 	"golang.org/x/crypto/bcrypt"
 	"html/template"
 	"net/http"
@@ -26,22 +27,17 @@ func serveSettingsPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("src/templates/settings.html"))
-
 	ExportData := accountPageData{}
 
-	if cookieExists(r, "sessionID") {
-		sessionID := src.GetValidSession(r)
-		if sessionID == "" {
-			logoutHandler(w, r)
-			return
-		}
-		user, _ := src.GetUserFromSessionID(sessionID)
-		if user.Username != "" {
-			ExportData.User = user
-		}
+	sessionID := src.GetValidSession(r)
+	if sessionID == "" {
+		logoutHandler(w, r)
+		return
 	}
+	user, _ := src.GetUserFromSessionID(sessionID)
+	ExportData.User = user
 
+	tmpl := template.Must(template.ParseFiles("src/templates/settings.html"))
 	tmpl.Execute(w, ExportData)
 }
 
@@ -88,9 +84,7 @@ func passwordHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		user, _ := src.GetUserFromSessionID(sessionID)
-		if user.Username != "" {
-			ExportData.User = user
-		}
+		ExportData.User = user
 	}
 
 	var hashedPassword string
@@ -99,7 +93,7 @@ func passwordHandler(w http.ResponseWriter, r *http.Request) {
 	errorMessage := "An error occurred"
 
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			http.Error(w, errorMessage, http.StatusUnauthorized)
 			return
 		}
@@ -138,9 +132,7 @@ func emailHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		user, _ := src.GetUserFromSessionID(sessionID)
-		if user.Username != "" {
-			ExportData.User = user
-		}
+		ExportData.User = user
 	}
 
 	email := r.FormValue("email")
@@ -191,9 +183,7 @@ func namesHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		user, _ := src.GetUserFromSessionID(sessionID)
-		if user.Username != "" {
-			ExportData.User = user
-		}
+		ExportData.User = user
 	}
 
 	var dataName string
@@ -230,9 +220,7 @@ func genderHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		user, _ := src.GetUserFromSessionID(sessionID)
-		if user.Username != "" {
-			ExportData.User = user
-		}
+		ExportData.User = user
 	}
 
 	gender := r.FormValue("gender")
