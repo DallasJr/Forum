@@ -5,6 +5,7 @@ import (
 	"Forum/src/structs"
 	"html/template"
 	"net/http"
+	"sort"
 	"strings"
 )
 
@@ -97,7 +98,18 @@ func getAllCategories() ([]structs.Category, error) {
 		if err := rows.Scan(&category.Name, &category.Description); err != nil {
 			return nil, err
 		}
+
+		postCount, err := src.GetPostsCountByCategory(category.Name)
+		if err != nil {
+			return nil, err
+		}
+		category.PostsCount = postCount
+
 		categories = append(categories, category)
 	}
+
+	sort.Slice(categories, func(i, j int) bool {
+		return categories[i].PostsCount > categories[j].PostsCount
+	})
 	return categories, nil
 }

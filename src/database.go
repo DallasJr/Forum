@@ -157,3 +157,20 @@ func GetPostsByCategory(categoryName string) ([]structs.Post, error) {
 	}
 	return posts, nil
 }
+
+func GetPostsCountByCategory(categoryName string) (int, error) {
+	rows, err := Db.Query("SELECT COUNT(*) FROM posts WHERE category_name = ?", categoryName)
+	if err != nil {
+		return 0, err
+	}
+	defer rows.Close()
+
+	var count int
+	if rows.Next() {
+		if err := rows.Scan(&count); err != nil {
+			return 0, err
+		}
+	}
+
+	return count, nil
+}

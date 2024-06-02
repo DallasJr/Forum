@@ -9,12 +9,12 @@ body {
 }
 
 .administration-title {
-     font-size: 30px;
-     margin-bottom: 20px;
-     color: #fff;
-     text-align: left;
-     padding-left: 10px;
- }
+    font-size: 30px;
+    margin-bottom: 20px;
+    color: #fff;
+    text-align: left;
+    padding-left: 10px;
+}
 
 .administration-nav {
     margin-bottom: 10px;
@@ -62,95 +62,111 @@ body {
     display: block;
 }
 
-.one-row {
-    display: flex;
-    align-items: center; /* Align items vertically in the center */
+.administration-nav a.active {
+    background-color: #C71E1E;
+    color: #000000;
 }
 
-.one-row select,
-.one-row input {
-    flex: 1; /* Take remaining space */
-    margin-right: 10px; /* Add spacing between input/select and button */
-    margin-top: 10px;
-    margin-bottom: 20px;
+.administration-nav a.active:hover {
+    background-color: #af1b1b;
 }
 
-.one-row button {
-    padding: 10px 15px;
-    width: 10em;
+.category-item {
+    border: 1px solid #232327;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
 }
 
-.large-button {
+.category-item h3 {
+    margin: 0;
+    color: #C71E1E;
+}
+
+.category-item p {
+    color: #ddd;
+}
+
+.category-actions {
     display: flex;
     flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
 }
-.two-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Two columns */
+
+.category-actions button,
+.update-form button,
+form button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 200ms;
+}
+
+.view-btn {
+    background-color: #6e6e6e;
+}
+
+.view-btn:hover {
+    background-color: #505050;
+}
+
+.rename-btn {
+    background-color: #004a98;
+}
+
+.rename-btn:hover {
+    background-color: #003064;
+}
+
+.delete-btn {
+    background-color: #b40000;
+}
+
+.delete-btn:hover {
+    background-color: #8d0000;
+}
+
+.update-form {
+    display: flex;
+    flex-direction: column;
     gap: 10px;
 }
 
-.two-row button {
-    width: 100%;
-}
-
-.two-row select,
-.two-row input {
-}
-
-form input, form select {
-    border-style: solid;
-    border-color: #232327;
+.update-form input[type="text"],
+.update-form textarea {
+    padding: 5px;
+    border: 2px solid #232327;
     border-radius: 4px;
     background-color: #18181b;
     color: #b6b6b6;
-    border-width: 2px;
-    padding: 8px;
 }
 
-form input:hover, form select:hover {
+.update-form input[type="text"]:hover,
+.update-form textarea:hover {
     border-color: #333336;
 }
 
-form input:focus, form select:focus {
+.update-form input[type="text"]:focus,
+.update-form textarea:focus {
     border-color: #C71E1E;
     border-width: 3px;
     outline: none;
     color: white;
 }
 
-form button {
-    padding: 10px 15px;
+.add-category-btn {
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    background-color: #C71E1E;
     border: none;
     border-radius: 4px;
-    background-color: #C71E1E;
     color: #fff;
     cursor: pointer;
-    transition: 200ms;
-    margin-top: 10px;
-    margin-bottom: 20px;
 }
 
-form button:hover:not(:disabled) {
-    background-color: #af1b1b;
-}
-
-form button:disabled {
-    background-color: #333336;
-    color: #fff;
-    cursor: default;
-}
-
-form label {
-    color: white;
-}
-
-.administration-nav a.active {
-    background-color: #C71E1E;
-    color: #000000;
-}
-
-/* Hover effect should be disabled for active nav item */
-.administration-nav a.active:hover {
+.add-category-btn:hover {
     background-color: #af1b1b;
 }

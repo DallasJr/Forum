@@ -40,6 +40,12 @@ func serveAdministrationPage(w http.ResponseWriter, r *http.Request) {
 
 	ExportData.User = user
 
+	categories, err := getAllCategories()
+	if err != nil {
+		http.Error(w, "Unable to retrieve categories", http.StatusInternalServerError)
+	}
+	ExportData.Categories = categories
+
 	tmpl := template.Must(template.ParseFiles("src/templates/administration.html"))
 	tmpl.Execute(w, ExportData)
 }
