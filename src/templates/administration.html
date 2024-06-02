@@ -19,7 +19,7 @@
             &#9776;
         </div>
         <div class="nav-links" id="nav-links">
-            {{if eq .User.Power 2}}
+            {{if gt .User.Power 0}}
             <a href="/administration.html" class="nav-item" id="administration">Admin panel</a>
             {{end}}
             {{if eq .User.Username ""}}
@@ -36,7 +36,7 @@
     </div>
 
     <div class="mobile-links" id="mobile-links">
-        {{if eq .User.Power 2}}
+        {{if gt .User.Power 0}}
         <a href="/administration.html" class="nav-item" id="administration-m">Admin panel</a>
         {{end}}
         {{if eq .User.Username ""}}
@@ -57,17 +57,21 @@
     <h1 class="administration-title">Administration Panel</h1>
     <nav class="administration-nav">
         <ul>
-            <li><a href="#" data-section="categories-section" onclick="showSection('categories-section')">Categories</a></li>
+            {{if eq .User.Power 2}}
+                <li><a href="#" data-section="categories-section" onclick="showSection('categories-section')">Categories</a></li>
+            {{end}}
             <li><a href="#" data-section="posts-section" onclick="showSection('posts-section')">Posts</a></li>
             <li><a href="#" data-section="answers-section" onclick="showSection('answers-section')">Answers</a></li>
             <li><a href="#" data-section="users-section" onclick="showSection('users-section')">Users</a></li>
         </ul>
     </nav>
     <div class="administration-content">
+        {{if eq .User.Power 2}}
         <div id="categories-section" class="administration-section">
             <h2>Categories</h2>
 
         </div>
+        {{end}}
         <div id="posts-section" class="administration-section">
             <h2>Posts</h2>
 
@@ -86,7 +90,8 @@
 <script>
 
     document.addEventListener("DOMContentLoaded", function() {
-        showSection('categories-section');
+        const sectionToShow = "{{if eq .User.Power 2}}categories-section{{else}}posts-section{{end}}";
+        showSection(sectionToShow);
     });
 
     function showSection(sectionId) {

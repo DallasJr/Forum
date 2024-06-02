@@ -33,7 +33,7 @@ func serveAdministrationPage(w http.ResponseWriter, r *http.Request) {
 	}
 	user, _ := src.GetUserFromSessionID(sessionID)
 
-	if user.Power != 2 {
+	if user.Power == 0 {
 		http.ServeFile(w, r, "src/templates/error.html")
 		return
 	}
