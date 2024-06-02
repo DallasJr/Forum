@@ -37,6 +37,9 @@ func SetupHandlers() {
 	//categories page
 	http.HandleFunc("/categories/", categoriesHandler)
 
+	//administration page
+	http.HandleFunc("/administration.html", serveAdministrationPage)
+
 	http.HandleFunc("/error.html", serveErrorPage)
 }
 

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="../static/css/style.css">
     <link rel="stylesheet" type="text/css" href="../static/css/navbar.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/administration.css">
     <script src="../static/javascript/navbar.js"></script>
     <title>RollinSpot</title>
 </head>
@@ -49,14 +50,65 @@
         <a href="/logout" class="nav-item" id="logout-m">Logout</a>
         {{end}}
     </div>
+
 </nav>
 
-{{if eq .Category.Name ""}}
-<h1>Unknown page</h1>
-{{else}}
-<h1>Welcome to {{.Category.Name}}</h1>
-<p>Posts :</p>
-{{end}}
+<div class="administration-container">
+    <h1 class="administration-title">Administration Panel</h1>
+    <nav class="administration-nav">
+        <ul>
+            <li><a href="#" data-section="categories-section" onclick="showSection('categories-section')">Categories</a></li>
+            <li><a href="#" data-section="posts-section" onclick="showSection('posts-section')">Posts</a></li>
+            <li><a href="#" data-section="answers-section" onclick="showSection('answers-section')">Answers</a></li>
+            <li><a href="#" data-section="users-section" onclick="showSection('users-section')">Users</a></li>
+        </ul>
+    </nav>
+    <div class="administration-content">
+        <div id="categories-section" class="administration-section">
+            <h2>Categories</h2>
+
+        </div>
+        <div id="posts-section" class="administration-section">
+            <h2>Posts</h2>
+
+        </div>
+        <div id="answers-section" class="administration-section">
+            <h2>Answers</h2>
+
+        </div>
+        <div id="users-section" class="administration-section">
+            <h2>Users</h2>
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function() {
+        showSection('categories-section');
+    });
+
+    function showSection(sectionId) {
+        const sections = document.querySelectorAll('.administration-section');
+        const navLinks = document.querySelectorAll('.administration-nav a');
+        sections.forEach(section => {
+            if (section.id === sectionId) {
+                section.classList.add('active');
+            } else {
+                section.classList.remove('active');
+            }
+        });
+        navLinks.forEach(link => {
+            if (link.getAttribute('data-section') === sectionId) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
+    }
+</script>
+
 </body>
 
 </html>

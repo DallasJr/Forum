@@ -20,7 +20,7 @@
         </div>
         <div class="nav-links" id="nav-links">
             {{if eq .User.Power 2}}
-            <a href="/error.html" class="nav-item" id="administration">Admin panel</a>
+            <a href="/administration.html" class="nav-item" id="administration">Admin panel</a>
             {{end}}
             {{if eq .User.Username ""}}
             <a href="/login.html" class="nav-item" id="login">Login</a>
@@ -37,7 +37,7 @@
 
     <div class="mobile-links" id="mobile-links">
         {{if eq .User.Power 2}}
-        <a href="/error.html" class="nav-item" id="administration-m">Admin panel</a>
+        <a href="/administration.html" class="nav-item" id="administration-m">Admin panel</a>
         {{end}}
         {{if eq .User.Username ""}}
         <a href="/login.html" class="nav-item" id="login-m">Login</a>

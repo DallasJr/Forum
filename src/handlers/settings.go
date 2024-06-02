@@ -11,7 +11,7 @@ import (
 	"regexp"
 )
 
-type accountPageData struct {
+type settingsPageData struct {
 	User structs.User
 }
 
@@ -27,7 +27,7 @@ func serveSettingsPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ExportData := accountPageData{}
+	ExportData := settingsPageData{}
 
 	sessionID := src.GetValidSession(r)
 	if sessionID == "" {
@@ -76,7 +76,7 @@ func passwordHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ExportData := accountPageData{}
+	ExportData := settingsPageData{}
 	if cookieExists(r, "sessionID") {
 		sessionID := src.GetValidSession(r)
 		if sessionID == "" {
@@ -124,7 +124,7 @@ func emailHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/error.html", http.StatusSeeOther)
 		return
 	}
-	ExportData := accountPageData{}
+	ExportData := settingsPageData{}
 	if cookieExists(r, "sessionID") {
 		sessionID := src.GetValidSession(r)
 		if sessionID == "" {
@@ -175,7 +175,7 @@ func namesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ExportData := accountPageData{}
+	ExportData := settingsPageData{}
 	if cookieExists(r, "sessionID") {
 		sessionID := src.GetValidSession(r)
 		if sessionID == "" {
@@ -212,7 +212,7 @@ func genderHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/error.html", http.StatusSeeOther)
 		return
 	}
-	ExportData := accountPageData{}
+	ExportData := settingsPageData{}
 	if cookieExists(r, "sessionID") {
 		sessionID := src.GetValidSession(r)
 		if sessionID == "" {
