@@ -69,7 +69,10 @@
         {{if eq .User.Power 2}}
         <div id="categories-section" class="administration-section">
             <h2>Categories</h2>
-            <button onclick="window.location.href='/add-category'" class="add-category-btn">Add a Category</button>
+            <div id="category-message" class="category-message"></div>
+            <form action="/add-category" method="POST">
+                <button type="submit" class="add-category-btn">Add a Category</button>
+            </form>
             <div class="category-list">
                 {{range .Categories}}
                 <div class="category-item">
@@ -78,8 +81,8 @@
                         <textarea name="newDescription" placeholder="New Description" rows="4">{{.Description}}</textarea>
                         <p>Number of Posts: {{.PostsCount}}</p>
                         <div class="category-actions">
-                            <button type="submit" class="rename-btn">Rename & Update</button>
-                            <button type="button" onclick="window.location.href='/view-category/{{.Name}}'" class="view-btn">View</button>
+                            <button type="submit" class="rename-btn">Save & Update</button>
+                            <a href="/categories/{{.Name}}" class="view-btn">View</a>
                             <form method="POST" action="/delete-category/{{.Name}}" class="delete-form">
                                 <button type="submit" class="delete-btn">Delete</button>
                             </form>
@@ -110,6 +113,15 @@
     document.addEventListener("DOMContentLoaded", function() {
         const sectionToShow = "{{if eq .User.Power 2}}categories-section{{else}}posts-section{{end}}";
         showSection(sectionToShow);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get('message');
+        if (message) {
+            document.getElementById('category-message').textContent = message;
+            // Remove the message parameter from the URL
+            const newUrl = window.location.origin + window.location.pathname;
+            window.history.replaceState({}, document.title, newUrl);
+        }
     });
 
     function showSection(sectionId) {

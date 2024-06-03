@@ -56,6 +56,7 @@ body {
 .administration-section h2 {
     color: white;
     margin-bottom: 20px;
+    display: inline-block;
 }
 
 .administration-section.active {
@@ -107,6 +108,14 @@ form button {
 
 .view-btn {
     background-color: #6e6e6e;
+    transition: background-color 200ms;
+    text-align: center;
+    text-decoration: none;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
 }
 
 .view-btn:hover {
@@ -169,4 +178,10 @@ form button {
 
 .add-category-btn:hover {
     background-color: #af1b1b;
+}
+
+.category-message {
+    display: inline-block;
+    margin-left: 20px;
+    color: green;
 }
