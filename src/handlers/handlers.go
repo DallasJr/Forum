@@ -40,6 +40,8 @@ func SetupHandlers() {
 	//administration page
 	http.HandleFunc("/administration.html", serveAdministrationPage)
 	http.HandleFunc("/add-category", addCategory)
+	http.HandleFunc("/delete-category/", deleteCategory)
+	http.HandleFunc("/update-category/", updateCategory)
 
 	http.HandleFunc("/error.html", serveErrorPage)
 }

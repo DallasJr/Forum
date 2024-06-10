@@ -82,11 +82,11 @@
                         <p>Number of Posts: {{.PostsCount}}</p>
                         <div class="category-actions">
                             <button type="submit" class="rename-btn">Save & Update</button>
-                            <a href="/categories/{{.Name}}" class="view-btn">View</a>
-                            <form method="POST" action="/delete-category/{{.Name}}" class="delete-form">
-                                <button type="submit" class="delete-btn">Delete</button>
-                            </form>
+                            <a href="/categories/{{.Name}}" class="view-btn">View page</a>
                         </div>
+                    </form>
+                    <form method="POST" action="/delete-category/{{.Name}}" class="delete-form">
+                        <button type="submit" class="delete-btn">Delete</button>
                     </form>
                 </div>
                 {{end}}

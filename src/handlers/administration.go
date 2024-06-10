@@ -100,3 +100,89 @@ func addCategory(w http.ResponseWriter, r *http.Request) {
 	}
 	http.Redirect(w, r, "/administration.html?message="+message, http.StatusSeeOther)
 }
+
+func deleteCategory(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if !cookieExists(r, "sessionID") {
+		http.ServeFile(w, r, "src/templates/login.html")
+		return
+	}
+
+	sessionID := src.GetValidSession(r)
+	if sessionID == "" {
+		logoutHandler(w, r)
+		return
+	}
+	user, _ := src.GetUserFromSessionID(sessionID)
+
+	if user.Power != 2 {
+		http.ServeFile(w, r, "src/templates/error.html")
+		return
+	}
+	categoryName := r.URL.Path[len("/delete-category/"):]
+
+	// Delete the category from the database
+	_, err := src.Db.Exec("DELETE FROM categories WHERE name = ?", categoryName)
+	if err != nil {
+		http.Error(w, "Unable to delete category", http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/administration.html?message=Category%20deleted%20successfully.", http.StatusSeeOther)
+}
+
+func updateCategory(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if !cookieExists(r, "sessionID") {
+		http.ServeFile(w, r, "src/templates/login.html")
+		return
+	}
+
+	sessionID := src.GetValidSession(r)
+	if sessionID == "" {
+		logoutHandler(w, r)
+		return
+	}
+	user, _ := src.GetUserFromSessionID(sessionID)
+
+	if user.Power != 2 {
+		http.ServeFile(w, r, "src/templates/error.html")
+		return
+	}
+	categoryName := r.URL.Path[len("/update-category/"):]
+
+	// Get form values
+	newName := r.FormValue("newName")
+	newDescription := r.FormValue("newDescription")
+
+	// Validate form values
+	if newName == "" || newDescription == "" {
+		http.Error(w, "New name and description are required", http.StatusBadRequest)
+		return
+	}
+
+	// Update the category in the database
+	_, err := src.Db.Exec("UPDATE categories SET name = ?, description = ? WHERE name = ?", newName, newDescription, categoryName)
+	if err != nil {
+		http.Error(w, "Unable to update category", http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/administration.html?message=Category%20updated%20successfully.", http.StatusSeeOther)
+}
