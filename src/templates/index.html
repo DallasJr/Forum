@@ -6,67 +6,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="../static/css/style.css">
     <link rel="stylesheet" type="text/css" href="../static/css/navbar.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/index.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <script src="../static/javascript/navbar.js"></script>
 </head>
-    <body>
+<body>
 
-    <nav class="navbar">
-        <div class="container">
-            <a href="/" class="brand">Home</a>
-            <div class="menu-icon" onclick="toggleMenu()">
-                &#9776;
-            </div>
-            <div class="nav-links" id="nav-links">
-                {{if eq .User.Power 2}}
-                    <a href="error.html" class="nav-item" id="administration">Admin panel</a>
-                {{end}}
-                {{if eq .User.Username ""}}
-                    <a href="login.html" class="nav-item" id="login">Login</a>
-                    <a href="register.html" class="nav-item" id="register">Register</a>
-                {{else}}
-                    <a href="error.html" class="nav-item" id="notifications">Notifications</a>
-                    <a href="error.html" class="nav-item" id="messages">Messages</a>
-                    <a href="error.html" class="nav-item" id="profile">{{.User.Username}}</a>
-                    <a href="settings.html" class="nav-item" id="settings">Settings</a>
-                    <a href="/logout" class="nav-item" id="logout">Logout</a>
-                {{end}}
-            </div>
+<nav class="navbar">
+    <div class="container">
+        <a href="/" class="brand">Home</a>
+        <div class="menu-icon" onclick="toggleMenu()">
+            &#9776;
         </div>
-
-        <div class="mobile-links" id="mobile-links">
-            {{if eq .User.Power 2}}
-                <a href="error.html" class="nav-item" id="administration-m">Admin panel</a>
+        <div class="nav-links" id="nav-links">
+            {{if gt .User.Power 0}}
+            <a href="/administration.html" class="nav-item" id="administration">Admin panel</a>
             {{end}}
             {{if eq .User.Username ""}}
-                <a href="login.html" class="nav-item" id="login-m">Login</a>
-                <a href="register.html" class="nav-item" id="register-m">Register</a>
+            <a href="/login.html" class="nav-item" id="login">Login</a>
+            <a href="/register.html" class="nav-item" id="register">Register</a>
             {{else}}
-            <a href="error.html" class="nav-item" id="notifications-m">Notifications</a>
-            <a href="error.html" class="nav-item" id="messages-m">Messages</a>
-                <a href="error.html" class="nav-item" id="profile-m">{{.User.Username}}</a>
-                <a href="settings.html" class="nav-item" id="settings-m">Settings</a>
-                <a href="/logout" class="nav-item" id="logout-m">Logout</a>
+            <a href="/error.html" class="nav-item" id="notifications">Notifications</a>
+            <a href="/error.html" class="nav-item" id="messages">Messages</a>
+            <a href="/error.html" class="nav-item" id="profile">{{.User.Username}}</a>
+            <a href="/settings.html" class="nav-item" id="settings">Settings</a>
+            <a href="/logout" class="nav-item" id="logout">Logout</a>
             {{end}}
         </div>
-    </nav>
+    </div>
+
+    <div class="mobile-links" id="mobile-links">
+        {{if gt .User.Power 0}}
+        <a href="/administration.html" class="nav-item" id="administration-m">Admin panel</a>
+        {{end}}
+        {{if eq .User.Username ""}}
+        <a href="/login.html" class="nav-item" id="login-m">Login</a>
+        <a href="/register.html" class="nav-item" id="register-m">Register</a>
+        {{else}}
+        <a href="/error.html" class="nav-item" id="notifications-m">Notifications</a>
+        <a href="/error.html" class="nav-item" id="messages-m">Messages</a>
+        <a href="/error.html" class="nav-item" id="profile-m">{{.User.Username}}</a>
+        <a href="/settings.html" class="nav-item" id="settings-m">Settings</a>
+        <a href="/logout" class="nav-item" id="logout-m">Logout</a>
+        {{end}}
+    </div>
+</nav>
 
 
-    <header>
-        <h1>Welcome to RollingSpot, a forum for all type of bikers !</h1>
-    </header>
-    <a href="categories/">Categories :</a>
-    <div class="container">
-        {{range .Categories}}
-        <div class="category-box">
-            <h2>{{.Name}}</h2>
-            <p>{{.Description}}</p>
-            <a href="#"><span class="material-symbols-outlined">
+<header>
+    <h1>Welcome to RollingSpot, a forum for all type of bikers !</h1>
+</header>
+<a href="categories/">Categories :</a>
+<div class="container">
+    {{range .Categories}}
+    <div class="category-box">
+        <h2>{{.Name}}</h2>
+        <p>{{.Description}}</p>
+        <a href="#"><span class="material-symbols-outlined">
 arrow_drop_down
 </span></a>
 
-        </div>
-        {{end}}
-        </div>
-    </body>
+    </div>
+    {{end}}
+</div>
+</body>
 </html>
