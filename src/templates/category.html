@@ -2,16 +2,14 @@
 <!--suppress HtmlUnknownTarget -->
 <html lang="en">
 <head>
-    <title>RollinSpot</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="../static/css/style.css">
     <link rel="stylesheet" type="text/css" href="../static/css/navbar.css">
-    <link rel="stylesheet" type="text/css" href="../static/css/index.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <script src="../static/javascript/navbar.js"></script>
+    <title>RollinSpot</title>
 </head>
-    <body>
+<body>
 
 <nav class="navbar">
     <div class="container">
@@ -53,22 +51,12 @@
     </div>
 </nav>
 
+{{if eq .Category.Name ""}}
+<h1>Unknown page</h1>
+{{else}}
+<h1>Welcome to {{.Category.Name}}</h1>
+<p>Posts :</p>
+{{end}}
+</body>
 
-    <header>
-        <h1>Welcome to RollingSpot, a forum for all type of bikers !</h1>
-    </header>
-    <a href="categories/">Categories :</a>
-    <div class="container">
-        {{range .Categories}}
-        <div class="category-box">
-            <h2>{{.Name}}</h2>
-            <p>{{.Description}}</p>
-            <a href="#"><span class="material-symbols-outlined">
-arrow_drop_down
-</span></a>
-
-        </div>
-        {{end}}
-        </div>
-    </body>
 </html>

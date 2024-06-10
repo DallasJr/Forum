@@ -34,11 +34,11 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	password := r.FormValue("password")
 	var id string
 	var hashedPassword string
-	row := src.Db.QueryRow("SELECT id, password FROM accounts WHERE username = ?", username)
+	row := src.Db.QueryRow("SELECT uuid, password FROM users WHERE username = ?", username)
 	err := row.Scan(&id, &hashedPassword)
 	errorMessage := "Invalid username or password"
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			http.Error(w, errorMessage, http.StatusUnauthorized)
 			return
 		}
@@ -133,7 +133,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to hash password", http.StatusInternalServerError)
 		return
 	}
-	_, err := src.Db.Exec("INSERT INTO accounts (id, name, surname, username, email, password, power, gender) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+	_, err := src.Db.Exec("INSERT INTO users (uuid, name, surname, username, email, password, power, gender) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
 		userID, name, surname, strings.ToLower(username), email, hashedPassword, 0, gender)
 	if err != nil {
 		http.Error(w, "Failed to update password", http.StatusInternalServerError)
@@ -184,9 +184,8 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 		MaxAge: -1,  // Set MaxAge to -1 to delete the cookie
 		Path:   "/", // Same path as the session cookie
 	})
-
-	// Redirect the user to the login page or any other page
-	http.Redirect(w, r, "/login.html", http.StatusSeeOther)
+	referrer := r.Header.Get("Referer")
+	http.Redirect(w, r, referrer, http.StatusSeeOther)
 }
 
 func serveRegisterPage(w http.ResponseWriter, r *http.Request) {
@@ -207,7 +206,7 @@ func serveRegisterPage(w http.ResponseWriter, r *http.Request) {
 func checkUsernameAvailability(w http.ResponseWriter, r *http.Request) {
 	username := r.URL.Query().Get("username")
 	var count int
-	err := src.Db.QueryRow("SELECT COUNT(*) FROM accounts WHERE username = ?", username).Scan(&count)
+	err := src.Db.QueryRow("SELECT COUNT(*) FROM users WHERE username = ?", username).Scan(&count)
 	if err != nil {
 		http.Error(w, "Failed to check username availability", http.StatusInternalServerError)
 		return
@@ -222,7 +221,7 @@ func checkUsernameAvailability(w http.ResponseWriter, r *http.Request) {
 func checkEmailAvailability(w http.ResponseWriter, r *http.Request) {
 	email := r.URL.Query().Get("email")
 	var count int
-	err := src.Db.QueryRow("SELECT COUNT(*) FROM accounts WHERE email = ?", email).Scan(&count)
+	err := src.Db.QueryRow("SELECT COUNT(*) FROM users WHERE email = ?", email).Scan(&count)
 	if err != nil {
 		http.Error(w, "Failed to check email availability", http.StatusInternalServerError)
 		return

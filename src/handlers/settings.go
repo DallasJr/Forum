@@ -4,13 +4,14 @@ import (
 	"Forum/src"
 	"Forum/src/structs"
 	"database/sql"
+	"errors"
 	"golang.org/x/crypto/bcrypt"
 	"html/template"
 	"net/http"
 	"regexp"
 )
 
-type accountPageData struct {
+type settingsPageData struct {
 	User structs.User
 }
 
@@ -26,22 +27,17 @@ func serveSettingsPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("src/templates/settings.html"))
+	ExportData := settingsPageData{}
 
-	ExportData := accountPageData{}
-
-	if cookieExists(r, "sessionID") {
-		sessionID := src.GetValidSession(r)
-		if sessionID == "" {
-			logoutHandler(w, r)
-			return
-		}
-		user, _ := src.GetUserFromSessionID(sessionID)
-		if user.Username != "" {
-			ExportData.User = user
-		}
+	sessionID := src.GetValidSession(r)
+	if sessionID == "" {
+		logoutHandler(w, r)
+		return
 	}
+	user, _ := src.GetUserFromSessionID(sessionID)
+	ExportData.User = user
 
+	tmpl := template.Must(template.ParseFiles("src/templates/settings.html"))
 	tmpl.Execute(w, ExportData)
 }
 
@@ -80,7 +76,7 @@ func passwordHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ExportData := accountPageData{}
+	ExportData := settingsPageData{}
 	if cookieExists(r, "sessionID") {
 		sessionID := src.GetValidSession(r)
 		if sessionID == "" {
@@ -88,18 +84,16 @@ func passwordHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		user, _ := src.GetUserFromSessionID(sessionID)
-		if user.Username != "" {
-			ExportData.User = user
-		}
+		ExportData.User = user
 	}
 
 	var hashedPassword string
-	row := src.Db.QueryRow("SELECT password FROM accounts WHERE id = ?", ExportData.User.Uuid)
+	row := src.Db.QueryRow("SELECT password FROM users WHERE uuid = ?", ExportData.User.Uuid)
 	err := row.Scan(&hashedPassword)
 	errorMessage := "An error occurred"
 
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			http.Error(w, errorMessage, http.StatusUnauthorized)
 			return
 		}
@@ -117,7 +111,7 @@ func passwordHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to hash password", http.StatusInternalServerError)
 		return
 	}
-	_, err = src.Db.Exec("UPDATE accounts SET password = ? WHERE id = ?", newHashedPassword, ExportData.User.Uuid)
+	_, err = src.Db.Exec("UPDATE users SET password = ? WHERE uuid = ?", newHashedPassword, ExportData.User.Uuid)
 	if err != nil {
 		http.Error(w, "Failed to update password", http.StatusInternalServerError)
 		return
@@ -130,7 +124,7 @@ func emailHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/error.html", http.StatusSeeOther)
 		return
 	}
-	ExportData := accountPageData{}
+	ExportData := settingsPageData{}
 	if cookieExists(r, "sessionID") {
 		sessionID := src.GetValidSession(r)
 		if sessionID == "" {
@@ -138,14 +132,12 @@ func emailHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		user, _ := src.GetUserFromSessionID(sessionID)
-		if user.Username != "" {
-			ExportData.User = user
-		}
+		ExportData.User = user
 	}
 
 	email := r.FormValue("email")
 	var dataEmail string
-	row := src.Db.QueryRow("SELECT email FROM accounts WHERE id = ?", ExportData.User.Uuid)
+	row := src.Db.QueryRow("SELECT email FROM users WHERE uuid = ?", ExportData.User.Uuid)
 	err := row.Scan(&dataEmail)
 	if err != nil {
 		http.Error(w, "An error occurred", http.StatusInternalServerError)
@@ -155,7 +147,7 @@ func emailHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No changes detected", http.StatusInternalServerError)
 		return
 	}
-	_, err = src.Db.Exec("UPDATE accounts SET email = ? WHERE id = ?", email, ExportData.User.Uuid)
+	_, err = src.Db.Exec("UPDATE users SET email = ? WHERE uuid = ?", email, ExportData.User.Uuid)
 	if err != nil {
 		http.Error(w, "Failed to update email", http.StatusInternalServerError)
 		return
@@ -183,7 +175,7 @@ func namesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ExportData := accountPageData{}
+	ExportData := settingsPageData{}
 	if cookieExists(r, "sessionID") {
 		sessionID := src.GetValidSession(r)
 		if sessionID == "" {
@@ -191,14 +183,12 @@ func namesHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		user, _ := src.GetUserFromSessionID(sessionID)
-		if user.Username != "" {
-			ExportData.User = user
-		}
+		ExportData.User = user
 	}
 
 	var dataName string
 	var dataSurname string
-	row := src.Db.QueryRow("SELECT name, surname FROM accounts WHERE id = ?", ExportData.User.Uuid)
+	row := src.Db.QueryRow("SELECT name, surname FROM users WHERE uuid = ?", ExportData.User.Uuid)
 	err := row.Scan(&dataName, &dataSurname)
 	if err != nil {
 		http.Error(w, "An error occurred", http.StatusInternalServerError)
@@ -209,7 +199,7 @@ func namesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = src.Db.Exec("UPDATE accounts SET name = ?, surname = ? WHERE id = ?", name, surname, ExportData.User.Uuid)
+	_, err = src.Db.Exec("UPDATE users SET name = ?, surname = ? WHERE uuid = ?", name, surname, ExportData.User.Uuid)
 	if err != nil {
 		http.Error(w, "Failed to update names", http.StatusInternalServerError)
 		return
@@ -222,7 +212,7 @@ func genderHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/error.html", http.StatusSeeOther)
 		return
 	}
-	ExportData := accountPageData{}
+	ExportData := settingsPageData{}
 	if cookieExists(r, "sessionID") {
 		sessionID := src.GetValidSession(r)
 		if sessionID == "" {
@@ -230,9 +220,7 @@ func genderHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		user, _ := src.GetUserFromSessionID(sessionID)
-		if user.Username != "" {
-			ExportData.User = user
-		}
+		ExportData.User = user
 	}
 
 	gender := r.FormValue("gender")
@@ -242,7 +230,7 @@ func genderHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var dataGender string
-	row := src.Db.QueryRow("SELECT gender FROM accounts WHERE id = ?", ExportData.User.Uuid)
+	row := src.Db.QueryRow("SELECT gender FROM users WHERE uuid = ?", ExportData.User.Uuid)
 	err := row.Scan(&dataGender)
 	if err != nil {
 		http.Error(w, "An error occurred", http.StatusInternalServerError)
@@ -252,7 +240,7 @@ func genderHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No changes detected", http.StatusInternalServerError)
 		return
 	}
-	_, err = src.Db.Exec("UPDATE accounts SET gender = ? WHERE id = ?", gender, ExportData.User.Uuid)
+	_, err = src.Db.Exec("UPDATE users SET gender = ? WHERE uuid = ?", gender, ExportData.User.Uuid)
 	if err != nil {
 		http.Error(w, "Failed to update gender", http.StatusInternalServerError)
 		return

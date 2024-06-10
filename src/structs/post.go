@@ -7,9 +7,11 @@ import (
 
 type Post struct {
 	Uuid         uuid.UUID
+	Title        string
+	Content      string
 	Creator      uuid.UUID
+	Category     string
+	CreationDate time.Time
 	Likes        []uuid.UUID
 	Dislikes     []uuid.UUID
-	CreationDate time.Time
-	Answers      []uuid.UUID
 }

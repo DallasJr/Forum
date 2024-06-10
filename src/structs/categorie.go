@@ -1,9 +1,7 @@
 package structs
 
-import "github.com/google/uuid"
-
-type Categories struct {
+type Category struct {
 	Name        string
 	Description string
-	Posts       []uuid.UUID
+	PostsCount  int
 }

@@ -10,7 +10,7 @@ import (
 
 type mainPageData struct {
 	User       structs.User
-	Categories structs.Categories
+	Categories []structs.Category
 }
 
 func SetupHandlers() {
@@ -35,7 +35,13 @@ func SetupHandlers() {
 	http.HandleFunc("/change-names", namesHandler)
 
 	//categories page
-	http.HandleFunc("/categories/", serveAllCategories)
+	http.HandleFunc("/categories/", categoriesHandler)
+
+	//administration page
+	http.HandleFunc("/administration.html", serveAdministrationPage)
+	http.HandleFunc("/add-category", addCategory)
+	http.HandleFunc("/delete-category/", deleteCategory)
+	http.HandleFunc("/update-category/", updateCategory)
 
 	http.HandleFunc("/error.html", serveErrorPage)
 }
@@ -45,32 +51,6 @@ func index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	tmpl := template.Must(template.ParseFiles("src/templates/index.html"))
-
-	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-	w.Header().Set("Pragma", "no-cache")
-	w.Header().Set("Expires", "0")
-
-	ExportData := mainPageData{}
-
-	if cookieExists(r, "sessionID") {
-		sessionID := src.GetValidSession(r)
-		if sessionID == "" {
-			logoutHandler(w, r)
-			return
-		}
-		user, _ := src.GetUserFromSessionID(sessionID)
-		if user.Username != "" {
-			ExportData.User = user
-		}
-	}
-
-	tmpl.Execute(w, ExportData)
-}
-func serveAllCategories(w http.ResponseWriter, r *http.Request) {
-	if strings.Contains(r.URL.Path, "favicon.ico") {
-		return
-	}
-	tmpl := template.Must(template.ParseFiles("src/templates/allcategories.html"))
 
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 	w.Header().Set("Pragma", "no-cache")

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<!--suppress HtmlUnknownTarget -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../static/css/style.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/navbar.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/administration.css">
+    <script src="../static/javascript/navbar.js"></script>
+    <title>RollinSpot</title>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container">
+        <a href="/" class="brand">Home</a>
+        <div class="menu-icon" onclick="toggleMenu()">
+            &#9776;
+        </div>
+        <div class="nav-links" id="nav-links">
+            {{if gt .User.Power 0}}
+            <a href="/administration.html" class="nav-item" id="administration">Admin panel</a>
+            {{end}}
+            {{if eq .User.Username ""}}
+            <a href="/login.html" class="nav-item" id="login">Login</a>
+            <a href="/register.html" class="nav-item" id="register">Register</a>
+            {{else}}
+            <a href="/error.html" class="nav-item" id="notifications">Notifications</a>
+            <a href="/error.html" class="nav-item" id="messages">Messages</a>
+            <a href="/error.html" class="nav-item" id="profile">{{.User.Username}}</a>
+            <a href="/settings.html" class="nav-item" id="settings">Settings</a>
+            <a href="/logout" class="nav-item" id="logout">Logout</a>
+            {{end}}
+        </div>
+    </div>
+
+    <div class="mobile-links" id="mobile-links">
+        {{if gt .User.Power 0}}
+        <a href="/administration.html" class="nav-item" id="administration-m">Admin panel</a>
+        {{end}}
+        {{if eq .User.Username ""}}
+        <a href="/login.html" class="nav-item" id="login-m">Login</a>
+        <a href="/register.html" class="nav-item" id="register-m">Register</a>
+        {{else}}
+        <a href="/error.html" class="nav-item" id="notifications-m">Notifications</a>
+        <a href="/error.html" class="nav-item" id="messages-m">Messages</a>
+        <a href="/error.html" class="nav-item" id="profile-m">{{.User.Username}}</a>
+        <a href="/settings.html" class="nav-item" id="settings-m">Settings</a>
+        <a href="/logout" class="nav-item" id="logout-m">Logout</a>
+        {{end}}
+    </div>
+
+</nav>
+
+<div class="administration-container">
+    <h1 class="administration-title">Administration Panel</h1>
+    <nav class="administration-nav">
+        <ul>
+            {{if eq .User.Power 2}}
+                <li><a href="#" data-section="categories-section" onclick="showSection('categories-section')">Categories</a></li>
+            {{end}}
+            <li><a href="#" data-section="posts-section" onclick="showSection('posts-section')">Posts</a></li>
+            <li><a href="#" data-section="answers-section" onclick="showSection('answers-section')">Answers</a></li>
+            <li><a href="#" data-section="users-section" onclick="showSection('users-section')">Users</a></li>
+        </ul>
+    </nav>
+    <div class="administration-content">
+        {{if eq .User.Power 2}}
+        <div id="categories-section" class="administration-section">
+            <h2>Categories</h2>
+            <div id="category-message" class="category-message"></div>
+            <form action="/add-category" method="POST">
+                <button type="submit" class="add-category-btn">Add a Category</button>
+            </form>
+            <div class="category-list">
+                {{range .Categories}}
+                <div class="category-item">
+                    <form method="POST" action="/update-category/{{.Name}}" class="update-form">
+                        <input type="text" name="newName" value="{{.Name}}" placeholder="New Name">
+                        <textarea name="newDescription" placeholder="New Description" rows="4">{{.Description}}</textarea>
+                        <p>Number of Posts: {{.PostsCount}}</p>
+                        <div class="category-actions">
+                            <button type="submit" class="rename-btn">Save & Update</button>
+                            <a href="/categories/{{.Name}}" class="view-btn">View page</a>
+                        </div>
+                    </form>
+                    <form method="POST" action="/delete-category/{{.Name}}" class="delete-form">
+                        <button type="submit" class="delete-btn">Delete</button>
+                    </form>
+                </div>
+                {{end}}
+            </div>
+        </div>
+        {{end}}
+        <div id="posts-section" class="administration-section">
+            <h2>Posts</h2>
+
+        </div>
+        <div id="answers-section" class="administration-section">
+            <h2>Answers</h2>
+
+        </div>
+        <div id="users-section" class="administration-section">
+            <h2>Users</h2>
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const sectionToShow = "{{if eq .User.Power 2}}categories-section{{else}}posts-section{{end}}";
+        showSection(sectionToShow);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get('message');
+        if (message) {
+            document.getElementById('category-message').textContent = message;
+            // Remove the message parameter from the URL
+            const newUrl = window.location.origin + window.location.pathname;
+            window.history.replaceState({}, document.title, newUrl);
+        }
+    });
+
+    function showSection(sectionId) {
+        const sections = document.querySelectorAll('.administration-section');
+        const navLinks = document.querySelectorAll('.administration-nav a');
+        sections.forEach(section => {
+            if (section.id === sectionId) {
+                section.classList.add('active');
+            } else {
+                section.classList.remove('active');
+            }
+        });
+        navLinks.forEach(link => {
+            if (link.getAttribute('data-section') === sectionId) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
+    }
+</script>
+
+</body>
+
+</html>
