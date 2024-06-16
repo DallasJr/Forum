@@ -154,7 +154,7 @@ func GetCategory(name string) (structs.Category, error) {
 }
 
 func GetPostsByCategory(categoryName string, offset int, limit int) ([]structs.Post, error) {
-	rows, err := Db.Query("SELECT uuid, title, content, owner_id, category_name, created_at FROM posts WHERE category_name = ? ORDER BY created_at DESC LIMIT ? OFFSET ?", categoryName, limit, offset)
+	rows, err := Db.Query("SELECT uuid, title, content, owner_id, category_name, created_at, likes, dislikes FROM posts WHERE category_name = ? ORDER BY created_at DESC LIMIT ? OFFSET ?", categoryName, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -163,9 +163,27 @@ func GetPostsByCategory(categoryName string, offset int, limit int) ([]structs.P
 	var posts []structs.Post
 	for rows.Next() {
 		var post structs.Post
-		if err := rows.Scan(&post.Uuid, &post.Title, &post.Content, &post.Creator, &post.Category, &post.CreationDate); err != nil {
+		var likesJSON, dislikesJSON string
+		if err := rows.Scan(&post.Uuid, &post.Title, &post.Content, &post.Creator, &post.Category, &post.CreationDate, &likesJSON, &dislikesJSON); err != nil {
 			return nil, err
 		}
+		var likes []uuid.UUID
+		var dislikes []uuid.UUID
+
+		err = json.Unmarshal([]byte(likesJSON), &likes)
+		if err != nil {
+			fmt.Println("Error unmarshaling likes:", err)
+			return nil, err
+		}
+
+		err = json.Unmarshal([]byte(dislikesJSON), &dislikes)
+		if err != nil {
+			fmt.Println("Error unmarshaling dislikes:", err)
+			return nil, err
+		}
+
+		post.Likes = likes
+		post.Dislikes = dislikes
 		posts = append(posts, post)
 	}
 	return posts, nil

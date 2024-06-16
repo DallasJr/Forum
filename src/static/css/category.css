@@ -46,24 +46,38 @@
 }
 
 .post-item {
-    display: block;
-    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
     background-color: #232327;
-    color: white;
+    padding: 10px 30px 5px 13px;
+    border-radius: 8px;
     text-decoration: none;
-    transition: box-shadow 0.3s ease;
-    padding: 10px 0 10px 10px;
-    border: 2px solid transparent;
+    color: white;
+    border: 3px solid transparent;
+    transition: 200ms;
 }
 
 .post-item:hover {
     /*box-shadow: 0 4px 8px rgba(0,0,0,0.3);*/
-    border: #C71E1E solid 2px;
+    border-color: #C71E1E;
 }
 
-.post-item h3 a {
+.post-content {
+    flex: 1;
+}
+
+/*.post-item h3 a {
     text-decoration: none;
     color: white;
+}*/
+.post-content h3 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.post-content p {
+    font-size: 1em;
+    margin-bottom: 10px;
 }
 
 .post-item p {
@@ -80,6 +94,23 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
+}
+.post-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.post-actions .like-count,
+.post-actions .dislike-count {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 1em;
+    color: #333;
+}
+.post-actions .fas {
+    font-size: 1.2em;
+    color: #333;
 }
 
 .category-description {
@@ -103,6 +134,7 @@
 
 #show-more-btn:hover {
     cursor: pointer;
+    text-decoration: underline;
 }
 
 .category-description h3 {

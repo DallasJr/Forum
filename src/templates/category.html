@@ -7,6 +7,7 @@
     <link rel="stylesheet" type="text/css" href="../static/css/style.css">
     <link rel="stylesheet" type="text/css" href="../static/css/navbar.css">
     <link rel="stylesheet" type="text/css" href="../static/css/category.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" />
     <script src="../static/javascript/navbar.js"></script>
     <title>RollinSpot</title>
 </head>
@@ -69,11 +70,23 @@
                     <h2>Posts in {{.Category.Name}}</h2>
                     <div class="posts-list" id="posts-list">
                         {{range .Posts}}
-                            <a href="/posts/{{.Uuid}}" class="post-item">
+                        <a href="/posts/{{.Uuid}}" class="post-item">
+                            <div class="post-content">
                                 <h3>{{.Title}}</h3>
                                 <p>{{.Content}}</p>
                                 <p class="post-meta">Posted on {{.CreationDate}}</p>
-                            </a>
+                            </div>
+                            <div class="post-actions">
+                                <div class="like-count">
+                                    <i class="fas fa-thumbs-up"></i>
+                                    <span>{{len .Likes}}</span>
+                                </div>
+                                <div class="dislike-count">
+                                    <i class="fas fa-thumbs-down"></i>
+                                    <span>{{len .Dislikes}}</span>
+                                </div>
+                            </div>
+                        </a>
                         {{end}}
                     </div>
                     <button id="show-more-btn" onclick="loadMorePosts()">Show More</button>
@@ -97,6 +110,7 @@
 
 <script>
     let offset = 5;
+
     function loadMorePosts() {
         const category = "{{.Category.Name}}";
         fetch(`/more-posts?category=${category}&offset=${offset}`)
@@ -117,14 +131,41 @@
                     const postLink = document.createElement('a');
                     postLink.href = `/posts/${post.Uuid}`;
                     postLink.classList.add('post-item');
+
                     postLink.innerHTML = `
+                    <div class="post-content">
                         <h3>${post.Title}</h3>
                         <p>${post.Content}</p>
                         <p class="post-meta">Posted on ${post.CreationDate}</p>
-                    `;
+                    </div>
+                `;
+
+                    const postActions = document.createElement('div');
+                    postActions.classList.add('post-actions');
+
+                    const likeCount = document.createElement('div');
+                    likeCount.classList.add('like-count');
+                    likeCount.innerHTML = `
+                    <i class="fas fa-thumbs-up"></i>
+                    <span>${post.Likes ? post.Likes.length : 0}</span>
+                `;
+                    postActions.appendChild(likeCount);
+
+                    const dislikeCount = document.createElement('div');
+                    dislikeCount.classList.add('dislike-count');
+                    dislikeCount.innerHTML = `
+                    <i class="fas fa-thumbs-down"></i>
+                    <span>${post.Dislikes ? post.Dislikes.length : 0}</span>
+                `;
+                    postActions.appendChild(dislikeCount);
+
+                    postLink.appendChild(postActions);
+
                     postsList.appendChild(postLink);
                 });
+
                 offset += posts.length;
+
                 if (posts.length < 5) {
                     document.getElementById('show-more-btn').style.display = 'none';
                 }
@@ -133,6 +174,7 @@
                 console.error('Error fetching more posts:', error);
             });
     }
+
 </script>
 
 

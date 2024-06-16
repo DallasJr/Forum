@@ -7,7 +7,7 @@
     <title>RollinSpot</title>
     <link rel="stylesheet" type="text/css" href="../static/css/style.css">
     <link rel="stylesheet" type="text/css" href="../static/css/navbar.css">
-    <link rel="stylesheet" type="text/css" href="../static/css/register.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/login.css">
     <script src="../static/javascript/navbar.js"></script>
     <script src="../static/javascript/checkers.js"></script>
 </head>
@@ -31,41 +31,52 @@
     </div>
 </nav>
 
-<h2>Register</h2>
-<form action="/register" method="post">
+<div class="main-content">
+    <div class="login-container">
+        <form action="/register" method="post" class="login-form">
+            <h2>Register</h2>
 
-    <label for="name">Name</label>
-    <input type="text" id="name" name="name" placeholder="Your name.." maxlength="32" required>
-    <label for="surname">Surname</label>
-    <input type="text" id="surname" name="surname" placeholder="Your surname.." maxlength="32" required>
-    <span id="namesurnameAvailability"></span><br><br>
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" placeholder="Your name.." maxlength="32" required>
 
-    <label for="gender">Gender</label>
-    <select id="gender" name="gender" required>
-        <option value="" disabled selected>Select your gender</option>
-        <option value="male">Male</option>
-        <option value="female">Female</option>
-    </select><br><br>
+            <label for="surname">Surname</label>
+            <input type="text" id="surname" name="surname" placeholder="Your surname.." maxlength="32" required>
+            <span id="namesurnameAvailability"></span>
 
-    <label for="email">Email</label>
-    <input type="email" id="email" name="email" placeholder="Your email.." required>
-    <span id="emailAvailability"></span><br><br>
+            <label for="gender">Gender</label>
+            <select id="gender" name="gender" required>
+                <option value="" disabled selected>Select your gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
 
-    <label for="username">Username</label>
-    <input type="text" id="username" name="username" placeholder="Your username.." maxlength="16" required>
-    <span id="usernameAvailability"></span><br><br>
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="Your email.." required>
+            <span id="emailAvailability"></span>
 
-    <label for="password">Password</label>
-    <input type="password" id="password" name="password" placeholder="Your password.." maxlength="32" required><br>
-    <input type="checkbox" id="password-checkbox">
-    <label for="password-checkbox">Show Password</label><br>
-    <span id="password8min"></span><br>
-    <span id="passwordNumber"></span><br>
-    <span id="passwordSpecialChar"></span><br><br>
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="Your username.." maxlength="16" required>
+            <span id="usernameAvailability"></span>
 
-    <button type="submit" id="registerButton" disabled>Register</button>
-</form>
-<p>You already have an account? <a href="/login.html">Login to your account here</a>.</p>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Your password.." maxlength="32" required>
+
+            <div class="show-password-container">
+                <input type="checkbox" id="password-checkbox">
+                <label for="password-checkbox">Show Password</label>
+            </div>
+
+            <span id="password8min"></span>
+            <span id="passwordNumber"></span>
+            <span id="passwordSpecialChar"></span>
+
+            <div class="submit">
+                <button type="submit" id="registerButton" disabled>Register</button>
+            </div>
+        </form>
+        <p>You already have an account? <a href="/login.html">Login to your account here</a>.</p>
+    </div>
+</div>
 
 <script>
 
