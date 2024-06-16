@@ -53,10 +53,12 @@
     text-decoration: none;
     transition: box-shadow 0.3s ease;
     padding: 10px 0 10px 10px;
+    border: 2px solid transparent;
 }
 
 .post-item:hover {
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    /*box-shadow: 0 4px 8px rgba(0,0,0,0.3);*/
+    border: #C71E1E solid 2px;
 }
 
 .post-item h3 a {
