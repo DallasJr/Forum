@@ -6,14 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="../static/css/style.css">
     <link rel="stylesheet" type="text/css" href="../static/css/navbar.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/category.css">
     <script src="../static/javascript/navbar.js"></script>
     <title>RollinSpot</title>
 </head>
 <body>
 
 <nav class="navbar">
-    <div class="container">
-        <a href="/" class="brand">Home</a>
+    <div class="navbar-container">
+        <a href="/" class="brand">RollinSpot</a>
         <div class="menu-icon" onclick="toggleMenu()">
             &#9776;
         </div>
@@ -51,12 +52,88 @@
     </div>
 </nav>
 
-{{if eq .Category.Name ""}}
-<h1>Unknown page</h1>
-{{else}}
-<h1>Welcome to {{.Category.Name}}</h1>
-<p>Posts :</p>
-{{end}}
+<div class="page-content">
+    {{if eq .Category.Name ""}}
+        <h1>Unknown page</h1>
+    {{else}}
+
+        <div class="category-container">
+            <div class="banner" style="background-image: url('{{.Category.Image}}');">
+                <div class="banner-content">
+                    <h1>{{.Category.Name}}</h1>
+                </div>
+            </div>
+
+            <div class="content-container">
+                <div class="posts-section">
+                    <h2>Posts in {{.Category.Name}}</h2>
+                    <div class="posts-list" id="posts-list">
+                        {{range .Posts}}
+                            <a href="/posts/{{.Uuid}}" class="post-item">
+                                <h3>{{.Title}}</h3>
+                                <p>{{.Content}}</p>
+                                <p class="post-meta">Posted on {{.CreationDate}}</p>
+                            </a>
+                        {{end}}
+                    </div>
+                    <button id="show-more-btn" onclick="loadMorePosts()">Show More</button>
+                </div>
+                <div class="sidebar">
+                    <div class="category-description">
+                        <h3>About {{.Category.Name}}</h3>
+                        <p>{{.Category.Description}}</p>
+                    </div>
+                    {{if eq .User.Username ""}}
+                    <a href="/login.html" class="login-btn">Login to create a Post</a>
+                    {{else}}
+                    <a href="/create-post?category={{.Category.Name}}" class="create-post-btn">Create a Post</a>
+                    {{end}}
+                </div>
+            </div>
+        </div>
+    {{end}}
+</div>
 </body>
+
+<script>
+    let offset = 5;
+    function loadMorePosts() {
+        const category = "{{.Category.Name}}";
+        fetch(`/more-posts?category=${category}&offset=${offset}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(posts => {
+                const postsList = document.getElementById('posts-list');
+                if (!postsList) {
+                    console.error('posts-list element not found');
+                    return;
+                }
+
+                posts.forEach(post => {
+                    const postLink = document.createElement('a');
+                    postLink.href = `/posts/${post.Uuid}`;
+                    postLink.classList.add('post-item');
+                    postLink.innerHTML = `
+                        <h3>${post.Title}</h3>
+                        <p>${post.Content}</p>
+                        <p class="post-meta">Posted on ${post.CreationDate}</p>
+                    `;
+                    postsList.appendChild(postLink);
+                });
+                offset += posts.length;
+                if (posts.length < 5) {
+                    document.getElementById('show-more-btn').style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching more posts:', error);
+            });
+    }
+</script>
+
 
 </html>

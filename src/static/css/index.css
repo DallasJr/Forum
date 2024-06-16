@@ -1,63 +1,148 @@
-body {
-    background-color: #0e0e10;
-}
-
-.index-container  {
+.main-container {
     width: 80%;
     margin: 20px auto;
     padding: 20px;
 }
 
-.index-title {
-    font-size: 30px;
-    margin-bottom: 20px;
-    color: #fff;
-    text-align: left;
-    padding-left: 10px;
+.banner {
+    background: url('/static/image/harley-davidson-banner.jpg') no-repeat center center;
+    background-size: cover;
+    padding: 125px 0;
+    color: white;
+    text-align: center;
 }
 
-.index-nav {
-    margin-bottom: 10px;
+.banner-content h1 {
+    margin: 0;
+    font-size: 3em;
 }
 
-.index-nav ul {
-    list-style-type: none;
-    padding: 0;
+.search-form {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
 }
 
-.index-nav li {
-    display: inline-grid;
-    margin-right: 5px;
-    margin-bottom: 5px;
+.search-form input[type="text"] {
+    padding: 10px;
+    font-size: 1em;
+    width: 300px;
+    border: none;
+    border-radius: 5px 0 0 5px;
+    outline: none;
 }
 
-.index-nav a {
-    text-decoration: none;
-    color: #C71E1E;
-    padding: 5px 10px;
-    border-radius: 4px;
+.search-form button {
+    padding: 10px 20px;
+    font-size: 18px;
+    background-color: #C71E1E;
+    color: #18181b;
+    border: none;
+    cursor: pointer;
+    border-radius: 0 5px 5px 0;
     transition: 200ms;
 }
 
-.index-nav a:hover, .index-nav a.active {
-    background-color: #C71E1E;
-    color: #2D2A2D;
+.search-form button:hover {
+    background-color: #18181b;
+    color: #C71E1E;
 }
 
-.index-content {
-    border-top: 1px solid #2c2c31;
-    padding-top: 20px;
+.categories-section, .recent-posts-section {
+    padding: 20px;
+    border: 1px solid #232327;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    background-color: #18181b;
 }
 
-.index-section {
-    display: none;
-}
-
-.index-section h2 {
+.categories-section h2, .recent-posts-section h2 {
     color: white;
     margin-bottom: 20px;
 }
 
-.index-section.active {
-    display: block;
+.categories-list {
+    display: flex;
+    overflow-x: scroll;
+    padding-bottom: 15px;
+}
+.categories-list::-webkit-scrollbar {
+    height: 8px;
+}
+.categories-list::-webkit-scrollbar-thumb {
+    background-color: #C71E1E;
+    border-radius: 10px;
+}
+
+.category-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-width: 200px;
+    min-height: 200px;
+    margin-right: 10px;
+    border-radius: 8px;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    background-size: cover;
+    background-position: center;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.category-content h3 {
+    margin-bottom: 20px;
+}
+
+.category-content p {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 1); /* Black shadow */
+}
+
+.category-content {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 5px;
+    border-radius: 8px;
+}
+
+.category-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 5px;
+    border-radius: 0 0 8px 8px;
+}
+
+.recent-posts-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.post-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.post-item h3 {
+    margin: 0;
+}
+
+.post-item h3 a {
+    text-decoration: none;
+    color: #333;
+}
+
+.post-item p {
+    margin: 5px 0;
+}
+
+.post-item .post-category, .post-item .post-date {
+    display: inline-block;
+    margin-right: 10px;
+    font-size: 0.9em;
+    color: #777;
 }

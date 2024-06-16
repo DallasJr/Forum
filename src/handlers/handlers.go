@@ -9,8 +9,9 @@ import (
 )
 
 type mainPageData struct {
-	User       structs.User
-	Categories []structs.Category
+	User        structs.User
+	Categories  []structs.Category
+	RecentPosts []structs.Post
 }
 
 func SetupHandlers() {
@@ -36,6 +37,7 @@ func SetupHandlers() {
 
 	//categories page
 	http.HandleFunc("/categories/", categoriesHandler)
+	http.HandleFunc("/more-posts", showMorePosts)
 
 	//administration page
 	http.HandleFunc("/administration.html", serveAdministrationPage)
@@ -69,6 +71,19 @@ func index(w http.ResponseWriter, r *http.Request) {
 			ExportData.User = user
 		}
 	}
+
+	categories, err := getAllCategories()
+	if err != nil {
+		http.Error(w, "Unable to retrieve categories", http.StatusInternalServerError)
+	}
+	ExportData.Categories = categories
+
+	posts, err := src.GetRecentPosts()
+	if err != nil {
+		http.Error(w, "Unable to retrieve recent posts", http.StatusInternalServerError)
+		return
+	}
+	ExportData.RecentPosts = posts
 
 	tmpl.Execute(w, ExportData)
 }

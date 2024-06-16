@@ -13,8 +13,8 @@
 <body>
 
 <nav class="navbar">
-    <div class="container">
-        <a href="/" class="brand">Home</a>
+    <div class="navbar-container">
+        <a href="/" class="brand">RollinSpot</a>
         <div class="menu-icon" onclick="toggleMenu()">
             &#9776;
         </div>
@@ -76,9 +76,14 @@
             <div class="category-list">
                 {{range .Categories}}
                 <div class="category-item">
-                    <form method="POST" action="/update-category/{{.Name}}" class="update-form">
+                    <form method="POST" action="/update-category/{{.Name}}" enctype="multipart/form-data" class="update-form">
                         <input type="text" name="newName" value="{{.Name}}" placeholder="New Name">
+                        <input name="prevName" value="{{.Name}}" hidden="hidden">
                         <textarea name="newDescription" placeholder="New Description" rows="4">{{.Description}}</textarea>
+                        <div class="category-image">
+                            <img id="preview-{{.Name}}" src="{{.Image}}" alt="{{.Name}} image" width="100">
+                            <input type="file" name="newImage" onchange="previewImage(event, 'preview-{{.Name}}')">
+                        </div>
                         <p>Number of Posts: {{.PostsCount}}</p>
                         <div class="category-actions">
                             <button type="submit" class="rename-btn">Save & Update</button>
@@ -109,6 +114,15 @@
 </div>
 
 <script>
+
+    function previewImage(event, previewId) {
+        var reader = new FileReader();
+        reader.onload = function(){
+            var output = document.getElementById(previewId);
+            output.src = reader.result;
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    }
 
     document.addEventListener("DOMContentLoaded", function() {
         const sectionToShow = "{{if eq .User.Power 2}}categories-section{{else}}posts-section{{end}}";

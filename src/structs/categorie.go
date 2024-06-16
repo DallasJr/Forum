@@ -4,4 +4,5 @@ type Category struct {
 	Name        string
 	Description string
 	PostsCount  int
+	Image       string
 }

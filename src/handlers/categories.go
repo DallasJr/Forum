@@ -3,19 +3,17 @@ package handlers
 import (
 	"Forum/src"
 	"Forum/src/structs"
+	"encoding/json"
 	"html/template"
 	"net/http"
 	"sort"
+	"strconv"
 	"strings"
 )
 
 type categoriesPageData struct {
 	User       structs.User
 	Categories []structs.Category
-}
-type categoryPageData struct {
-	User     structs.User
-	Category structs.Category
 }
 
 func serveCategoriesPage(w http.ResponseWriter, r *http.Request) {
@@ -50,6 +48,12 @@ func serveCategoriesPage(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, ExportData)
 }
 
+type categoryPageData struct {
+	User     structs.User
+	Category structs.Category
+	Posts    []structs.Post
+}
+
 func serveCategoryPage(w http.ResponseWriter, r *http.Request) {
 	// Remove the prefix "/categories/"
 	name := strings.TrimPrefix(r.URL.Path, "/categories/")
@@ -74,7 +78,26 @@ func serveCategoryPage(w http.ResponseWriter, r *http.Request) {
 	category, _ := src.GetCategory(name)
 	ExportData.Category = category
 
+	posts, _ := src.GetPostsByCategory(name, 0, 5)
+	ExportData.Posts = posts
+
 	tmpl.Execute(w, ExportData)
+}
+
+func showMorePosts(w http.ResponseWriter, r *http.Request) {
+	categoryName := r.URL.Query().Get("category")
+	offset, err := strconv.Atoi(r.URL.Query().Get("offset"))
+	if err != nil {
+		http.Error(w, "Invalid offset", http.StatusBadRequest)
+		return
+	}
+	posts, err := src.GetPostsByCategory(categoryName, offset, 5)
+	if err != nil {
+		http.Error(w, "Unable to retrieve more posts", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(posts)
 }
 
 func categoriesHandler(w http.ResponseWriter, r *http.Request) {
@@ -86,7 +109,7 @@ func categoriesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getAllCategories() ([]structs.Category, error) {
-	rows, err := src.Db.Query("SELECT name, description FROM categories")
+	rows, err := src.Db.Query("SELECT name, description, image FROM categories")
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +118,7 @@ func getAllCategories() ([]structs.Category, error) {
 	var categories []structs.Category
 	for rows.Next() {
 		var category structs.Category
-		if err := rows.Scan(&category.Name, &category.Description); err != nil {
+		if err := rows.Scan(&category.Name, &category.Description, &category.Image); err != nil {
 			return nil, err
 		}
 

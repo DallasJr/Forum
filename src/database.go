@@ -3,10 +3,13 @@ package src
 import (
 	"Forum/src/structs"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"log"
 	"net/http"
+	"strings"
 	"sync"
 )
 
@@ -51,8 +54,8 @@ func SetupDatabase() *sql.DB {
 			owner_id TEXT NOT NULL,
 			category_name TEXT NOT NULL,
 			created_at TEXT NOT NULL,
-			FOREIGN KEY(owner_id) REFERENCES users(uuid),
-			FOREIGN KEY(category_name) REFERENCES categories(name)
+			likes TEXT,
+			dislikes TEXT 
 		)
 	`)
 	if err != nil {
@@ -79,11 +82,21 @@ func SetupDatabase() *sql.DB {
 	_, err = Db.Exec(`
 		CREATE TABLE IF NOT EXISTS categories (
     		name TEXT PRIMARY KEY,
-    		description TEXT
+    		description TEXT,
+			image TEXT NOT NULL
 		)
 	`)
 	if err != nil {
 		log.Fatal(err)
+	}
+	_, err = Db.Exec(`
+		ALTER TABLE posts ADD COLUMN image TEXT
+	`)
+	if err != nil {
+		// Check for "duplicate column name" error, which means the column already exists
+		if !strings.Contains(err.Error(), "duplicate column name") {
+			log.Fatalf("Error adding column: %v", err)
+		}
 	}
 	return Db
 }
@@ -126,9 +139,9 @@ func GetValidSession(r *http.Request) string {
 func GetCategory(name string) (structs.Category, error) {
 	var category structs.Category
 
-	query := `SELECT name, description FROM categories WHERE name = ?`
+	query := `SELECT name, description, image FROM categories WHERE name = ?`
 	err := Db.QueryRow(query, name).Scan(
-		&category.Name, &category.Description,
+		&category.Name, &category.Description, &category.Image,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -140,8 +153,8 @@ func GetCategory(name string) (structs.Category, error) {
 	return category, nil
 }
 
-func GetPostsByCategory(categoryName string) ([]structs.Post, error) {
-	rows, err := Db.Query("SELECT uuid, title, content, owner_id, category_name, created_at FROM posts WHERE category_name = ?", categoryName)
+func GetPostsByCategory(categoryName string, offset int, limit int) ([]structs.Post, error) {
+	rows, err := Db.Query("SELECT uuid, title, content, owner_id, category_name, created_at FROM posts WHERE category_name = ? ORDER BY created_at DESC LIMIT ? OFFSET ?", categoryName, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -173,4 +186,56 @@ func GetPostsCountByCategory(categoryName string) (int, error) {
 	}
 
 	return count, nil
+}
+
+func GetRecentPosts() ([]structs.Post, error) {
+	var posts []structs.Post
+	rows, err := Db.Query(`
+	        SELECT uuid, title, content, owner_id, category_name, created_at, likes, dislikes
+	        FROM posts
+	        ORDER BY created_at DESC
+	        LIMIT 5
+	    `)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var post structs.Post
+		var likesJSON, dislikesJSON string
+		err := rows.Scan(&post.Uuid, &post.Title, &post.Content, &post.Creator, &post.Category, &post.CreationDate, &likesJSON, &dislikesJSON)
+		if err != nil {
+			fmt.Println("Error scanning row:", err)
+			return nil, err
+		}
+		var likes []uuid.UUID
+		var dislikes []uuid.UUID
+
+		err = json.Unmarshal([]byte(likesJSON), &likes)
+		if err != nil {
+			fmt.Println("Error unmarshaling likes:", err)
+			return nil, err
+		}
+
+		err = json.Unmarshal([]byte(dislikesJSON), &dislikes)
+		if err != nil {
+			fmt.Println("Error unmarshaling dislikes:", err)
+			return nil, err
+		}
+
+		post.Likes = likes
+		post.Dislikes = dislikes
+
+		/*formattedDate, err := post.FormattedDate()
+		if err != nil {
+			fmt.Println("Error formatting date:", err)
+		}
+
+		post.CreationDate = formattedDate*/
+		posts = append(posts, post)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return posts, nil
 }

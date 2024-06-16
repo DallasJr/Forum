@@ -1,0 +1,152 @@
+.page-content {
+    padding-top: 50px;
+}
+
+.category-container {
+    width: 80%;
+    margin: 20px auto;
+    padding: 20px;
+    color: white;
+}
+
+.banner {
+    background-size: cover;
+    background-position: center;
+    padding: 50px 0;
+    color: white;
+    text-align: center;
+    border-radius: 20px;
+}
+
+.banner-content h1 {
+    margin: 0;
+    font-size: 3em;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.content-container {
+    display: flex;
+    margin-top: 20px;
+}
+
+.posts-section {
+    flex: 3;
+    margin-right: 20px;
+    background-color: #18181b;
+    padding: 20px 20px 10px 20px;
+    border: 1px solid #232327;
+    border-radius: 8px;
+}
+
+.posts-list {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    gap: 10px;
+}
+
+.post-item {
+    display: block;
+    border-radius: 8px;
+    background-color: #232327;
+    color: white;
+    text-decoration: none;
+    transition: box-shadow 0.3s ease;
+    padding: 10px 0 10px 10px;
+}
+
+.post-item:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.post-item h3 a {
+    text-decoration: none;
+    color: white;
+}
+
+.post-item p {
+    margin: 5px 0;
+}
+
+.post-meta {
+    font-size: 0.9em;
+    color: #bbb;
+}
+
+.sidebar {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.category-description {
+    background-color: #18181b;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #232327;
+}
+
+#show-more-btn {
+    border: none;
+    border-top: 1px #2c2c31 solid;
+    background-color: #18181b;
+    color: white;
+    width: 100%;
+    margin-top: 10px;
+    padding-top: 10px;
+
+}
+
+#show-more-btn:hover {
+    cursor: pointer;
+}
+
+.category-description h3 {
+    margin-top: 0;
+    color: #C71E1E;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    border-bottom: 1px #2c2c31 solid;
+}
+
+.category-description p {
+    color: #bbb;
+}
+
+.create-post-btn, .login-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 18px;
+    background-color: #C71E1E;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    text-align: center;
+    transition: background-color 200ms;
+}
+
+h2 {
+    color: #C71E1E;
+    border-bottom: 1px #2c2c31 solid;
+    padding-bottom: 10px;
+}
+
+.create-post-btn:hover, .login-btn:hover {
+    background-color: #18181b;
+}
+
+@media screen and (max-width: 768px) {
+    .content-container {
+        flex-direction: column-reverse;
+    }
+
+    .posts-section {
+        margin-right: 0;
+    }
+
+    .sidebar {
+        margin-bottom: 20px;
+    }
+}

@@ -1,16 +1,17 @@
 .navbar {
     background-color: #18181b;
-    /*position: fixed;*/
     overflow: hidden;
     width: 100%;
-    box-shadow: 0px 1px 3px 0px #000000;
+    box-shadow: 0 1px 3px 0 #000000;
+    position: fixed;
+    z-index: 100;
 }
 
-.container {
+.navbar-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
+    padding: 10px 10%;
     position: relative;
 }
 
@@ -33,7 +34,6 @@
     flex-direction: row;
     align-items: center;
     justify-content: flex-end;
-    gap: 10px;
 }
 .mobile-links {
     display: none;
@@ -43,10 +43,9 @@
 .nav-links a {
     color: #C71E1E;
     text-decoration: none;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding: 5px 10px;
     font-size: 18px;
-    border-radius: 10px;
+    border-radius: 15px;
     transition: 200ms;
 }
 .mobile-links a {
@@ -74,7 +73,7 @@
 
 /* Mobile view */
 @media screen and (max-width: 768px) {
-    .container {
+    .navbar-container {
         flex-direction: row;
         justify-content: space-between;
     }
