@@ -14,7 +14,9 @@
     <body>
     <nav class="navbar">
         <div class="navbar-container">
-            <a href="/" class="brand">RollinSpot</a>
+            <a href="/" class="brand">
+            <img src="../static/image/Rollinspot-logo.png" alt="RollinSpot Logo">
+        </a>
             <div class="menu-icon" onclick="toggleMenu()">
                 &#9776;
             </div>
@@ -88,9 +90,15 @@
                             {{if eq .User.Gender "male"}}
                             <option value="male" selected>Male</option>
                             <option value="female">Female</option>
-                            {{else}}
+                            <option value="female">Other</option>
+                            {{else if eq .User.Gender "male"}}
                             <option value="male">Male</option>
                             <option value="female" selected>Female</option>
+                            <option value="female">Other</option>
+                            {{else if eq .User.Gender "male"}}
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="female" selected>Other</option>
                             {{end}}
                         </select>
                         <button id="gender-button" type="submit" disabled>Save</button>

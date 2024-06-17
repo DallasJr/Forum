@@ -102,7 +102,7 @@ func showMorePosts(w http.ResponseWriter, r *http.Request) {
 
 func categoriesHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/categories" || r.URL.Path == "/categories/" {
-		serveCategoriesPage(w, r)
+		index(w, r)
 	} else {
 		serveCategoryPage(w, r)
 	}

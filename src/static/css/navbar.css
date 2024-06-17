@@ -15,10 +15,11 @@
     position: relative;
 }
 
-.brand {
-    color: #C71E1E;
-    text-decoration: none;
-    font-size: 18px;
+.brand img{
+    width: 150px; /* Adjust width as needed */
+    height: auto; /* Maintain aspect ratio */
+    margin-right: 10px; /* Example margin */
+    vertical-align: middle; /* Align vertically */
 }
 
 .menu-icon {

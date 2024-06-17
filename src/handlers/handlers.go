@@ -39,6 +39,10 @@ func SetupHandlers() {
 	http.HandleFunc("/categories/", categoriesHandler)
 	http.HandleFunc("/more-posts", showMorePosts)
 
+	//post page
+	http.HandleFunc("/create-post/", servePostCreatePage)
+	http.HandleFunc("/create-post/submit", handleCreatePost)
+
 	//administration page
 	http.HandleFunc("/administration.html", serveAdministrationPage)
 	http.HandleFunc("/add-category", addCategory)

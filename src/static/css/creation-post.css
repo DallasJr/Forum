@@ -1,0 +1,92 @@
+.form-container {
+    padding-top: 50px;
+}
+h1, h2 {
+    color: white;
+}
+
+h2 {
+    border-bottom: 1px #2c2c31 solid;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+}
+
+p {
+    color: #737373;
+    border-bottom: 1px #2c2c31 solid;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+p a {
+    color: #737373;
+
+}
+
+form {
+    width: clamp(350px, 50vw, 600px);
+    margin: 50px auto 0 auto;
+    background-color: #18181b;
+    padding: 30px 40px 20px 40px;
+    border-radius: 10px;
+    border: 1px solid #232327;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: white;
+}
+
+input[type="text"],
+textarea,
+input[type="file"],
+button {
+    box-sizing: border-box;
+    padding: 10px;
+    margin-top: 5px;
+    border-style: solid;
+    border-color: #232327;
+    border-radius: 4px;
+    background-color: #18181b;
+    color: #b6b6b6;
+    border-width: 2px;
+    width: 100%;
+    margin-bottom: 20px;
+    transition: 200ms;
+}
+
+input[type="text"]:hover,
+textarea:hover,
+input[type="file"]:hover,
+button:hover {
+    border-color: #333336;
+}
+
+input[type="text"]:focus,
+textarea:focus,
+input[type="file"]:focus,
+button:focus {
+    border-color: #C71E1E;
+    border-width: 3px;
+    outline: none;
+    color: white;
+}
+
+button {
+    background-color: #C71E1E;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #af1b1b;
+}
+
+#error-message {
+    color: red;
+    font-size: 0.9em;
+    display: none;
+    text-align: center;
+}

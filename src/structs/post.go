@@ -14,6 +14,7 @@ type Post struct {
 	CreationDate string
 	Likes        []uuid.UUID `json:"likes"` // Assuming likes are stored as a JSON array of UUIDs
 	Dislikes     []uuid.UUID `json:"dislikes"`
+	Images       []string    `json:"images"`
 }
 
 func (p *Post) FormattedDate() (string, error) {

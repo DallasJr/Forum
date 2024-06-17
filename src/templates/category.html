@@ -15,7 +15,9 @@
 
 <nav class="navbar">
     <div class="navbar-container">
-        <a href="/" class="brand">RollinSpot</a>
+        <a href="/" class="brand">
+            <img src="../static/image/Rollinspot-logo.png" alt="RollinSpot Logo">
+        </a>
         <div class="menu-icon" onclick="toggleMenu()">
             &#9776;
         </div>
@@ -64,6 +66,7 @@
                     <h1>{{.Category.Name}}</h1>
                 </div>
             </div>
+            <div id="category-message" class="category-message" style="color: green" hidden="hidden"></div>
 
             <div class="content-container">
                 <div class="posts-section">
@@ -89,7 +92,9 @@
                         </a>
                         {{end}}
                     </div>
+                    {{if eq (len .Posts) 5}}
                     <button id="show-more-btn" onclick="loadMorePosts()">Show More</button>
+                    {{end}}
                 </div>
                 <div class="sidebar">
                     <div class="category-description">
@@ -126,7 +131,6 @@
                     console.error('posts-list element not found');
                     return;
                 }
-
                 posts.forEach(post => {
                     const postLink = document.createElement('a');
                     postLink.href = `/posts/${post.Uuid}`;
@@ -174,6 +178,16 @@
                 console.error('Error fetching more posts:', error);
             });
     }
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get('message');
+        if (message) {
+            document.getElementById('category-message').textContent = message;
+            document.getElementById('category-message').hidden = false;
+            const newUrl = window.location.origin + window.location.pathname;
+            window.history.replaceState({}, document.title, newUrl);
+        }
+    });
 
 </script>
 

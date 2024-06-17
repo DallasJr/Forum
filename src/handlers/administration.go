@@ -211,7 +211,7 @@ func updateCategory(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
-		imagePath := fmt.Sprintf("src/static/image/category-%s-image%s", newName, filepath.Ext(header.Filename))
+		imagePath := fmt.Sprintf("src/static/image/categories/%s-image%s", newName, filepath.Ext(header.Filename))
 		out, err := os.Create(imagePath)
 		if err != nil {
 			http.Error(w, "Unable to upload image", http.StatusInternalServerError)
@@ -223,18 +223,18 @@ func updateCategory(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Unable to save image", http.StatusInternalServerError)
 			return
 		}
-		newImage = fmt.Sprintf("/static/image/category-%s-image%s", newName, filepath.Ext(header.Filename))
+		newImage = fmt.Sprintf("/static/image/categories/%s-image%s", newName, filepath.Ext(header.Filename))
 	} else {
 		if prevName != newName {
 			if category.Image != "/static/image/default-category-image.jpg" {
 				oldImagePath := fmt.Sprintf("src%s", category.Image)
-				newImagePath := fmt.Sprintf("src/static/image/category-%s-image%s", newName, filepath.Ext(category.Image))
+				newImagePath := fmt.Sprintf("src/static/image/categories/%s-image%s", newName, filepath.Ext(category.Image))
 				err := os.Rename(oldImagePath, newImagePath)
 				if err != nil {
 					http.Error(w, "Failed to rename image", http.StatusInternalServerError)
 					return
 				}
-				newImage = fmt.Sprintf("/static/image/category-%s-image%s", newName, filepath.Ext(category.Image))
+				newImage = fmt.Sprintf("/static/image/categories/%s-image%s", newName, filepath.Ext(category.Image))
 			}
 		}
 	}

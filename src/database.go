@@ -9,7 +9,6 @@ import (
 	"github.com/google/uuid"
 	"log"
 	"net/http"
-	"strings"
 	"sync"
 )
 
@@ -55,7 +54,8 @@ func SetupDatabase() *sql.DB {
 			category_name TEXT NOT NULL,
 			created_at TEXT NOT NULL,
 			likes TEXT,
-			dislikes TEXT 
+			dislikes TEXT,
+			images TEXT 
 		)
 	`)
 	if err != nil {
@@ -89,15 +89,15 @@ func SetupDatabase() *sql.DB {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = Db.Exec(`
-		ALTER TABLE posts ADD COLUMN image TEXT
+	/*_, err = Db.Exec(`
+		ALTER TABLE posts ADD COLUMN images TEXT
 	`)
 	if err != nil {
 		// Check for "duplicate column name" error, which means the column already exists
 		if !strings.Contains(err.Error(), "duplicate column name") {
 			log.Fatalf("Error adding column: %v", err)
 		}
-	}
+	}*/
 	return Db
 }
 
