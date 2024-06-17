@@ -123,26 +123,89 @@
 }
 
 .post-item {
-    padding: 10px 0;
-    border-bottom: 1px solid #ddd;
-}
-
-.post-item h3 {
-    margin: 0;
-}
-
-.post-item h3 a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     text-decoration: none;
     color: #333;
-}
-
-.post-item p {
+    background-color: #232327;
+    border: 3px solid transparent;
+    border-radius: 5px;
     margin: 5px 0;
+    padding: 10px 20px;
+    transition: 200ms
 }
 
-.post-item .post-category, .post-item .post-date {
-    display: inline-block;
-    margin-right: 10px;
-    font-size: 0.9em;
-    color: #777;
+.post-item:hover {
+    border-color: #C71E1E;
+}
+
+.post-creator {
+    font-size: 15px;
+    font-weight: bold;
+    color: #fff;
+    flex: 2;
+}
+
+.post-content {
+    flex: 5;
+}
+
+.post-category {
+    flex: 3;
+}
+
+.post-category h3 {
+    font-size: 15px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.post-category p {
+    font-size: 15px;
+    color: #666;
+}
+
+.post-meta {
+    font-size: 12px;
+    color: #555;
+    margin-top: 5px;
+    flex: 2;
+}
+
+.post-content p {
+    margin: 5px 0 0 0;
+    font-size: 15px;
+    color: #666;
+}
+
+.post-content h3 {
+    margin: 0;
+    font-size: 16px;
+    color: #fff;
+}
+
+.post-actions {
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+}
+
+.like-count,
+.dislike-count {
+    display: flex;
+    align-items: center;
+    margin-left: 20px;
+    color: #555;
+}
+
+.like-count i,
+.dislike-count i {
+    margin-right: 5px;
+    color: #555;
+}
+
+.like-count span,
+.dislike-count span {
+    font-weight: bold;
 }

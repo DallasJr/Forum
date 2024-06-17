@@ -27,9 +27,23 @@ func (p *Post) FormattedDate() (string, error) {
 		return "", err
 	}
 
-	// Define the desired output layout
-	outputLayout := "January 2, 2006"
+	// Define the desired output layouts
+	dateOutputLayout := "January 2, 2006"
+	timeOutputLayout := "3:04pm"
 
-	// Format the time.Time object into the desired string format
-	return t.Format(outputLayout), nil
+	// Format the time.Time object into the desired string formats
+	dateStr := t.Format(dateOutputLayout)
+	timeStr := t.Format(timeOutputLayout)
+
+	// Combine date and time strings
+	formattedDateTime := dateStr + " " + timeStr
+
+	return formattedDateTime, nil
+}
+
+func Shorten(word string, size int) string {
+	if len(word) > size {
+		word = word[:size] + "..."
+	}
+	return word
 }

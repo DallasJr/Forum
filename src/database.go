@@ -244,12 +244,12 @@ func GetRecentPosts() ([]structs.Post, error) {
 		post.Likes = likes
 		post.Dislikes = dislikes
 
-		/*formattedDate, err := post.FormattedDate()
+		formattedDate, err := post.FormattedDate()
 		if err != nil {
 			fmt.Println("Error formatting date:", err)
 		}
 
-		post.CreationDate = formattedDate*/
+		post.CreationDate = formattedDate
 		posts = append(posts, post)
 	}
 	if err := rows.Err(); err != nil {

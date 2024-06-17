@@ -79,6 +79,13 @@ func serveCategoryPage(w http.ResponseWriter, r *http.Request) {
 	ExportData.Category = category
 
 	posts, _ := src.GetPostsByCategory(name, 0, 5)
+
+	for i := range posts {
+		posts[i].Title = structs.Shorten(posts[i].Title, 13)
+		posts[i].Content = structs.Shorten(posts[i].Content, 13)
+		posts[i].Creator = structs.Shorten(posts[i].Creator, 10)
+	}
+
 	ExportData.Posts = posts
 
 	tmpl.Execute(w, ExportData)

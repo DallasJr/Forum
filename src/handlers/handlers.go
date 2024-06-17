@@ -87,6 +87,11 @@ func index(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unable to retrieve recent posts", http.StatusInternalServerError)
 		return
 	}
+	for i := range posts {
+		posts[i].Title = structs.Shorten(posts[i].Title, 20)
+		posts[i].Content = structs.Shorten(posts[i].Content, 20)
+		posts[i].Creator = structs.Shorten(posts[i].Creator, 10)
+	}
 	ExportData.RecentPosts = posts
 
 	tmpl.Execute(w, ExportData)
