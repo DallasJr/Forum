@@ -224,7 +224,7 @@ func genderHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	gender := r.FormValue("gender")
-	if gender != "male" && gender != "female" {
+	if gender != "male" && gender != "female" && gender != "other" {
 		http.Error(w, "An error occurred", http.StatusInternalServerError)
 		return
 	}

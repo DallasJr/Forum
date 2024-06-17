@@ -120,7 +120,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		returnError(w, r)
 		return
 	}*/
-	if gender != "male" && gender != "female" {
+	if gender != "male" && gender != "female" && gender != "other" {
 		serveRegisterPage(w, r)
 		return
 	}

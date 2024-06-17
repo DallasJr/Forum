@@ -90,15 +90,15 @@
                             {{if eq .User.Gender "male"}}
                             <option value="male" selected>Male</option>
                             <option value="female">Female</option>
-                            <option value="female">Other</option>
-                            {{else if eq .User.Gender "male"}}
+                            <option value="other">Other</option>
+                            {{else if eq .User.Gender "female"}}
                             <option value="male">Male</option>
                             <option value="female" selected>Female</option>
-                            <option value="female">Other</option>
-                            {{else if eq .User.Gender "male"}}
+                            <option value="other">Other</option>
+                            {{else if eq .User.Gender "other"}}
                             <option value="male">Male</option>
                             <option value="female">Female</option>
-                            <option value="female" selected>Other</option>
+                            <option value="other" selected>Other</option>
                             {{end}}
                         </select>
                         <button id="gender-button" type="submit" disabled>Save</button>
