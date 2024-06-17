@@ -66,14 +66,13 @@
                     <h1>{{.Category.Name}}</h1>
                 </div>
             </div>
-            <div id="category-message" class="category-message" style="color: green" hidden="hidden"></div>
 
             <div class="content-container">
                 <div class="posts-section">
                     <h2>Posts in {{.Category.Name}}</h2>
                     <div class="posts-list" id="posts-list">
                         {{range .Posts}}
-                        <a href="/posts/{{.Uuid}}" class="post-item">
+                        <a href="/post/{{.Uuid}}" class="post-item">
                             <div class="post-creator">{{.Creator}}</div>
                             <div class="post-content">
                                 <h3>{{.Title}}</h3>
@@ -131,48 +130,57 @@
                 return response.json();
             })
             .then(posts => {
+                if (!posts || posts.length === 0) {
+                    document.getElementById('show-more-btn').style.display = 'none';
+                    return;
+                }
+
                 const postsList = document.getElementById('posts-list');
                 if (!postsList) {
                     console.error('posts-list element not found');
                     return;
                 }
-                posts.forEach(post => {
-                    const postLink = document.createElement('a');
-                    postLink.href = `/posts/${post.Uuid}`;
-                    postLink.classList.add('post-item');
+                    posts.forEach(post => {
+                        const postLink = document.createElement('a');
+                        postLink.href = `/post/${post.Uuid}`;
+                        postLink.classList.add('post-item');
 
-                    postLink.innerHTML = `
-                    <div class="post-content">
-                        <h3>${post.Title}</h3>
-                        <p>${post.Content}</p>
-                        <p class="post-meta">Posted on ${post.CreationDate}</p>
-                    </div>
-                `;
+                        postLink.innerHTML = `
+                        <div class="post-creator">${post.Creator}</div>
+                        <div class="post-content">
+                            <h3>${post.Title}</h3>
+                            <p>${post.Content}</p>
+                        </div>
+                        <div class="post-category">
+                            <h3>Category</h3>
+                            <p>${post.Category}</p>
+                        </div>
+                        <div class="post-meta">Posted on ${post.CreationDate}</div>
+                    `;
 
-                    const postActions = document.createElement('div');
-                    postActions.classList.add('post-actions');
+                        const postActions = document.createElement('div');
+                        postActions.classList.add('post-actions');
 
-                    const likeCount = document.createElement('div');
-                    likeCount.classList.add('like-count');
-                    likeCount.innerHTML = `
-                    <i class="fas fa-thumbs-up"></i>
-                    <span>${post.Likes ? post.Likes.length : 0}</span>
-                `;
-                    postActions.appendChild(likeCount);
+                        const likeCount = document.createElement('div');
+                        likeCount.classList.add('like-count');
+                        likeCount.innerHTML = `
+                        <i class="fas fa-thumbs-up"></i>
+                        <span>${post.Likes ? post.Likes.length : 0}</span>
+                    `;
+                        postActions.appendChild(likeCount);
 
-                    const dislikeCount = document.createElement('div');
-                    dislikeCount.classList.add('dislike-count');
-                    dislikeCount.innerHTML = `
-                    <i class="fas fa-thumbs-down"></i>
-                    <span>${post.Dislikes ? post.Dislikes.length : 0}</span>
-                `;
-                    postActions.appendChild(dislikeCount);
+                        const dislikeCount = document.createElement('div');
+                        dislikeCount.classList.add('dislike-count');
+                        dislikeCount.innerHTML = `
+                        <i class="fas fa-thumbs-down"></i>
+                        <span>${post.Dislikes ? post.Dislikes.length : 0}</span>
+                    `;
+                        postActions.appendChild(dislikeCount);
 
-                    postLink.appendChild(postActions);
+                        postLink.appendChild(postActions);
 
-                    postsList.appendChild(postLink);
-                });
-
+                        postsList.appendChild(postLink);
+                    });
                 offset += posts.length;
 
                 if (posts.length < 5) {
@@ -183,16 +191,6 @@
                 console.error('Error fetching more posts:', error);
             });
     }
-    document.addEventListener("DOMContentLoaded", function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const message = urlParams.get('message');
-        if (message) {
-            document.getElementById('category-message').textContent = message;
-            document.getElementById('category-message').hidden = false;
-            const newUrl = window.location.origin + window.location.pathname;
-            window.history.replaceState({}, document.title, newUrl);
-        }
-    });
 
 </script>
 

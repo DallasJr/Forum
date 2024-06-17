@@ -42,6 +42,9 @@ func SetupHandlers() {
 	//post page
 	http.HandleFunc("/create-post/", servePostCreatePage)
 	http.HandleFunc("/create-post/submit", handleCreatePost)
+	http.HandleFunc("/post/", postsHandler)
+	http.HandleFunc("/submit-answer", handleAnswerSubmission)
+	http.HandleFunc("/more-answers", showMoreAnswers)
 
 	//administration page
 	http.HandleFunc("/administration.html", serveAdministrationPage)

@@ -6,7 +6,7 @@ import (
 )
 
 type Post struct {
-	Uuid         string
+	Uuid         uuid.UUID
 	Title        string
 	Content      string
 	Creator      string

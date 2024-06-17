@@ -54,6 +54,7 @@ button {
     width: 100%;
     margin-bottom: 20px;
     transition: 200ms;
+    resize: vertical;
 }
 
 input[type="text"]:hover,

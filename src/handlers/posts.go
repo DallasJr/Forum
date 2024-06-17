@@ -5,11 +5,12 @@ import (
 	"Forum/src/structs"
 	"encoding/json"
 	"fmt"
-	"github.com/gofrs/uuid/v5"
+	"github.com/google/uuid"
 	"html/template"
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -17,6 +18,12 @@ import (
 type postCreationPageData struct {
 	User     structs.User
 	Category structs.Category
+}
+
+type postPageData struct {
+	User    structs.User
+	Post    structs.Post
+	Answers []structs.Answer
 }
 
 func servePostCreatePage(w http.ResponseWriter, r *http.Request) {
@@ -96,8 +103,17 @@ func handleCreatePost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Title and content are required", http.StatusBadRequest)
 		return
 	}
+	if len(title) > 100 {
+		http.Error(w, "Title too long", http.StatusBadRequest)
+		return
+	}
+	if len(content) > 2500 {
+		http.Error(w, "Content too long", http.StatusBadRequest)
+		return
+	}
+
 	post := structs.Post{
-		Uuid:         uuid.Must(uuid.NewV4()).String(),
+		Uuid:         uuid.New(),
 		Title:        title,
 		Content:      content,
 		Creator:      user.Username,
@@ -187,12 +203,149 @@ func handleCreatePost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to execute SQL statement", http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"redirect": "/categories/" + category.Name + "?message=Post%20posted%20successfully%20!"})
+	//http.Redirect(w, r, "/post/"+post.Uuid.String()+"?p-message=Post%20posted%20successfully%20!", http.StatusSeeOther)
+	json.NewEncoder(w).Encode(map[string]string{"redirect": "/post/" + post.Uuid.String() + "?p-message=Post%20posted%20successfully%20!"})
 }
 
 func sendErrorResponse(w http.ResponseWriter, message string, statusCode int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	json.NewEncoder(w).Encode(map[string]string{"error": message})
+}
+
+func showMoreAnswers(w http.ResponseWriter, r *http.Request) {
+	postUuid := r.URL.Query().Get("post")
+	offset, err := strconv.Atoi(r.URL.Query().Get("offset"))
+	if err != nil {
+		http.Error(w, "Invalid offset", http.StatusBadRequest)
+		return
+	}
+	posts, err := src.GetAnswersByPosts(postUuid, offset, 5)
+	if err != nil {
+		http.Error(w, "Unable to retrieve more answers", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(posts)
+}
+
+func postsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path == "/post" || r.URL.Path == "/post/" {
+		index(w, r)
+		return
+	} else {
+		servePostPage(w, r)
+	}
+}
+
+func servePostPage(w http.ResponseWriter, r *http.Request) {
+	id := strings.TrimPrefix(r.URL.Path, "/post/")
+	if id == "" {
+		http.NotFound(w, r)
+		return
+	}
+
+	ExportData := postPageData{}
+
+	if cookieExists(r, "sessionID") {
+		sessionID := src.GetValidSession(r)
+		if sessionID == "" {
+			logoutHandler(w, r)
+			return
+		}
+		user, _ := src.GetUserFromSessionID(sessionID)
+		ExportData.User = user
+	}
+
+	post, _ := src.GetPost(id)
+	ExportData.Post = post
+
+	//Answers
+	answers, _ := src.GetAnswersByPosts(id, 0, 5)
+
+	ExportData.Answers = answers
+
+	funcMap := template.FuncMap{
+		"userHasLiked":    userHasLiked,
+		"userHasDisliked": userHasDisliked,
+	}
+	t := template.Must(template.New("post.html").Funcs(funcMap).ParseFiles("src/templates/post.html"))
+	t.Execute(w, ExportData)
+}
+
+func userHasLiked(userUUID uuid.UUID, likes []uuid.UUID) bool {
+	for _, like := range likes {
+		if like == userUUID {
+			return true
+		}
+	}
+	return false
+}
+
+func userHasDisliked(userUUID uuid.UUID, dislikes []uuid.UUID) bool {
+	for _, dislike := range dislikes {
+		if dislike == userUUID {
+			return true
+		}
+	}
+	return false
+}
+
+func handleAnswerSubmission(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if !cookieExists(r, "sessionID") {
+		http.Redirect(w, r, "/login.html", http.StatusFound)
+		return
+	}
+
+	sessionID := src.GetValidSession(r)
+	if sessionID == "" {
+		logoutHandler(w, r)
+		return
+	}
+	user, _ := src.GetUserFromSessionID(sessionID)
+
+	postString := r.FormValue("post")
+	post, err := src.GetPost(postString)
+	if err != nil {
+		http.Redirect(w, r, "/error.html", http.StatusFound)
+		return
+	}
+	content := r.FormValue("answer-content")
+
+	// Validate title and content
+	if content == "" {
+		http.Error(w, "Content is required", http.StatusBadRequest)
+		return
+	}
+	if len(content) > 1000 {
+		http.Error(w, "Content too long", http.StatusBadRequest)
+		return
+	}
+
+	answer := structs.Answer{
+		Uuid:         uuid.New(),
+		Content:      content,
+		CreatorUUID:  user.Uuid,
+		PostID:       post.Uuid,
+		CreationDate: time.Now().Format("2006-01-02 15:04:05"),
+	}
+
+	stmt, err := src.Db.Prepare(`INSERT INTO answers (uuid, content, owner_id, post_id, created_at)
+                             VALUES (?, ?, ?, ?, ?)`)
+	if err != nil {
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(answer.Uuid, answer.Content, answer.CreatorUUID, answer.PostID, answer.CreationDate)
+	if err != nil {
+		http.Error(w, "Failed to execute SQL statement", http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, "/post/"+post.Uuid.String()+"?a-message=Answer%20posted%20successfully%20!", http.StatusSeeOther)
 }

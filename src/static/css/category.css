@@ -2,16 +2,6 @@ h1 {
     color: white;
 }
 
-#category-message {
-    color: white;
-    text-align: center;
-    background-color: #18181b;
-    border: 1px solid #232327;
-    border-radius: 8px;
-    margin-top: 20px;
-    padding: 10px;
-}
-
 .page-content {
     padding-top: 50px;
 }
@@ -247,8 +237,8 @@ h2 {
 }
 
 .create-post-btn:hover, .login-btn:hover {
-    background-color: #18181b;
-}
+        background-color: #18181b;
+    }
 
 @media screen and (max-width: 768px) {
     .content-container {

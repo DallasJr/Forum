@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<!--suppress HtmlUnknownTarget -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../static/css/style.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/navbar.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/post.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" />
+    <script src="../static/javascript/navbar.js"></script>
+    <title>RollinSpot</title>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-container">
+        <a href="/" class="brand">
+            <img src="../static/image/Rollinspot-logo.png" alt="RollinSpot Logo">
+        </a>
+        <div class="menu-icon" onclick="toggleMenu()">
+            &#9776;
+        </div>
+        <div class="nav-links" id="nav-links">
+            {{if gt .User.Power 0}}
+            <a href="/administration.html" class="nav-item" id="administration">Admin panel</a>
+            {{end}}
+            {{if eq .User.Username ""}}
+            <a href="/login.html" class="nav-item" id="login">Login</a>
+            <a href="/register.html" class="nav-item" id="register">Register</a>
+            {{else}}
+            <a href="/error.html" class="nav-item" id="notifications">Notifications</a>
+            <a href="/error.html" class="nav-item" id="messages">Messages</a>
+            <a href="/error.html" class="nav-item" id="profile">{{.User.Username}}</a>
+            <a href="/settings.html" class="nav-item" id="settings">Settings</a>
+            <a href="/logout" class="nav-item" id="logout">Logout</a>
+            {{end}}
+        </div>
+    </div>
+
+    <div class="mobile-links" id="mobile-links">
+        {{if gt .User.Power 0}}
+        <a href="/administration.html" class="nav-item" id="administration-m">Admin panel</a>
+        {{end}}
+        {{if eq .User.Username ""}}
+        <a href="/login.html" class="nav-item" id="login-m">Login</a>
+        <a href="/register.html" class="nav-item" id="register-m">Register</a>
+        {{else}}
+        <a href="/error.html" class="nav-item" id="notifications-m">Notifications</a>
+        <a href="/error.html" class="nav-item" id="messages-m">Messages</a>
+        <a href="/error.html" class="nav-item" id="profile-m">{{.User.Username}}</a>
+        <a href="/settings.html" class="nav-item" id="settings-m">Settings</a>
+        <a href="/logout" class="nav-item" id="logout-m">Logout</a>
+        {{end}}
+    </div>
+</nav>
+
+<div class="post-page">
+    <div id="post-feedback" class="post-feedback" style="color: green" hidden="hidden"></div>
+    <div class="post">
+        <h2>{{.Post.Title}}</h2>
+        <p class="post-meta">Posted by {{ .Post.Creator }} in <a href="/categories/{{ .Post.Category }}">{{ .Post.Category }}</a> on {{ .Post.CreationDate }}</p>
+        <div class="post-content">
+            <p>{{ .Post.Content }}</p>
+            {{ if .Post.Images }}
+            <div class="post-images">
+                {{ range .Post.Images }}
+                <img src="{{ . }}" alt="Post Image">
+                {{ end }}
+            </div>
+            {{ end }}
+        </div>
+        <div class="post-actions">
+            <div class="like-action">
+                {{if eq .User.Username ""}}
+                    <button class="like-btn" data-action="like">
+                        <i class="fas fa-thumbs-up"></i>
+                        <span class="like-count">{{ len .Post.Likes }}</span>
+                    </button>
+                {{else}}
+                    {{ if userHasLiked .User.Uuid .Post.Likes }}
+                        <button class="like-btn liked" data-action="unlike">
+                            <i class="fas fa-thumbs-up"></i>
+                            <span class="like-count">{{ len .Post.Likes }}</span>
+                        </button>
+                    {{ else }}
+                        <button class="like-btn" data-action="like">
+                            <i class="fas fa-thumbs-up"></i>
+                            <span class="like-count">{{ len .Post.Likes }}</span>
+                        </button>
+                    {{ end }}
+                {{end}}
+
+            </div>
+            <div class="dislike-action">
+                {{if eq .User.Username ""}}
+                    <button class="dislike-btn" data-action="dislike">
+                        <i class="fas fa-thumbs-down"></i>
+                        <span class="dislike-count">{{ len .Post.Dislikes }}</span>
+                    </button>
+                {{else}}
+                    {{ if userHasDisliked .User.Uuid .Post.Dislikes }}
+                        <button class="dislike-btn disliked" data-action="undislike">
+                            <i class="fas fa-thumbs-down"></i>
+                            <span class="dislike-count">{{ len .Post.Dislikes }}</span>
+                        </button>
+                    {{ else }}
+                        <button class="dislike-btn" data-action="dislike">
+                            <i class="fas fa-thumbs-down"></i>
+                            <span class="dislike-count">{{ len .Post.Dislikes }}</span>
+                        </button>
+                    {{ end }}
+                {{ end }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Display answers -->
+    <div class="answers">
+        <div class="answers-title">
+            <h3>Answers</h3>
+            <div id="answer-feedback" class="answer-feedback"></div>
+        </div>
+
+        <div id="answers-list" class="for-first">
+        {{ range .Answers }}
+            <div class="answer">
+                <div class="answer-header">
+                    <p class="answer-username">{{ .Creator.Username }}</p>
+                    <p class="answer-meta">{{ .CreationDate }}</p>
+                </div>
+                <p class="answer-msg">
+                    {{ .Content }}
+                </p>
+            </div>
+        {{ end }}
+        </div>
+        {{if eq (len .Answers) 5}}
+            <button id="show-more-btn" onclick="loadMoreAnswers()">Show More</button>
+        {{end}}
+
+        <!-- Form to post an answer -->
+        {{if eq .User.Username ""}}
+        <a href="/login.html">
+            <button class="login-btn">Login to answer</button>
+        </a>
+        {{else}}
+            <form id="answer-form" action="/submit-answer" method="post">
+                <input type="hidden" name="post" value="{{.Post.Uuid}}">
+                <textarea id="answer-content" name="answer-content" rows="4" placeholder="Write your answer here" maxlength="1000" minlength="2"></textarea><br>
+                <button type="submit">Post Answer</button>
+            </form>
+        {{end}}
+    </div>
+</div>
+</body>
+
+<script>
+
+    let offset = 5;
+
+    function loadMoreAnswers() {
+        const post = "{{.Post.Uuid}}";
+        fetch(`/more-answers?post=${post}&offset=${offset}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(answers => {
+                if (!answers || answers.length === 0) {
+                    document.getElementById('show-more-btn').style.display = 'none';
+                    return;
+                }
+
+                const answersList = document.getElementById('answers-list');
+                if (!answersList) {
+                    console.error('answers-list element not found');
+                    return;
+                }
+                answers.forEach(answer => {
+                    const answerDiv = document.createElement('div');
+                    answerDiv.classList.add('answer');
+
+                    answerDiv.innerHTML = `
+                        <div class="answer-header">
+                            <p class="answer-username">${answer.Creator.Username}</p>
+                            <p class="answer-meta">${answer.CreationDate}</p>
+                        </div>
+                        <p class="answer-msg">
+                            ${answer.Content}
+                        </p>
+                    `;
+
+                    answersList.appendChild(answerDiv);
+                });
+
+                offset += answers.length;
+
+                if (answers.length < 5) {
+                    document.getElementById('show-more-btn').style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching more answers:', error);
+            });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const amessage = urlParams.get('a-message');
+        const pmessage = urlParams.get('p-message');
+
+        if (amessage) {
+            const feedbackElement = document.getElementById('answer-feedback');
+            feedbackElement.textContent = amessage;
+            const newUrl = window.location.origin + window.location.pathname;
+            window.history.replaceState({}, document.title, newUrl);
+        }
+        if (pmessage) {
+            const feedbackElement = document.getElementById('post-feedback');
+            feedbackElement.textContent = pmessage;
+            feedbackElement.hidden = false;
+            const newUrl = window.location.origin + window.location.pathname;
+            window.history.replaceState({}, document.title, newUrl);
+        }
+    });
+
+
+</script>
+
+
+</html>

@@ -1,0 +1,246 @@
+/* Container styles */
+.post-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-top: 80px;
+}
+
+/* Post styles */
+.post, .post-feedback {
+    border: 1px solid #232327;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    background-color: #18181b;
+    word-wrap: break-word; /* Ensure content wraps */
+    overflow-wrap: break-word;
+}
+
+.post h2 {
+    color: white;
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+.post-meta {
+    font-size: 0.9em;
+    color: #777;
+}
+
+.post-meta a {
+    color: #737373;
+}
+
+.post-content p {
+    color: white;
+    margin: 10px 0;
+}
+
+.post-images img {
+    max-width: 100%;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+/* Post actions styles */
+.post-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+.post-actions .like-action,
+.post-actions .dislike-action {
+    margin-left: 15px;
+}
+
+.like-btn,
+.dislike-btn {
+    background: none;
+    border: 3px solid #232327;
+    cursor: pointer;
+    font-size: 1em;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: 200ms
+}
+
+.like-btn {
+    color: green;
+}
+
+.dislike-btn {
+    color: #C71E1E;
+}
+
+.like-btn:hover {
+    border-color: green;
+}
+
+.like-btn.liked {
+    border-color: green;
+}
+
+.dislike-btn:hover {
+    border-color: #C71E1E;
+}
+
+.dislike-btn.disliked {
+    border-color: #C71E1E;
+}
+
+.like-count,
+.dislike-count {
+    font-size: 1em;
+    color: #333;
+}
+
+/* Answers section styles */
+.answers {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    border: 1px solid #232327;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #18181b;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.answers h3 {
+    color: white;
+    margin-bottom: 15px;
+}
+
+#show-more-btn {
+    border: 2px solid #2c2c31;
+    background-color: #18181b;
+    color: white;
+    width: 100%;
+    margin-bottom: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+#show-more-btn:hover {
+    cursor: pointer;
+    text-decoration: underline;
+    border-color: #333336;
+}
+
+.answer:first-child {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.answer {
+    padding: 10px 10px;
+    margin-bottom: 5px;
+    border: 2px solid #2c2c31;
+    background-color: #18181b;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.answer-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 3px;
+}
+
+.answer-username {
+    color: #fff;
+    font-size: 1.09em;
+}
+
+.answer-msg {
+    color: #dddee0;
+}
+
+.answer-meta {
+    margin-left: 10px;
+    font-size: 0.8em;
+    color: #6c7178;
+}
+
+.answer-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 5px;
+}
+
+.answer-actions .like-action,
+.answer-actions .dislike-action {
+    margin-left: 15px;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    border-style: solid;
+    border-color: #4c4c50;
+    border-radius: 4px;
+    background-color: #18181b;
+    color: #b6b6b6;
+    border-width: 2px;
+    resize: vertical;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+textarea:hover {
+    border-color: #6d6d72;
+}
+
+textarea:focus {
+    border-color: #C71E1E;
+    border-width: 3px;
+    outline: none;
+    color: white;
+}
+
+button[type="submit"] {
+    background-color: #C71E1E;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+}
+
+button[type="submit"]:hover {
+    background-color: #af1b1b;
+}
+
+.answers-title {
+    display: flex;
+}
+
+.answer-feedback {
+    margin: 2px 0 0 20px;
+    color: green;
+}
+
+.login-btn {
+    border: none;
+    width: 100%;
+    padding: 10px 20px;
+    font-size: 18px;
+    background-color: #C71E1E;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    text-align: center;
+    transition: background-color 200ms;
+    cursor: pointer;
+}
+
+.login-btn:hover {
+    background-color: #af1b1b;
+}

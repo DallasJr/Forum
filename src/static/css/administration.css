@@ -159,6 +159,7 @@ form button {
     padding: 5px;
     border: 2px solid #232327;
     border-radius: 4px;
+    resize: vertical;
     background-color: #18181b;
     color: #b6b6b6;
 }

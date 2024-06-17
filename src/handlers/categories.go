@@ -55,7 +55,6 @@ type categoryPageData struct {
 }
 
 func serveCategoryPage(w http.ResponseWriter, r *http.Request) {
-	// Remove the prefix "/categories/"
 	name := strings.TrimPrefix(r.URL.Path, "/categories/")
 	if name == "" {
 		http.NotFound(w, r)
