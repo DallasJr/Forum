@@ -135,6 +135,36 @@
     padding: 10px 20px;
     transition: 200ms
 }
+@media screen and (max-width: 768px) {
+
+    .post-item {
+        display: inline;
+    }
+
+    .post-creator {
+        margin-bottom: 10px;
+    }
+
+    .post-content {
+        margin-bottom: 10px;
+    }
+
+    .post-category {
+        margin-bottom: 10px;
+    }
+
+    .post-meta {
+        margin-bottom: 10px;
+    }
+
+    .post-actions {
+        justify-content: center;
+    }
+
+    .dislike-count {
+        margin-left: 20px;
+    }
+}
 
 .post-item:hover {
     border-color: #C71E1E;
@@ -195,8 +225,15 @@
 .dislike-count {
     display: flex;
     align-items: center;
-    margin-left: 20px;
     color: #555;
+}
+
+@media screen and (min-width: 768px) {
+
+    .like-count,
+    .dislike-count {
+        margin-left: 20px;
+    }
 }
 
 .like-count i,
