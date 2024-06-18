@@ -9,10 +9,11 @@ type Post struct {
 	Uuid         uuid.UUID
 	Title        string
 	Content      string
-	Creator      string
+	CreatorUUID  uuid.UUID
 	Category     string
 	CreationDate string
-	Likes        []uuid.UUID `json:"likes"` // Assuming likes are stored as a JSON array of UUIDs
+	Creator      User
+	Likes        []uuid.UUID `json:"likes"`
 	Dislikes     []uuid.UUID `json:"dislikes"`
 	Images       []string    `json:"images"`
 	AnswersCount int

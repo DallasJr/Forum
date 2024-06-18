@@ -33,11 +33,15 @@ func SetupHandlers() {
 	http.HandleFunc("/change-password", passwordHandler)
 	http.HandleFunc("/change-email", emailHandler)
 	http.HandleFunc("/change-gender", genderHandler)
+	http.HandleFunc("/change-username", usernameHandler)
 	http.HandleFunc("/change-names", namesHandler)
 
 	//categories page
 	http.HandleFunc("/categories/", categoriesHandler)
 	http.HandleFunc("/more-posts", showMorePosts)
+
+	//profile page
+	http.HandleFunc("/profile/", profilesHandler)
 
 	//post page
 	http.HandleFunc("/create-post/", servePostCreatePage)
@@ -70,13 +74,10 @@ func index(w http.ResponseWriter, r *http.Request) {
 	if cookieExists(r, "sessionID") {
 		sessionID := src.GetValidSession(r)
 		if sessionID == "" {
-			logoutHandler(w, r)
-			return
+			w, r = removeSession(w, r)
 		}
 		user, _ := src.GetUserFromSessionID(sessionID)
-		if user.Username != "" {
-			ExportData.User = user
-		}
+		ExportData.User = user
 	}
 
 	categories, err := getAllCategories()
@@ -93,7 +94,9 @@ func index(w http.ResponseWriter, r *http.Request) {
 	for i := range posts {
 		posts[i].Title = structs.Shorten(posts[i].Title, 20)
 		posts[i].Content = structs.Shorten(posts[i].Content, 20)
-		posts[i].Creator = structs.Shorten(posts[i].Creator, 10)
+		if posts[i].Creator.Username != "Deleted User" {
+			posts[i].Creator.Username = structs.Shorten(posts[i].Creator.Username, 12)
+		}
 	}
 	ExportData.RecentPosts = posts
 

@@ -27,23 +27,21 @@ type postPageData struct {
 }
 
 func servePostCreatePage(w http.ResponseWriter, r *http.Request) {
-	if strings.Contains(r.URL.Path, "favicon.ico") {
-		return
-	}
 	tmpl := template.Must(template.ParseFiles("src/templates/creation-post.html"))
 
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 	w.Header().Set("Pragma", "no-cache")
 	w.Header().Set("Expires", "0")
 
+	ExportData := postCreationPageData{}
 	if !cookieExists(r, "sessionID") {
 		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
-	ExportData := postCreationPageData{}
 	sessionID := src.GetValidSession(r)
 	if sessionID == "" {
-		logoutHandler(w, r)
+		w, r = removeSession(w, r)
+		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
 	user, _ := src.GetUserFromSessionID(sessionID)
@@ -75,10 +73,10 @@ func handleCreatePost(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
-
 	sessionID := src.GetValidSession(r)
 	if sessionID == "" {
-		logoutHandler(w, r)
+		w, r = removeSession(w, r)
+		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
 	user, _ := src.GetUserFromSessionID(sessionID)
@@ -116,7 +114,7 @@ func handleCreatePost(w http.ResponseWriter, r *http.Request) {
 		Uuid:         uuid.New(),
 		Title:        title,
 		Content:      content,
-		Creator:      user.Username,
+		CreatorUUID:  user.Uuid,
 		Category:     category.Name,
 		CreationDate: time.Now().Format("2006-01-02 15:04:05"),
 	}
@@ -198,7 +196,7 @@ func handleCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer stmt.Close()
-	_, err = stmt.Exec(post.Uuid, post.Title, post.Content, post.Creator, post.Category, post.CreationDate, likesJSON, dislikesJSON, imagesJSON)
+	_, err = stmt.Exec(post.Uuid, post.Title, post.Content, post.CreatorUUID, post.Category, post.CreationDate, likesJSON, dislikesJSON, imagesJSON)
 	if err != nil {
 		http.Error(w, "Failed to execute SQL statement", http.StatusInternalServerError)
 		return
@@ -239,19 +237,23 @@ func postsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func servePostPage(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
+
 	id := strings.TrimPrefix(r.URL.Path, "/post/")
-	if id == "" {
+	/*if id == "" {
 		http.NotFound(w, r)
 		return
-	}
+	}*/
 
 	ExportData := postPageData{}
 
 	if cookieExists(r, "sessionID") {
 		sessionID := src.GetValidSession(r)
 		if sessionID == "" {
-			logoutHandler(w, r)
-			return
+			w, r = removeSession(w, r)
 		}
 		user, _ := src.GetUserFromSessionID(sessionID)
 		ExportData.User = user
@@ -301,10 +303,10 @@ func handleAnswerSubmission(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
-
 	sessionID := src.GetValidSession(r)
 	if sessionID == "" {
-		logoutHandler(w, r)
+		w, r = removeSession(w, r)
+		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
 	user, _ := src.GetUserFromSessionID(sessionID)
@@ -335,14 +337,37 @@ func handleAnswerSubmission(w http.ResponseWriter, r *http.Request) {
 		CreationDate: time.Now().Format("2006-01-02 15:04:05"),
 	}
 
-	stmt, err := src.Db.Prepare(`INSERT INTO answers (uuid, content, owner_id, post_id, created_at)
-                             VALUES (?, ?, ?, ?, ?)`)
+	likeStrings := make([]string, len(answer.Likes))
+	for i, like := range answer.Likes {
+		likeStrings[i] = like.String()
+	}
+
+	dislikeStrings := make([]string, len(answer.Dislikes))
+	for i, dislike := range answer.Dislikes {
+		dislikeStrings[i] = dislike.String()
+	}
+
+	// Convert likes, dislikes, and images to JSON
+	likesJSON, err := json.Marshal(likeStrings)
+	if err != nil {
+		http.Error(w, "Unable to post post", http.StatusInternalServerError)
+		return
+	}
+
+	dislikesJSON, err := json.Marshal(dislikeStrings)
+	if err != nil {
+		http.Error(w, "Unable to post post", http.StatusInternalServerError)
+		return
+	}
+
+	stmt, err := src.Db.Prepare(`INSERT INTO answers (uuid, content, owner_id, post_id, created_at, likes, dislikes)
+                             VALUES (?, ?, ?, ?, ?, ?, ?)`)
 	if err != nil {
 		http.Error(w, "Database error", http.StatusInternalServerError)
 		return
 	}
 	defer stmt.Close()
-	_, err = stmt.Exec(answer.Uuid, answer.Content, answer.CreatorUUID, answer.PostID, answer.CreationDate)
+	_, err = stmt.Exec(answer.Uuid, answer.Content, answer.CreatorUUID, answer.PostID, answer.CreationDate, likesJSON, dislikesJSON)
 	if err != nil {
 		http.Error(w, "Failed to execute SQL statement", http.StatusInternalServerError)
 		return

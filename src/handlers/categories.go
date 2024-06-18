@@ -11,43 +11,6 @@ import (
 	"strings"
 )
 
-type categoriesPageData struct {
-	User       structs.User
-	Categories []structs.Category
-}
-
-func serveCategoriesPage(w http.ResponseWriter, r *http.Request) {
-	if strings.Contains(r.URL.Path, "favicon.ico") {
-		return
-	}
-	tmpl := template.Must(template.ParseFiles("src/templates/categories.html"))
-
-	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-	w.Header().Set("Pragma", "no-cache")
-	w.Header().Set("Expires", "0")
-
-	ExportData := categoriesPageData{}
-
-	if cookieExists(r, "sessionID") {
-		sessionID := src.GetValidSession(r)
-		if sessionID == "" {
-			logoutHandler(w, r)
-			return
-		}
-		user, _ := src.GetUserFromSessionID(sessionID)
-		ExportData.User = user
-	}
-
-	categories, err := getAllCategories()
-	if err != nil {
-		http.Error(w, "Unable to retrieve categories", http.StatusInternalServerError)
-		return
-	}
-	ExportData.Categories = categories
-
-	tmpl.Execute(w, ExportData)
-}
-
 type categoryPageData struct {
 	User     structs.User
 	Category structs.Category
@@ -55,11 +18,15 @@ type categoryPageData struct {
 }
 
 func serveCategoryPage(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
+
 	name := strings.TrimPrefix(r.URL.Path, "/categories/")
-	if name == "" {
+	/*if name == "" {
 		http.NotFound(w, r)
 		return
-	}
+	}*/
 	tmpl := template.Must(template.ParseFiles("src/templates/category.html"))
 
 	ExportData := categoryPageData{}
@@ -67,8 +34,7 @@ func serveCategoryPage(w http.ResponseWriter, r *http.Request) {
 	if cookieExists(r, "sessionID") {
 		sessionID := src.GetValidSession(r)
 		if sessionID == "" {
-			logoutHandler(w, r)
-			return
+			w, r = removeSession(w, r)
 		}
 		user, _ := src.GetUserFromSessionID(sessionID)
 		ExportData.User = user
@@ -82,7 +48,9 @@ func serveCategoryPage(w http.ResponseWriter, r *http.Request) {
 	for i := range posts {
 		posts[i].Title = structs.Shorten(posts[i].Title, 20)
 		posts[i].Content = structs.Shorten(posts[i].Content, 20)
-		posts[i].Creator = structs.Shorten(posts[i].Creator, 16)
+		if posts[i].Creator.Username != "Deleted User" {
+			posts[i].Creator.Username = structs.Shorten(posts[i].Creator.Username, 16)
+		}
 	}
 
 	ExportData.Posts = posts
@@ -105,7 +73,9 @@ func showMorePosts(w http.ResponseWriter, r *http.Request) {
 	for i := range posts {
 		posts[i].Title = structs.Shorten(posts[i].Title, 20)
 		posts[i].Content = structs.Shorten(posts[i].Content, 20)
-		posts[i].Creator = structs.Shorten(posts[i].Creator, 16)
+		if posts[i].Creator.Username != "Deleted User" {
+			posts[i].Creator.Username = structs.Shorten(posts[i].Creator.Username, 16)
+		}
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(posts)

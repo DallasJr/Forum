@@ -26,15 +26,14 @@ func serveAdministrationPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Expires", "0")
 
 	if !cookieExists(r, "sessionID") {
-		http.ServeFile(w, r, "src/templates/login.html")
+		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
-
 	ExportData := administrationPageData{}
-
 	sessionID := src.GetValidSession(r)
 	if sessionID == "" {
-		logoutHandler(w, r)
+		w, r = removeSession(w, r)
+		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
 	user, _ := src.GetUserFromSessionID(sessionID)
@@ -57,23 +56,23 @@ func serveAdministrationPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func addCategory(w http.ResponseWriter, r *http.Request) {
-
-	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-	w.Header().Set("Pragma", "no-cache")
-	w.Header().Set("Expires", "0")
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
 
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
+
 	if !cookieExists(r, "sessionID") {
-		http.ServeFile(w, r, "src/templates/login.html")
+		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
-
 	sessionID := src.GetValidSession(r)
 	if sessionID == "" {
-		logoutHandler(w, r)
+		w, r = removeSession(w, r)
+		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
 	user, _ := src.GetUserFromSessionID(sessionID)
@@ -106,23 +105,24 @@ func addCategory(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteCategory(w http.ResponseWriter, r *http.Request) {
-
-	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-	w.Header().Set("Pragma", "no-cache")
-	w.Header().Set("Expires", "0")
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
 
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
+
 	if !cookieExists(r, "sessionID") {
-		http.ServeFile(w, r, "src/templates/login.html")
+		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
 
 	sessionID := src.GetValidSession(r)
 	if sessionID == "" {
-		logoutHandler(w, r)
+		w, r = removeSession(w, r)
+		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
 	user, _ := src.GetUserFromSessionID(sessionID)
@@ -158,23 +158,24 @@ func updateCategory(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unable to parse form", http.StatusBadRequest)
 		return
 	}
-
-	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-	w.Header().Set("Pragma", "no-cache")
-	w.Header().Set("Expires", "0")
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
 
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
+
 	if !cookieExists(r, "sessionID") {
-		http.ServeFile(w, r, "src/templates/login.html")
+		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
 
 	sessionID := src.GetValidSession(r)
 	if sessionID == "" {
-		logoutHandler(w, r)
+		w, r = removeSession(w, r)
+		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
 	user, _ := src.GetUserFromSessionID(sessionID)

@@ -22,16 +22,16 @@ func serveSettingsPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Pragma", "no-cache")
 	w.Header().Set("Expires", "0")
 
-	if !cookieExists(r, "sessionID") {
-		http.ServeFile(w, r, "src/templates/login.html")
-		return
-	}
-
 	ExportData := settingsPageData{}
 
+	if !cookieExists(r, "sessionID") {
+		http.Redirect(w, r, "/login.html", http.StatusFound)
+		return
+	}
 	sessionID := src.GetValidSession(r)
 	if sessionID == "" {
-		logoutHandler(w, r)
+		w, r = removeSession(w, r)
+		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
 	user, _ := src.GetUserFromSessionID(sessionID)
@@ -77,15 +77,17 @@ func passwordHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ExportData := settingsPageData{}
-	if cookieExists(r, "sessionID") {
-		sessionID := src.GetValidSession(r)
-		if sessionID == "" {
-			logoutHandler(w, r)
-			return
-		}
-		user, _ := src.GetUserFromSessionID(sessionID)
-		ExportData.User = user
+	if !cookieExists(r, "sessionID") {
+		http.Redirect(w, r, "/login.html", http.StatusFound)
+		return
 	}
+	sessionID := src.GetValidSession(r)
+	if sessionID == "" {
+		w, r = removeSession(w, r)
+		http.Redirect(w, r, "/login.html", http.StatusFound)
+		return
+	}
+	ExportData.User, _ = src.GetUserFromSessionID(sessionID)
 
 	var hashedPassword string
 	row := src.Db.QueryRow("SELECT password FROM users WHERE uuid = ?", ExportData.User.Uuid)
@@ -125,15 +127,17 @@ func emailHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ExportData := settingsPageData{}
-	if cookieExists(r, "sessionID") {
-		sessionID := src.GetValidSession(r)
-		if sessionID == "" {
-			logoutHandler(w, r)
-			return
-		}
-		user, _ := src.GetUserFromSessionID(sessionID)
-		ExportData.User = user
+	if !cookieExists(r, "sessionID") {
+		http.Redirect(w, r, "/login.html", http.StatusFound)
+		return
 	}
+	sessionID := src.GetValidSession(r)
+	if sessionID == "" {
+		w, r = removeSession(w, r)
+		http.Redirect(w, r, "/login.html", http.StatusFound)
+		return
+	}
+	ExportData.User, _ = src.GetUserFromSessionID(sessionID)
 
 	email := r.FormValue("email")
 	var dataEmail string
@@ -176,15 +180,17 @@ func namesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ExportData := settingsPageData{}
-	if cookieExists(r, "sessionID") {
-		sessionID := src.GetValidSession(r)
-		if sessionID == "" {
-			logoutHandler(w, r)
-			return
-		}
-		user, _ := src.GetUserFromSessionID(sessionID)
-		ExportData.User = user
+	if !cookieExists(r, "sessionID") {
+		http.Redirect(w, r, "/login.html", http.StatusFound)
+		return
 	}
+	sessionID := src.GetValidSession(r)
+	if sessionID == "" {
+		w, r = removeSession(w, r)
+		http.Redirect(w, r, "/login.html", http.StatusFound)
+		return
+	}
+	ExportData.User, _ = src.GetUserFromSessionID(sessionID)
 
 	var dataName string
 	var dataSurname string
@@ -213,15 +219,17 @@ func genderHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ExportData := settingsPageData{}
-	if cookieExists(r, "sessionID") {
-		sessionID := src.GetValidSession(r)
-		if sessionID == "" {
-			logoutHandler(w, r)
-			return
-		}
-		user, _ := src.GetUserFromSessionID(sessionID)
-		ExportData.User = user
+	if !cookieExists(r, "sessionID") {
+		http.Redirect(w, r, "/login.html", http.StatusFound)
+		return
 	}
+	sessionID := src.GetValidSession(r)
+	if sessionID == "" {
+		w, r = removeSession(w, r)
+		http.Redirect(w, r, "/login.html", http.StatusFound)
+		return
+	}
+	ExportData.User, _ = src.GetUserFromSessionID(sessionID)
 
 	gender := r.FormValue("gender")
 	if gender != "male" && gender != "female" && gender != "other" {
@@ -246,4 +254,42 @@ func genderHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.Error(w, "Gender changed successfully", http.StatusInternalServerError)
+}
+
+func usernameHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Redirect(w, r, "/error.html", http.StatusSeeOther)
+		return
+	}
+	ExportData := settingsPageData{}
+	if !cookieExists(r, "sessionID") {
+		http.Redirect(w, r, "/login.html", http.StatusFound)
+		return
+	}
+	sessionID := src.GetValidSession(r)
+	if sessionID == "" {
+		w, r = removeSession(w, r)
+		http.Redirect(w, r, "/login.html", http.StatusFound)
+		return
+	}
+	ExportData.User, _ = src.GetUserFromSessionID(sessionID)
+
+	username := r.FormValue("username")
+	var dataUsername string
+	row := src.Db.QueryRow("SELECT username FROM users WHERE uuid = ?", ExportData.User.Uuid)
+	err := row.Scan(&dataUsername)
+	if err != nil {
+		http.Error(w, "An error occurred", http.StatusInternalServerError)
+		return
+	}
+	if username == dataUsername {
+		http.Error(w, "No changes detected", http.StatusInternalServerError)
+		return
+	}
+	_, err = src.Db.Exec("UPDATE users SET username = ? WHERE uuid = ?", username, ExportData.User.Uuid)
+	if err != nil {
+		http.Error(w, "Failed to update username", http.StatusInternalServerError)
+		return
+	}
+	http.Error(w, "Username changed successfully", http.StatusInternalServerError)
 }

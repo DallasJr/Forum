@@ -165,7 +165,8 @@ func cookieExists(r *http.Request, cookieName string) bool {
 
 func serveLoginPage(w http.ResponseWriter, r *http.Request) {
 	if cookieExists(r, "sessionID") && src.GetValidSession(r) != "" {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		referrer := r.Header.Get("Referer")
+		http.Redirect(w, r, referrer, http.StatusSeeOther)
 		return
 	}
 
@@ -178,19 +179,25 @@ func serveLoginPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func logoutHandler(w http.ResponseWriter, r *http.Request) {
-	http.SetCookie(w, &http.Cookie{
-		Name:   "sessionID",
-		Value:  "",
-		MaxAge: -1,  // Set MaxAge to -1 to delete the cookie
-		Path:   "/", // Same path as the session cookie
-	})
+	w, r = removeSession(w, r)
 	referrer := r.Header.Get("Referer")
 	http.Redirect(w, r, referrer, http.StatusSeeOther)
 }
 
+func removeSession(w http.ResponseWriter, r *http.Request) (http.ResponseWriter, *http.Request) {
+	http.SetCookie(w, &http.Cookie{
+		Name:   "sessionID",
+		Value:  "",
+		MaxAge: -1,
+		Path:   "/",
+	})
+	return w, r
+}
+
 func serveRegisterPage(w http.ResponseWriter, r *http.Request) {
 	if cookieExists(r, "sessionID") && src.GetValidSession(r) != "" {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		referrer := r.Header.Get("Referer")
+		http.Redirect(w, r, referrer, http.StatusSeeOther)
 		return
 	}
 

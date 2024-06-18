@@ -47,7 +47,6 @@
 .post-actions {
     display: flex;
     justify-content: flex-end;
-    margin-top: 10px;
 }
 
 .post-actions .like-action,
@@ -146,6 +145,14 @@
     background-color: #18181b;
     word-wrap: break-word;
     overflow-wrap: break-word;
+    display: flex;
+}
+
+.answer-right {
+    display: flex;
+    align-items: center;
+    justify-content: right;
+    flex: 1;
 }
 
 .answer-header {

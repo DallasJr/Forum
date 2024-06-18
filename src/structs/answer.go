@@ -12,6 +12,8 @@ type Answer struct {
 	PostID       uuid.UUID
 	CreationDate string
 	Creator      User
+	Likes        []uuid.UUID `json:"likes"`
+	Dislikes     []uuid.UUID `json:"dislikes"`
 }
 
 func (a *Answer) FormattedDate() (string, error) {

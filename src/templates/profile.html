@@ -2,16 +2,16 @@
 <!--suppress HtmlUnknownTarget -->
 <html lang="en">
 <head>
-    <title>RollinSpot</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="../static/css/style.css">
     <link rel="stylesheet" type="text/css" href="../static/css/navbar.css">
-    <link rel="stylesheet" type="text/css" href="../static/css/index.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/profile.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" />
     <script src="../static/javascript/navbar.js"></script>
+    <title>RollinSpot</title>
 </head>
-    <body>
+<body>
 
 <nav class="navbar">
     <div class="navbar-container">
@@ -55,64 +55,12 @@
     </div>
 </nav>
 
-    <div class="banner">
-        <div class="banner-content">
-            <h1>Welcome to RollinSpot</h1>
-            <form action="/search" method="get" class="search-form">
-                <input type="text" name="query" placeholder="Search...">
-                <button type="submit">Search</button>
-            </form>
-        </div>
-    </div>
 
-    <div class="main-container">
-        <div class="categories-section">
-            <h2>Categories</h2>
-            <div class="categories-list">
-                {{range .Categories}}
-                <a href="/categories/{{.Name}}" class="category-item" style="background-image: url('{{.Image}}');">
-                    <div class="category-content">
-                        <h3>{{.Name}}</h3>
-                        <p>{{.Description}}</p>
-                    </div>
-                    <div class="category-footer">
-                        <p>{{.PostsCount}} posts</p>
-                    </div>
-                </a>
-                {{end}}
-            </div>
-        </div>
+</body>
 
-        <div class="recent-posts-section">
-            <h2>Recent Posts</h2>
-            <div class="recent-posts-list">
-                {{range .RecentPosts}}
-                <a href="/post/{{.Uuid}}" class="post-item">
-                    <div class="post-creator">{{.Creator.Username}}</div>
-                    <div class="post-content">
-                        <h3>{{.Title}}</h3>
-                        <p>{{.Content}}</p>
-                    </div>
-                    <div class="post-category">
-                        <h3>Category:</h3>
-                        <p>{{.Category}}</p>
-                    </div>
-                    <div class="post-meta">Posted on {{.CreationDate}}</div>
-                    <div class="post-actions">
-                        <div class="like-count">
-                            <i class="fas fa-thumbs-up"></i>
-                            <span>{{len .Likes}}</span>
-                        </div>
-                        <div class="dislike-count">
-                            <i class="fas fa-thumbs-down"></i>
-                            <span>{{len .Dislikes}}</span>
-                        </div>
-                    </div>
-                </a>
+<script>
 
-                {{end}}
-            </div>
-        </div>
-    </div>
-    </body>
+</script>
+
+
 </html>

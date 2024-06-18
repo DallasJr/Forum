@@ -30,7 +30,7 @@
                 {{else}}
                 <a href="/error.html" class="nav-item" id="notifications">Notifications</a>
                 <a href="/error.html" class="nav-item" id="messages">Messages</a>
-                <a href="/error.html" class="nav-item" id="profile">{{.User.Username}}</a>
+                <a href="/profile/{{.User.Uuid}}" class="nav-item" id="profile">{{.User.Username}}</a>
                 <a href="/settings.html" class="nav-item" id="settings">Settings</a>
                 <a href="/logout" class="nav-item" id="logout">Logout</a>
                 {{end}}
@@ -47,7 +47,7 @@
             {{else}}
             <a href="/error.html" class="nav-item" id="notifications-m">Notifications</a>
             <a href="/error.html" class="nav-item" id="messages-m">Messages</a>
-            <a href="/error.html" class="nav-item" id="profile-m">{{.User.Username}}</a>
+            <a href="/profile/{{.User.Uuid}}" class="nav-item" id="profile-m">{{.User.Username}}</a>
             <a href="/settings.html" class="nav-item" id="settings-m">Settings</a>
             <a href="/logout" class="nav-item" id="logout-m">Logout</a>
             {{end}}
@@ -115,9 +115,9 @@
             </div>
             <div id="username-section" class="settings-section">
                 <h2>Change Username</h2>
-                <form>
+                <form id="username-form" action="/change-username" method="post">
                     <label for="username">Username:</label>
-                    <span id="username-availability"></span>
+                    <span id="username-error"></span>
                     <div class="one-row">
                         <input type="text" id="username" name="username" placeholder="{{.User.Username}}" value="{{.User.Username}}">
                         <button id="username-button" type="submit" disabled>Save</button>
@@ -171,9 +171,12 @@
         let inSurname = "{{.User.Surname}}"
         let inGender = "{{.User.Gender}}"
         let inEmail = "{{.User.Email}}"
-        
+        let inUsername = "{{.User.Username}}"
+
         const nameError = document.getElementById('name-error')
         const surnameError = document.getElementById('surname-error')
+
+        const usernameError = document.getElementById('username-error')
 
         const emailError = document.getElementById('email-error')
 
@@ -278,10 +281,11 @@
 
         usernameInput.addEventListener('input', function() {
             let username = this.value;
+            let usernameAvailabilitySpan = usernameError;
             usernameInput.value = username.toLowerCase()
             username = username.toLowerCase()
-            let usernameAvailabilitySpan = document.getElementById("username-availability");
-            if (username === "{{.User.Username}}") {
+            if (inUsername === username) {
+                usernameButton.disabled = true
                 usernameAvailabilitySpan.textContent = "";
                 return
             }
@@ -309,6 +313,35 @@
             xhr.send();
         });
 
+        document.getElementById('username-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            fetch(this.action, {
+                method: this.method,
+                body: formData
+            }).then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(text);
+                    });
+                }
+                window.location.href = response.url;
+            })
+                .catch(error => {
+                    handleUsernameError(error.message);
+                });
+        });
+
+        function handleUsernameError(errorMessage) {
+            if (errorMessage.includes("successfully")) {
+                usernameError.style.color = "green";
+                inUsername = usernameInput.value
+                usernameButton.disabled = true
+            } else {
+                usernameError.style.color = "red";
+            }
+            usernameError.textContent = errorMessage;
+        }
 
         function handleGenderError(errorMessage) {
             if (errorMessage.includes("successfully")) {

@@ -30,7 +30,7 @@
             {{else}}
             <a href="/error.html" class="nav-item" id="notifications">Notifications</a>
             <a href="/error.html" class="nav-item" id="messages">Messages</a>
-            <a href="/error.html" class="nav-item" id="profile">{{.User.Username}}</a>
+            <a href="/profile/{{.User.Uuid}}" class="nav-item" id="profile">{{.User.Username}}</a>
             <a href="/settings.html" class="nav-item" id="settings">Settings</a>
             <a href="/logout" class="nav-item" id="logout">Logout</a>
             {{end}}
@@ -47,7 +47,7 @@
         {{else}}
         <a href="/error.html" class="nav-item" id="notifications-m">Notifications</a>
         <a href="/error.html" class="nav-item" id="messages-m">Messages</a>
-        <a href="/error.html" class="nav-item" id="profile-m">{{.User.Username}}</a>
+        <a href="/profile/{{.User.Uuid}}" class="nav-item" id="profile-m">{{.User.Username}}</a>
         <a href="/settings.html" class="nav-item" id="settings-m">Settings</a>
         <a href="/logout" class="nav-item" id="logout-m">Logout</a>
         {{end}}

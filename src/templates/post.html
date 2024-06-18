@@ -31,7 +31,7 @@
             {{else}}
             <a href="/error.html" class="nav-item" id="notifications">Notifications</a>
             <a href="/error.html" class="nav-item" id="messages">Messages</a>
-            <a href="/error.html" class="nav-item" id="profile">{{.User.Username}}</a>
+            <a href="/profile/{{.User.Uuid}}" class="nav-item" id="profile">{{.User.Username}}</a>
             <a href="/settings.html" class="nav-item" id="settings">Settings</a>
             <a href="/logout" class="nav-item" id="logout">Logout</a>
             {{end}}
@@ -48,7 +48,7 @@
         {{else}}
         <a href="/error.html" class="nav-item" id="notifications-m">Notifications</a>
         <a href="/error.html" class="nav-item" id="messages-m">Messages</a>
-        <a href="/error.html" class="nav-item" id="profile-m">{{.User.Username}}</a>
+        <a href="/profile/{{.User.Uuid}}" class="nav-item" id="profile-m">{{.User.Username}}</a>
         <a href="/settings.html" class="nav-item" id="settings-m">Settings</a>
         <a href="/logout" class="nav-item" id="logout-m">Logout</a>
         {{end}}
@@ -59,7 +59,7 @@
     <div id="post-feedback" class="post-feedback" style="color: green" hidden="hidden"></div>
     <div class="post">
         <h2>{{.Post.Title}}</h2>
-        <p class="post-meta">Posted by {{ .Post.Creator }} in <a href="/categories/{{ .Post.Category }}">{{ .Post.Category }}</a> on {{ .Post.CreationDate }}</p>
+        <p class="post-meta">Posted by {{ .Post.Creator.Username }} in <a href="/categories/{{ .Post.Category }}">{{ .Post.Category }}</a> on {{ .Post.CreationDate }}</p>
         <div class="post-content">
             <pre>{{ .Post.Content }}</pre>
             {{ if .Post.Images }}
@@ -125,11 +125,59 @@
         <div id="answers-list" class="for-first">
         {{ range .Answers }}
             <div class="answer">
-                <div class="answer-header">
-                    <p class="answer-username">{{ .Creator.Username }}</p>
-                    <p class="answer-meta">{{ .CreationDate }}</p>
+                <div class="answer-left">
+                    <div class="answer-header">
+                        <p class="answer-username">{{ .Creator.Username }}</p>
+                        <p class="answer-meta">{{ .CreationDate }}</p>
+                    </div>
+                    <pre class="answer-msg">{{ .Content }}</pre>
                 </div>
-                <pre class="answer-msg">{{ .Content }}</pre>
+                <div class="answer-right">
+                    <div class="post-actions">
+                        <div class="like-action">
+                            {{if eq $.User.Username ""}}
+                            <button class="like-btn" data-action="like">
+                                <i class="fas fa-thumbs-up"></i>
+                                <span class="like-count">{{ len .Likes }}</span>
+                            </button>
+                            {{else}}
+                            {{ if userHasLiked $.User.Uuid .Likes }}
+                            <button class="like-btn liked" data-action="unlike">
+                                <i class="fas fa-thumbs-up"></i>
+                                <span class="like-count">{{ len .Likes }}</span>
+                            </button>
+                            {{ else }}
+                            <button class="like-btn" data-action="like">
+                                <i class="fas fa-thumbs-up"></i>
+                                <span class="like-count">{{ len .Likes }}</span>
+                            </button>
+                            {{ end }}
+                            {{end}}
+
+                        </div>
+                        <div class="dislike-action">
+                            {{if eq $.User.Username ""}}
+                            <button class="dislike-btn" data-action="dislike">
+                                <i class="fas fa-thumbs-down"></i>
+                                <span class="dislike-count">{{ len .Dislikes }}</span>
+                            </button>
+                            {{else}}
+                            {{ if userHasDisliked $.User.Uuid .Dislikes }}
+                            <button class="dislike-btn disliked" data-action="undislike">
+                                <i class="fas fa-thumbs-down"></i>
+                                <span class="dislike-count">{{ len .Dislikes }}</span>
+                            </button>
+                            {{ else }}
+                            <button class="dislike-btn" data-action="dislike">
+                                <i class="fas fa-thumbs-down"></i>
+                                <span class="dislike-count">{{ len .Dislikes }}</span>
+                            </button>
+                            {{ end }}
+                            {{ end }}
+                        </div>
+                    </div>
+                </div>
+
             </div>
         {{ end }}
         </div>
@@ -180,16 +228,46 @@
                 answers.forEach(answer => {
                     const answerDiv = document.createElement('div');
                     answerDiv.classList.add('answer');
+                    const answerLeft = document.createElement('div');
+                    answerLeft.classList.add('answer-left');
 
-                    answerDiv.innerHTML = `
+                    answerLeft.innerHTML = `
                         <div class="answer-header">
                             <p class="answer-username">${answer.Creator.Username}</p>
                             <p class="answer-meta">${answer.CreationDate}</p>
                         </div>
-                        <p class="answer-msg">
-                            ${answer.Content}
-                        </p>
+                        <pre class="answer-msg">${answer.Content}</pre>
                     `;
+
+                    const answerRight = document.createElement('div');
+                    answerRight.classList.add('answer-right');
+
+                    const answerActions = document.createElement('div');
+                    answerActions.classList.add('post-actions');
+
+                    const likeAction = document.createElement('div');
+                    likeAction.classList.add('like-action');
+                    likeAction.innerHTML = `
+                        <button class="like-btn" data-action="like">
+                            <i class="fas fa-thumbs-up"></i>
+                            <span class="like-count">${answer.Likes ? answer.Likes.length : 0}</span>
+                        </button>
+                    `;
+
+                    const dislikeAction = document.createElement('div');
+                    dislikeAction.classList.add('dislike-action');
+                    dislikeAction.innerHTML = `
+                        <button class="dislike-btn" data-action="dislike">
+                            <i class="fas fa-thumbs-down"></i>
+                            <span class="dislike-count">${answer.Dislikes ? answer.Dislikes.length : 0}</span>
+                        </button>
+                    `;
+                    answerActions.appendChild(likeAction);
+                    answerActions.appendChild(dislikeAction);
+                    answerRight.appendChild(answerActions);
+
+                    answerDiv.appendChild(answerLeft);
+                    answerDiv.appendChild(answerRight);
 
                     answersList.appendChild(answerDiv);
                 });
