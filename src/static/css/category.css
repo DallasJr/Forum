@@ -77,7 +77,7 @@ h1 {
         margin-bottom: 10px;
     }
 
-    .post-category {
+    .post-answers-count {
         margin-bottom: 10px;
     }
 
@@ -109,17 +109,17 @@ h1 {
     flex: 5;
 }
 
-.post-category {
-    flex: 3;
+.post-answers-count {
+    flex: 2;
 }
 
-.post-category h3 {
+.post-answers-count h3 {
     font-size: 15px;
     font-weight: bold;
     color: #fff;
 }
 
-.post-category p {
+.post-answers-count p {
     font-size: 15px;
     color: #666;
 }

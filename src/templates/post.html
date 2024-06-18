@@ -61,7 +61,7 @@
         <h2>{{.Post.Title}}</h2>
         <p class="post-meta">Posted by {{ .Post.Creator }} in <a href="/categories/{{ .Post.Category }}">{{ .Post.Category }}</a> on {{ .Post.CreationDate }}</p>
         <div class="post-content">
-            <p>{{ .Post.Content }}</p>
+            <pre>{{ .Post.Content }}</pre>
             {{ if .Post.Images }}
             <div class="post-images">
                 {{ range .Post.Images }}
@@ -129,9 +129,7 @@
                     <p class="answer-username">{{ .Creator.Username }}</p>
                     <p class="answer-meta">{{ .CreationDate }}</p>
                 </div>
-                <p class="answer-msg">
-                    {{ .Content }}
-                </p>
+                <pre class="answer-msg">{{ .Content }}</pre>
             </div>
         {{ end }}
         </div>
@@ -147,7 +145,7 @@
         {{else}}
             <form id="answer-form" action="/submit-answer" method="post">
                 <input type="hidden" name="post" value="{{.Post.Uuid}}">
-                <textarea id="answer-content" name="answer-content" rows="4" placeholder="Write your answer here" maxlength="1000" minlength="2"></textarea><br>
+                <textarea id="answer-content" name="answer-content" rows="4" placeholder="Write your answer here" maxlength="1000" minlength="2" required></textarea><br>
                 <button type="submit">Post Answer</button>
             </form>
         {{end}}

@@ -201,6 +201,8 @@ func GetPostsByCategory(categoryName string, offset int, limit int) ([]structs.P
 
 		post.Likes = likes
 		post.Dislikes = dislikes
+		answersCount, _ := GetAnswersCountByPost(post.Uuid)
+		post.AnswersCount = answersCount
 		posts = append(posts, post)
 	}
 	return posts, nil
@@ -353,4 +355,19 @@ func GetAnswersByPosts(post string, offset int, limit int) ([]structs.Answer, er
 		answers = append(answers, answer)
 	}
 	return answers, nil
+}
+
+func GetAnswersCountByPost(post uuid.UUID) (int, error) {
+	rows, err := Db.Query("SELECT COUNT(*) FROM answers WHERE post_id = ?", post)
+	if err != nil {
+		return 0, err
+	}
+	defer rows.Close()
+	var count int
+	if rows.Next() {
+		if err := rows.Scan(&count); err != nil {
+			return 0, err
+		}
+	}
+	return count, nil
 }

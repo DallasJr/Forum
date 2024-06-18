@@ -80,9 +80,9 @@ func serveCategoryPage(w http.ResponseWriter, r *http.Request) {
 	posts, _ := src.GetPostsByCategory(name, 0, 5)
 
 	for i := range posts {
-		posts[i].Title = structs.Shorten(posts[i].Title, 13)
-		posts[i].Content = structs.Shorten(posts[i].Content, 13)
-		posts[i].Creator = structs.Shorten(posts[i].Creator, 10)
+		posts[i].Title = structs.Shorten(posts[i].Title, 20)
+		posts[i].Content = structs.Shorten(posts[i].Content, 20)
+		posts[i].Creator = structs.Shorten(posts[i].Creator, 16)
 	}
 
 	ExportData.Posts = posts
@@ -101,6 +101,11 @@ func showMorePosts(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "Unable to retrieve more posts", http.StatusInternalServerError)
 		return
+	}
+	for i := range posts {
+		posts[i].Title = structs.Shorten(posts[i].Title, 20)
+		posts[i].Content = structs.Shorten(posts[i].Content, 20)
+		posts[i].Creator = structs.Shorten(posts[i].Creator, 16)
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(posts)

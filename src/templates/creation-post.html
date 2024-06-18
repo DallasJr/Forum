@@ -62,11 +62,11 @@
             <h2>Create a New Post</h2>
             <p>Category: <a href="/categories/{{.Category.Name}}">{{.Category.Name}}</a></p>
             <label for="post-title">Title:</label>
-            <input type="text" id="post-title" name="post-title" maxlength="100" required>
+            <input type="text" id="post-title" name="post-title" maxlength="100" minlength="10" required>
             <br><br>
 
             <label for="post-content">Content:</label>
-            <textarea id="post-content" name="post-content" rows="5" maxlength="2500" required></textarea>
+            <textarea id="post-content" name="post-content" rows="5" maxlength="2500" minlength="50" required></textarea>
             <br><br>
 
             <label for="post-images">Upload Image (JPEG, PNG, GIF, max 20MB):</label>

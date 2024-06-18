@@ -103,12 +103,12 @@ func handleCreatePost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Title and content are required", http.StatusBadRequest)
 		return
 	}
-	if len(title) > 100 {
-		http.Error(w, "Title too long", http.StatusBadRequest)
+	if len(title) > 100 || len(title) < 10 {
+		http.Error(w, "Title incorrect length", http.StatusBadRequest)
 		return
 	}
-	if len(content) > 2500 {
-		http.Error(w, "Content too long", http.StatusBadRequest)
+	if len(content) > 2500 || len(content) < 50 {
+		http.Error(w, "Content incorrect length", http.StatusBadRequest)
 		return
 	}
 
@@ -322,8 +322,8 @@ func handleAnswerSubmission(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Content is required", http.StatusBadRequest)
 		return
 	}
-	if len(content) > 1000 {
-		http.Error(w, "Content too long", http.StatusBadRequest)
+	if len(content) > 1000 || len(content) < 2 {
+		http.Error(w, "Content incorrect length", http.StatusBadRequest)
 		return
 	}
 
