@@ -56,6 +56,9 @@
 </nav>
 
 <div class="post-page">
+    {{if eq .Post.Title ""}}
+    <h1>Unknown page</h1>
+    {{else}}
     <div id="post-feedback" class="post-feedback" style="color: green" hidden="hidden"></div>
     <div class="post">
         <h2>{{.Post.Title}}</h2>
@@ -130,7 +133,7 @@
                         <p class="answer-username">{{ .Creator.Username }}</p>
                         <p class="answer-meta">{{ .CreationDate }}</p>
                     </div>
-                    <pre class="answer-msg">{{ .Content }}</pre>
+                    <pre>{{ .Content }}</pre>
                 </div>
                 <div class="answer-right">
                     <div class="post-actions">
@@ -198,6 +201,7 @@
             </form>
         {{end}}
     </div>
+    {{end}}
 </div>
 </body>
 

@@ -10,6 +10,7 @@ type Answer struct {
 	Content      string
 	CreatorUUID  uuid.UUID
 	PostID       uuid.UUID
+	PostTitle    string
 	CreationDate string
 	Creator      User
 	Likes        []uuid.UUID `json:"likes"`

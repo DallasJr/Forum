@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"time"
 )
 
 // Generate a random session ID
@@ -133,8 +134,8 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to hash password", http.StatusInternalServerError)
 		return
 	}
-	_, err := src.Db.Exec("INSERT INTO users (uuid, name, surname, username, email, password, power, gender) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-		userID, name, surname, strings.ToLower(username), email, hashedPassword, 0, gender)
+	_, err := src.Db.Exec("INSERT INTO users (uuid, name, surname, username, created_at, email, password, power, gender) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		userID, name, surname, strings.ToLower(username), time.Now().Format("2006-01-02 15:04:05"), email, hashedPassword, 0, gender)
 	if err != nil {
 		http.Error(w, "Failed to update password", http.StatusInternalServerError)
 		return

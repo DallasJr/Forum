@@ -1,0 +1,266 @@
+.page-content {
+    padding-top: 50px;
+}
+
+.profile-container {
+    background-color: #18181b;
+    max-width: 1200px;
+    margin: 50px auto;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #232327;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.username-box {
+    flex: 2;
+}
+
+.show-more-btn {
+    border: none;
+    width: 100%;
+    margin-top: 10px;
+    background-color: transparent;
+    color: white;
+}
+
+.show-more-btn:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.username {
+    font-size: 2.5em;
+    margin-left: 20px;
+    color: #c4c4c4;
+    text-align: center;
+}
+
+.meta-box {
+    flex: 3;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #464649;
+    background-color: #333336;
+    max-width: 400px;
+}
+
+.meta-box p {
+    margin: 5px 0 5px 10px;
+    color: #9d9d9d;
+    font-size: 1.3em;
+}
+
+.profile-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.posts-section,
+.answers-section,
+.liked-section {
+    border-radius: 8px;
+    padding: 20px;
+    border: 1px solid #464649;
+    background-color: #333336;
+}
+
+.posts-section h2,
+.answers-section h2,
+.liked-section h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #9d9d9d;
+}
+
+@media (max-width: 768px) {
+    .profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+    }
+
+    .username {
+        font-size: 2em;
+    }
+
+    .meta-box {
+        margin-top: 20px;
+        flex: none;
+        width: 100%;
+        max-width: none;
+        box-sizing: border-box;
+    }
+
+    .posts-section,
+    .answers-section,
+    .liked-section {
+        padding: 15px;
+    }
+}
+
+
+
+
+
+
+
+
+.post-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-decoration: none;
+    color: #333;
+    background-color: #232327;
+    border: 3px solid transparent;
+    border-radius: 5px;
+    margin: 5px 0;
+    padding: 10px 20px;
+    transition: 200ms
+}
+@media screen and (max-width: 768px) {
+
+    .post-item {
+        display: block;
+    }
+
+    .show-more-btn {
+        background-color: #232327;
+        border-radius: 8px;
+        padding: 10px;
+    }
+
+    .post-content {
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .post-category {
+        margin-bottom: 10px;
+    }
+
+    .post-meta {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .post-actions {
+        justify-content: center;
+    }
+
+    .dislike-count {
+        margin-left: 20px;
+    }
+}
+
+.post-item:hover {
+    border-color: #C71E1E;
+}
+
+.post-content {
+    flex: 5;
+}
+
+.post-category {
+    flex: 3;
+}
+
+.post-category h3 {
+    font-size: 15px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.post-category p {
+    font-size: 15px;
+    color: #666;
+}
+
+.post-answers-count {
+    flex: 2;
+}
+
+.post-answers-count h3 {
+    font-size: 15px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.post-answers-count p {
+    font-size: 15px;
+    color: #666;
+}
+
+.answer-post {
+    flex: 4;
+}
+
+.answer-post h3 {
+    font-size: 15px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.answer-post p {
+    font-size: 15px;
+    color: #666;
+}
+
+.post-meta {
+    font-size: 12px;
+    color: #555;
+    margin-top: 5px;
+    flex: 2;
+}
+
+.post-content p {
+    margin: 5px 0 0 0;
+    font-size: 15px;
+    color: #666;
+}
+
+.post-content h3 {
+    margin: 0;
+    font-size: 16px;
+    color: #fff;
+}
+
+.post-actions {
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+}
+
+.like-count,
+.dislike-count {
+    display: flex;
+    align-items: center;
+    color: #555;
+}
+
+@media screen and (min-width: 768px) {
+
+    .like-count,
+    .dislike-count {
+        margin-left: 20px;
+    }
+}
+
+.like-count i,
+.dislike-count i {
+    margin-right: 5px;
+    color: #555;
+}
+
+.like-count span,
+.dislike-count span {
+    font-weight: bold;
+}

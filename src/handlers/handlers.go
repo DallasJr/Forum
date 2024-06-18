@@ -42,6 +42,10 @@ func SetupHandlers() {
 
 	//profile page
 	http.HandleFunc("/profile/", profilesHandler)
+	http.HandleFunc("/more-posted-answers", showMorePostedAnswers)
+	http.HandleFunc("/more-liked-answers", showMoreLikedAnswers)
+	http.HandleFunc("/more-created-posts", showMoreCreatedPosts)
+	http.HandleFunc("/more-liked-posts", showMoreLikedPosts)
 
 	//post page
 	http.HandleFunc("/create-post/", servePostCreatePage)

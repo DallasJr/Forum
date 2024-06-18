@@ -223,6 +223,7 @@ func showMoreAnswers(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unable to retrieve more answers", http.StatusInternalServerError)
 		return
 	}
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(posts)
 }

@@ -37,7 +37,7 @@ func SetupDatabase() *sql.DB {
 			password TEXT NOT NULL,
 			gender TEXT NOT NULL,
 			power INTEGER NOT NULL DEFAULT 0,
-			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+			created_at TEXT NOT NULL
 		)
 	`)
 	if err != nil {
@@ -414,4 +414,215 @@ func GetAnswersCountByPost(post uuid.UUID) (int, error) {
 		}
 	}
 	return count, nil
+}
+
+func GetPostsByUser(userID string, offset int, limit int) ([]structs.Post, error) {
+	rows, err := Db.Query("SELECT uuid, title, content, owner_id, category_name, created_at, likes, dislikes FROM posts WHERE owner_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?", userID, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []structs.Post
+	for rows.Next() {
+		var post structs.Post
+		var likesJSON, dislikesJSON string
+		if err := rows.Scan(&post.Uuid, &post.Title, &post.Content, &post.CreatorUUID, &post.Category, &post.CreationDate, &likesJSON, &dislikesJSON); err != nil {
+			return nil, err
+		}
+		var likes []uuid.UUID
+		var dislikes []uuid.UUID
+
+		err = json.Unmarshal([]byte(likesJSON), &likes)
+		if err != nil {
+			fmt.Println("Error unmarshaling likes:", err)
+			return nil, err
+		}
+
+		err = json.Unmarshal([]byte(dislikesJSON), &dislikes)
+		if err != nil {
+			fmt.Println("Error unmarshaling dislikes:", err)
+			return nil, err
+		}
+
+		post.Likes = likes
+		post.Dislikes = dislikes
+		answersCount, _ := GetAnswersCountByPost(post.Uuid)
+		post.AnswersCount = answersCount
+
+		formattedDate, err := post.FormattedDate()
+		if err != nil {
+			fmt.Println("Error formatting date:", err)
+		}
+
+		post.Creator, _ = GetUserFromUUID(post.CreatorUUID)
+		if post.Creator.Username == "" {
+			post.Creator = structs.User{Username: "Deleted User"}
+		}
+
+		post.CreationDate = formattedDate
+		posts = append(posts, post)
+	}
+	return posts, nil
+}
+
+func GetLikedPostsByUser(userID string, offset int, limit int) ([]structs.Post, error) {
+	rows, err := Db.Query("SELECT uuid, title, content, owner_id, category_name, created_at, likes, dislikes FROM posts WHERE likes LIKE CONCAT('%', ?, '%') ORDER BY created_at DESC LIMIT ? OFFSET ?", userID, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []structs.Post
+	for rows.Next() {
+		var post structs.Post
+		var likesJSON, dislikesJSON string
+		if err := rows.Scan(&post.Uuid, &post.Title, &post.Content, &post.CreatorUUID, &post.Category, &post.CreationDate, &likesJSON, &dislikesJSON); err != nil {
+			return nil, err
+		}
+		var likes []uuid.UUID
+		var dislikes []uuid.UUID
+
+		err = json.Unmarshal([]byte(likesJSON), &likes)
+		if err != nil {
+			fmt.Println("Error unmarshaling likes:", err)
+			return nil, err
+		}
+
+		err = json.Unmarshal([]byte(dislikesJSON), &dislikes)
+		if err != nil {
+			fmt.Println("Error unmarshaling dislikes:", err)
+			return nil, err
+		}
+
+		post.Likes = likes
+		post.Dislikes = dislikes
+		answersCount, _ := GetAnswersCountByPost(post.Uuid)
+		post.AnswersCount = answersCount
+
+		formattedDate, err := post.FormattedDate()
+		if err != nil {
+			fmt.Println("Error formatting date:", err)
+		}
+
+		post.Creator, _ = GetUserFromUUID(post.CreatorUUID)
+		if post.Creator.Username == "" {
+			post.Creator = structs.User{Username: "Deleted User"}
+		}
+
+		post.CreationDate = formattedDate
+		posts = append(posts, post)
+	}
+	return posts, nil
+}
+
+func GetPostNameByPostID(postID string) (string, error) {
+	rows, err := Db.Query("SELECT title FROM posts WHERE uuid = ? ", postID)
+	if err != nil {
+		return "", err
+	}
+	defer rows.Close()
+	var title string
+	if rows.Next() {
+		if err := rows.Scan(&title); err != nil {
+			return "", err
+		}
+	}
+	return title, nil
+}
+
+func GetAnswersByUser(userID string, offset int, limit int) ([]structs.Answer, error) {
+	rows, err := Db.Query("SELECT uuid, content, owner_id, post_id, created_at, likes, dislikes FROM answers WHERE owner_id = ? ORDER BY created_at LIMIT ? OFFSET ?", userID, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var answers []structs.Answer
+	for rows.Next() {
+		var answer structs.Answer
+		var likesJSON, dislikesJSON string
+		if err := rows.Scan(&answer.Uuid, &answer.Content, &answer.CreatorUUID, &answer.PostID, &answer.CreationDate, &likesJSON, &dislikesJSON); err != nil {
+			return nil, err
+		}
+		var likes []uuid.UUID
+		var dislikes []uuid.UUID
+
+		err = json.Unmarshal([]byte(likesJSON), &likes)
+		if err != nil {
+			fmt.Println("Error unmarshaling likes:", err)
+			return nil, err
+		}
+
+		err = json.Unmarshal([]byte(dislikesJSON), &dislikes)
+		if err != nil {
+			fmt.Println("Error unmarshaling dislikes:", err)
+			return nil, err
+		}
+
+		answer.Likes = likes
+		answer.Dislikes = dislikes
+
+		formattedDate, err := answer.FormattedDate()
+		if err != nil {
+			fmt.Println("Error formatting date:", err)
+		}
+
+		answer.Creator, _ = GetUserFromUUID(answer.CreatorUUID)
+		if answer.Creator.Username == "" {
+			answer.Creator = structs.User{Username: "Deleted User"}
+		}
+
+		answer.CreationDate = formattedDate
+		answers = append(answers, answer)
+	}
+	return answers, nil
+}
+
+func GetLikedAnswersByUser(userID string, offset int, limit int) ([]structs.Answer, error) {
+	rows, err := Db.Query("SELECT uuid, content, owner_id, post_id, created_at, likes, dislikes FROM answers WHERE likes LIKE CONCAT('%', ?, '%') ORDER BY created_at LIMIT ? OFFSET ?", userID, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var answers []structs.Answer
+	for rows.Next() {
+		var answer structs.Answer
+		var likesJSON, dislikesJSON string
+		if err := rows.Scan(&answer.Uuid, &answer.Content, &answer.CreatorUUID, &answer.PostID, &answer.CreationDate, &likesJSON, &dislikesJSON); err != nil {
+			return nil, err
+		}
+		var likes []uuid.UUID
+		var dislikes []uuid.UUID
+
+		err = json.Unmarshal([]byte(likesJSON), &likes)
+		if err != nil {
+			fmt.Println("Error unmarshaling likes:", err)
+			return nil, err
+		}
+
+		err = json.Unmarshal([]byte(dislikesJSON), &dislikes)
+		if err != nil {
+			fmt.Println("Error unmarshaling dislikes:", err)
+			return nil, err
+		}
+
+		answer.Likes = likes
+		answer.Dislikes = dislikes
+
+		formattedDate, err := answer.FormattedDate()
+		if err != nil {
+			fmt.Println("Error formatting date:", err)
+		}
+
+		answer.Creator, _ = GetUserFromUUID(answer.CreatorUUID)
+		if answer.Creator.Username == "" {
+			answer.Creator = structs.User{Username: "Deleted User"}
+		}
+
+		answer.CreationDate = formattedDate
+		answers = append(answers, answer)
+	}
+	return answers, nil
 }

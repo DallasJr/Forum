@@ -5,6 +5,10 @@
     padding-top: 80px;
 }
 
+h1 {
+    color: white;
+}
+
 /* Post styles */
 .post, .post-feedback {
     border: 1px solid #232327;
@@ -166,8 +170,12 @@
     font-size: 1.09em;
 }
 
-.answer-msg {
+.answer-left pre {
+    white-space: pre-wrap;
     color: #dddee0;
+    word-wrap: break-word;       /* Ensures content wraps */
+    overflow-wrap: break-word;   /* Ensures content wraps */
+    word-break: break-word;      /* Ensures long words break */
 }
 
 .answer-meta {

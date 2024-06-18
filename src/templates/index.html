@@ -65,54 +65,54 @@
         </div>
     </div>
 
-    <div class="main-container">
-        <div class="categories-section">
-            <h2>Categories</h2>
-            <div class="categories-list">
-                {{range .Categories}}
-                <a href="/categories/{{.Name}}" class="category-item" style="background-image: url('{{.Image}}');">
-                    <div class="category-content">
-                        <h3>{{.Name}}</h3>
-                        <p>{{.Description}}</p>
-                    </div>
-                    <div class="category-footer">
-                        <p>{{.PostsCount}} posts</p>
-                    </div>
-                </a>
-                {{end}}
-            </div>
-        </div>
-
-        <div class="recent-posts-section">
-            <h2>Recent Posts</h2>
-            <div class="recent-posts-list">
-                {{range .RecentPosts}}
-                <a href="/post/{{.Uuid}}" class="post-item">
-                    <div class="post-creator">{{.Creator.Username}}</div>
-                    <div class="post-content">
-                        <h3>{{.Title}}</h3>
-                        <p>{{.Content}}</p>
-                    </div>
-                    <div class="post-category">
-                        <h3>Category:</h3>
-                        <p>{{.Category}}</p>
-                    </div>
-                    <div class="post-meta">Posted on {{.CreationDate}}</div>
-                    <div class="post-actions">
-                        <div class="like-count">
-                            <i class="fas fa-thumbs-up"></i>
-                            <span>{{len .Likes}}</span>
-                        </div>
-                        <div class="dislike-count">
-                            <i class="fas fa-thumbs-down"></i>
-                            <span>{{len .Dislikes}}</span>
-                        </div>
-                    </div>
-                </a>
-
-                {{end}}
-            </div>
+<div class="main-container">
+    <div class="categories-section">
+        <h2>Categories</h2>
+        <div class="categories-list">
+            {{range .Categories}}
+            <a href="/categories/{{.Name}}" class="category-item" style="background-image: url('{{.Image}}');">
+                <div class="category-content">
+                    <h3>{{.Name}}</h3>
+                    <p>{{.Description}}</p>
+                </div>
+                <div class="category-footer">
+                    <p>{{.PostsCount}} posts</p>
+                </div>
+            </a>
+            {{end}}
         </div>
     </div>
+
+    <div class="recent-posts-section">
+        <h2>Recent Posts</h2>
+        <div class="recent-posts-list">
+            {{range .RecentPosts}}
+            <a href="/post/{{.Uuid}}" class="post-item">
+                <div class="post-creator">{{.Creator.Username}}</div>
+                <div class="post-content">
+                    <h3>{{.Title}}</h3>
+                    <p>{{.Content}}</p>
+                </div>
+                <div class="post-category">
+                    <h3>Category:</h3>
+                    <p>{{.Category}}</p>
+                </div>
+                <div class="post-meta">Posted on {{.CreationDate}}</div>
+                <div class="post-actions">
+                    <div class="like-count">
+                        <i class="fas fa-thumbs-up"></i>
+                        <span>{{len .Likes}}</span>
+                    </div>
+                    <div class="dislike-count">
+                        <i class="fas fa-thumbs-down"></i>
+                        <span>{{len .Dislikes}}</span>
+                    </div>
+                </div>
+            </a>
+
+            {{end}}
+        </div>
+    </div>
+</div>
     </body>
 </html>
