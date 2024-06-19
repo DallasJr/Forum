@@ -68,7 +68,6 @@ func serveProfilePage(w http.ResponseWriter, r *http.Request) {
 	answers, _ := src.GetAnswersByUser(profileID, 0, 5)
 	for i := range answers {
 		answers[i].Content = structs.Shorten(answers[i].Content, 30)
-		answers[i].PostTitle, _ = src.GetPostNameByPostID(answers[i].PostID.String())
 		answers[i].PostTitle = structs.Shorten(answers[i].PostTitle, 20)
 	}
 	ExportData.Answers = answers
@@ -88,7 +87,6 @@ func serveProfilePage(w http.ResponseWriter, r *http.Request) {
 	likedAnswers, _ := src.GetLikedAnswersByUser(profileID, 0, 5)
 	for i := range likedAnswers {
 		likedAnswers[i].Content = structs.Shorten(likedAnswers[i].Content, 30)
-		likedAnswers[i].PostTitle, _ = src.GetPostNameByPostID(likedAnswers[i].PostID.String())
 		likedAnswers[i].PostTitle = structs.Shorten(likedAnswers[i].PostTitle, 20)
 		if likedAnswers[i].Creator.Username != "Deleted User" {
 			likedAnswers[i].Creator.Username = structs.Shorten(likedAnswers[i].Creator.Username, 12)
@@ -122,7 +120,6 @@ func showMorePostedAnswers(w http.ResponseWriter, r *http.Request) {
 	}
 	for i := range answers {
 		answers[i].Content = structs.Shorten(answers[i].Content, 20)
-		answers[i].PostTitle, _ = src.GetPostNameByPostID(answers[i].PostID.String())
 		answers[i].PostTitle = structs.Shorten(answers[i].PostTitle, 20)
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -166,7 +163,6 @@ func showMoreLikedAnswers(w http.ResponseWriter, r *http.Request) {
 	}
 	for i := range answers {
 		answers[i].Content = structs.Shorten(answers[i].Content, 20)
-		answers[i].PostTitle, _ = src.GetPostNameByPostID(answers[i].PostID.String())
 		answers[i].PostTitle = structs.Shorten(answers[i].PostTitle, 20)
 	}
 	w.Header().Set("Content-Type", "application/json")

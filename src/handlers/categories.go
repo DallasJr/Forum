@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"html/template"
 	"net/http"
-	"sort"
 	"strconv"
 	"strings"
 )
@@ -87,33 +86,4 @@ func categoriesHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		serveCategoryPage(w, r)
 	}
-}
-
-func getAllCategories() ([]structs.Category, error) {
-	rows, err := src.Db.Query("SELECT name, description, image FROM categories")
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var categories []structs.Category
-	for rows.Next() {
-		var category structs.Category
-		if err := rows.Scan(&category.Name, &category.Description, &category.Image); err != nil {
-			return nil, err
-		}
-
-		postCount, err := src.GetPostsCountByCategory(category.Name)
-		if err != nil {
-			return nil, err
-		}
-		category.PostsCount = postCount
-
-		categories = append(categories, category)
-	}
-
-	sort.Slice(categories, func(i, j int) bool {
-		return categories[i].PostsCount > categories[j].PostsCount
-	})
-	return categories, nil
 }

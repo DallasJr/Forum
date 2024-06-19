@@ -80,7 +80,7 @@ h1 {
     color: #C71E1E;
 }
 
-.like-btn:hover {
+.like-btn:hover:not(:disabled) {
     border-color: green;
 }
 
@@ -88,7 +88,7 @@ h1 {
     border-color: green;
 }
 
-.dislike-btn:hover {
+.dislike-btn:hover:not(:disabled) {
     border-color: #C71E1E;
 }
 

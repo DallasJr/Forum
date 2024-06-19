@@ -62,58 +62,58 @@
     <div id="post-feedback" class="post-feedback" style="color: green" hidden="hidden"></div>
     <div class="post">
         <h2>{{.Post.Title}}</h2>
-        <p class="post-meta">Posted by {{ .Post.Creator.Username }} in <a href="/categories/{{ .Post.Category }}">{{ .Post.Category }}</a> on {{ .Post.CreationDate }}</p>
+        <p class="post-meta">Posted by {{.Post.Creator.Username}} in <a href="/categories/{{.Post.Category}}">{{.Post.Category}}</a> on {{.Post.CreationDate}}</p>
         <div class="post-content">
-            <pre>{{ .Post.Content }}</pre>
-            {{ if .Post.Images }}
+            <pre>{{.Post.Content}}</pre>
+            {{if .Post.Images}}
             <div class="post-images">
-                {{ range .Post.Images }}
-                <img src="{{ . }}" alt="Post Image">
-                {{ end }}
+                {{range .Post.Images}}
+                <img src="{{.}}" alt="Post Image">
+                {{end}}
             </div>
-            {{ end }}
+            {{end}}
         </div>
         <div class="post-actions">
             <div class="like-action">
                 {{if eq .User.Username ""}}
-                    <button class="like-btn" data-action="like">
+                    <button class="like-btn" data-action="like" disabled>
                         <i class="fas fa-thumbs-up"></i>
-                        <span class="like-count">{{ len .Post.Likes }}</span>
+                        <span class="like-count">{{len .Post.Likes}}</span>
                     </button>
                 {{else}}
-                    {{ if userHasLiked .User.Uuid .Post.Likes }}
+                    {{if userHasLiked .User.Uuid .Post.Likes}}
                         <button class="like-btn liked" data-action="unlike">
                             <i class="fas fa-thumbs-up"></i>
-                            <span class="like-count">{{ len .Post.Likes }}</span>
+                            <span class="like-count">{{len .Post.Likes}}</span>
                         </button>
-                    {{ else }}
+                    {{else}}
                         <button class="like-btn" data-action="like">
                             <i class="fas fa-thumbs-up"></i>
-                            <span class="like-count">{{ len .Post.Likes }}</span>
+                            <span class="like-count">{{len .Post.Likes}}</span>
                         </button>
-                    {{ end }}
+                    {{end}}
                 {{end}}
 
             </div>
             <div class="dislike-action">
                 {{if eq .User.Username ""}}
-                    <button class="dislike-btn" data-action="dislike">
+                    <button class="dislike-btn" data-action="dislike" disabled>
                         <i class="fas fa-thumbs-down"></i>
-                        <span class="dislike-count">{{ len .Post.Dislikes }}</span>
+                        <span class="dislike-count">{{len .Post.Dislikes}}</span>
                     </button>
                 {{else}}
-                    {{ if userHasDisliked .User.Uuid .Post.Dislikes }}
+                    {{if userHasDisliked .User.Uuid .Post.Dislikes}}
                         <button class="dislike-btn disliked" data-action="undislike">
                             <i class="fas fa-thumbs-down"></i>
-                            <span class="dislike-count">{{ len .Post.Dislikes }}</span>
+                            <span class="dislike-count">{{len .Post.Dislikes}}</span>
                         </button>
-                    {{ else }}
+                    {{else}}
                         <button class="dislike-btn" data-action="dislike">
                             <i class="fas fa-thumbs-down"></i>
-                            <span class="dislike-count">{{ len .Post.Dislikes }}</span>
+                            <span class="dislike-count">{{len .Post.Dislikes}}</span>
                         </button>
-                    {{ end }}
-                {{ end }}
+                    {{end}}
+                {{end}}
             </div>
         </div>
     </div>
@@ -126,63 +126,62 @@
         </div>
 
         <div id="answers-list" class="for-first">
-        {{ range .Answers }}
+        {{range .Answers}}
             <div class="answer">
                 <div class="answer-left">
                     <div class="answer-header">
-                        <p class="answer-username">{{ .Creator.Username }}</p>
-                        <p class="answer-meta">{{ .CreationDate }}</p>
+                        <p class="answer-username">{{.Creator.Username}}</p>
+                        <p class="answer-meta">{{.CreationDate}}</p>
                     </div>
-                    <pre>{{ .Content }}</pre>
+                    <pre>{{.Content}}</pre>
                 </div>
                 <div class="answer-right">
                     <div class="post-actions">
                         <div class="like-action">
                             {{if eq $.User.Username ""}}
-                            <button class="like-btn" data-action="like">
-                                <i class="fas fa-thumbs-up"></i>
-                                <span class="like-count">{{ len .Likes }}</span>
-                            </button>
+                                <button class="like-btn" data-action="like" disabled>
+                                    <i class="fas fa-thumbs-up"></i>
+                                    <span class="like-count">{{len .Likes}}</span>
+                                </button>
                             {{else}}
-                            {{ if userHasLiked $.User.Uuid .Likes }}
-                            <button class="like-btn liked" data-action="unlike">
-                                <i class="fas fa-thumbs-up"></i>
-                                <span class="like-count">{{ len .Likes }}</span>
-                            </button>
-                            {{ else }}
-                            <button class="like-btn" data-action="like">
-                                <i class="fas fa-thumbs-up"></i>
-                                <span class="like-count">{{ len .Likes }}</span>
-                            </button>
-                            {{ end }}
+                                {{if userHasLiked $.User.Uuid .Likes}}
+                                    <button class="like-btn liked" data-action="unlike">
+                                        <i class="fas fa-thumbs-up"></i>
+                                        <span class="like-count">{{len .Likes}}</span>
+                                    </button>
+                                    {{else}}
+                                    <button class="like-btn" data-action="like">
+                                        <i class="fas fa-thumbs-up"></i>
+                                        <span class="like-count">{{len .Likes}}</span>
+                                    </button>
+                                {{end}}
                             {{end}}
-
                         </div>
                         <div class="dislike-action">
                             {{if eq $.User.Username ""}}
-                            <button class="dislike-btn" data-action="dislike">
-                                <i class="fas fa-thumbs-down"></i>
-                                <span class="dislike-count">{{ len .Dislikes }}</span>
-                            </button>
+                                <button class="dislike-btn" data-action="dislike" disabled>
+                                    <i class="fas fa-thumbs-down"></i>
+                                    <span class="dislike-count">{{len .Dislikes}}</span>
+                                </button>
                             {{else}}
-                            {{ if userHasDisliked $.User.Uuid .Dislikes }}
-                            <button class="dislike-btn disliked" data-action="undislike">
-                                <i class="fas fa-thumbs-down"></i>
-                                <span class="dislike-count">{{ len .Dislikes }}</span>
-                            </button>
-                            {{ else }}
-                            <button class="dislike-btn" data-action="dislike">
-                                <i class="fas fa-thumbs-down"></i>
-                                <span class="dislike-count">{{ len .Dislikes }}</span>
-                            </button>
-                            {{ end }}
-                            {{ end }}
+                                {{if userHasDisliked $.User.Uuid .Dislikes}}
+                                    <button class="dislike-btn disliked" data-action="undislike">
+                                        <i class="fas fa-thumbs-down"></i>
+                                        <span class="dislike-count">{{len .Dislikes}}</span>
+                                    </button>
+                                {{else}}
+                                    <button class="dislike-btn" data-action="dislike">
+                                        <i class="fas fa-thumbs-down"></i>
+                                        <span class="dislike-count">{{len .Dislikes}}</span>
+                                    </button>
+                                {{end}}
+                            {{end}}
                         </div>
                     </div>
                 </div>
 
             </div>
-        {{ end }}
+        {{end}}
         </div>
         {{if eq (len .Answers) 5}}
             <button id="show-more-btn" onclick="loadMoreAnswers()">Show More</button>

@@ -59,6 +59,10 @@ func SetupHandlers() {
 	http.HandleFunc("/add-category", addCategory)
 	http.HandleFunc("/delete-category/", deleteCategory)
 	http.HandleFunc("/update-category/", updateCategory)
+	http.HandleFunc("/delete-post/", deletePost)
+	http.HandleFunc("/delete-answer/", deleteAnswer)
+	http.HandleFunc("/delete-user/", deleteUser)
+	http.HandleFunc("/update-user/", updateUser)
 
 	http.HandleFunc("/error.html", serveErrorPage)
 }
@@ -84,7 +88,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 		ExportData.User = user
 	}
 
-	categories, err := getAllCategories()
+	categories, err := src.GetAllCategories()
 	if err != nil {
 		http.Error(w, "Unable to retrieve categories", http.StatusInternalServerError)
 	}

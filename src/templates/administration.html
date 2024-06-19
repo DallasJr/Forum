@@ -102,15 +102,100 @@
         {{end}}
         <div id="posts-section" class="administration-section">
             <h2>Posts</h2>
-
+            <div id="post-message" class="post-message"></div>
+            <div class="post-list">
+                {{range .Posts}}
+                    <div class="post-item">
+                        <div class="other-form">
+                            <h4>Title:</h4>
+                            <p>{{.Title}}</p>
+                            <h4>Creator:</h4>
+                            <p>{{.Creator.Username}}</p>
+                            <h4>Date:</h4>
+                            <p>{{.CreationDate}}</p>
+                            <h4>Content:</h4>
+                            <p>{{.Content}}</p>
+                            <h4>Number of Images:</h4>
+                            <p>{{len .Images}}</p>
+                            <h4>Number of Answers:</h4>
+                            <p>{{.AnswersCount}}</p>
+                            <h4>Likes</h4>
+                            <p>{{len .Likes}}</p>
+                            <h4>Dislike</h4>
+                            <p>{{len .Dislikes}}</p>
+                            <div class="post-actions">
+                                <a href="/post/{{.Uuid}}" class="view-btn">View page</a>
+                            </div>
+                        </div>
+                        <form method="POST" action="/delete-post/{{.Uuid}}" class="delete-form">
+                            <button type="submit" class="delete-btn">Delete</button>
+                        </form>
+                    </div>
+                {{end}}
+            </div>
         </div>
         <div id="answers-section" class="administration-section">
             <h2>Answers</h2>
-
+            <div id="answer-message" class="answer-message"></div>
+            <div class="answer-list">
+                {{range .Answers}}
+                <div class="answer-item">
+                    <div class="other-form">
+                        <h4>Creator:</h4>
+                        <p>{{.Creator.Username}}</p>
+                        <h4>Date:</h4>
+                        <p>{{.CreationDate}}</p>
+                        <h4>Post:</h4>
+                        <p>{{.PostTitle}}</p>
+                        <h4>Content:</h4>
+                        <p>{{.Content}}</p>
+                        <h4>Likes</h4>
+                        <p>{{len .Likes}}</p>
+                        <h4>Dislike</h4>
+                        <p>{{len .Dislikes}}</p>
+                        <div class="post-actions">
+                            <a href="/post/{{.PostID}}" class="view-btn">View page</a>
+                        </div>
+                    </div>
+                    <form method="POST" action="/delete-answer/{{.Uuid}}" id="delete-answer-form" class="delete-form">
+                        <button type="submit" class="delete-btn">Delete</button>
+                    </form>
+                </div>
+                {{end}}
+            </div>
         </div>
         <div id="users-section" class="administration-section">
             <h2>Users</h2>
-
+            <span id="users-message" class="users-message"></span>
+            <div class="user-list">
+                {{range .Users}}
+                <div class="user-item">
+                    <form method="POST" action="/update-user/{{.Uuid}}" id="users-form" class="users-form">
+                        <h4>Username:</h4>
+                        <p>{{.Username}}</p>
+                        <h4>Name Surname:</h4>
+                        <p>{{.Name}} {{.Surname}}</p>
+                        <h4>Email:</h4>
+                        <p>{{.Email}}</p>
+                        <h4>Gender:</h4>
+                        <p>{{.Gender}}</p>
+                        <h4>Creation Date:</h4>
+                        <p>{{.CreationDate}}</p>
+                        <h4>Power:</h4>
+                        <p>{{.Power}}</p>
+                        <div class="post-actions">
+                            {{if eq $.User.Power 2}}
+                            <button type="submit" class="rename-btn">Change power</button>
+                            {{end}}
+                            <a href="/profile/{{.Uuid}}" class="view-btn">View profile</a>
+                        </div>
+                    </form>
+                    <form method="POST" action="/delete-user/{{.Uuid}}" class="delete-user-form">
+                        <button type="submit" class="delete-btn">Delete</button>
+                    </form>
+                </div>
+                {{end}}
+            </div>
         </div>
     </div>
 </div>
@@ -126,18 +211,30 @@
         reader.readAsDataURL(event.target.files[0]);
     }
 
-    document.addEventListener("DOMContentLoaded", function() {
-        const sectionToShow = "{{if eq .User.Power 2}}categories-section{{else}}posts-section{{end}}";
-        showSection(sectionToShow);
-
+    window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
-        const message = urlParams.get('message');
-        if (message) {
-            document.getElementById('category-message').textContent = message;
-            // Remove the message parameter from the URL
-            const newUrl = window.location.origin + window.location.pathname;
-            window.history.replaceState({}, document.title, newUrl);
+        const scrollPos = urlParams.get('scrollPos');
+
+        if (scrollPos) {
+            window.scrollTo(0, parseFloat(scrollPos));
         }
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const section = urlParams.get('section') || "{{if eq .User.Power 2}}categories-section{{else}}posts-section{{end}}";
+        showSection(section);
+
+        const forms = document.querySelectorAll("form");
+        forms.forEach(form => {
+            form.addEventListener("submit", function(event) {
+                const scrollPosInput = document.createElement('input');
+                scrollPosInput.type = 'hidden';
+                scrollPosInput.name = 'scrollPos';
+                scrollPosInput.value = window.scrollY;
+                form.appendChild(scrollPosInput);
+            });
+        });
     });
 
     function showSection(sectionId) {

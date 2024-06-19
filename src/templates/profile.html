@@ -63,11 +63,11 @@
         <div class="profile-container">
             <div class="profile-header">
                 <div class="username-box">
-                    <h1 class="username">{{ .Profile.Username }}</h1>
+                    <h1 class="username">{{.Profile.Username}}</h1>
                 </div>
                 <div class="meta-box">
-                    <p>Since: {{ .Profile.CreationDate }}</p>
-                    <p>Gender: {{ .Profile.Gender }}</p>
+                    <p>Since: {{.Profile.CreationDate}}</p>
+                    <p>Gender: {{.Profile.Gender}}</p>
                     {{if eq .Profile.Power 1}}
                     <p style="color: dodgerblue">Moderator</p>
                     {{end}}
@@ -80,7 +80,7 @@
                 <div id="posts-section" class="posts-section">
                     <h2>Posts posted</h2>
                     <div id="created-posts">
-                        {{ range .Posts }}
+                        {{range .Posts}}
                         <a href="/post/{{.Uuid}}" class="post-item">
                             <div class="post-content">
                                 <h3>{{.Title}}</h3>
@@ -106,7 +106,7 @@
                                 </div>
                             </div>
                         </a>
-                        {{ end }}
+                        {{end}}
                     </div>
                     {{if eq (len .Posts) 5}}
                     <button id="show-more-posts-btn" class="show-more-btn" onclick="loadMoreCreatedPosts()">Show More</button>
@@ -115,7 +115,7 @@
                 <div class="answers-section">
                     <h2>Answers posted</h2>
                     <div id="posted-answers">
-                        {{ range .Answers }}
+                        {{range .Answers}}
                         <a href="/post/{{.PostID}}" class="post-item">
                             <div class="post-content">
                                 <h3>Answer:</h3>
@@ -137,7 +137,7 @@
                                 </div>
                             </div>
                         </a>
-                        {{ end }}
+                        {{end}}
                     </div>
                     {{if eq (len .Answers) 5}}
                     <button id="show-more-answers-btn" class="show-more-btn" onclick="loadMorePostedAnswers()">Show More</button>
@@ -146,7 +146,7 @@
                 <div class="liked-section">
                     <h2>Liked Posts</h2>
                     <div id="liked-posts">
-                        {{ range .LikedPosts }}
+                        {{range .LikedPosts}}
                         <a href="/post/{{.Uuid}}" class="post-item">
                             <div class="post-content">
                                 <h3>{{.Title}}</h3>
@@ -172,7 +172,7 @@
                                 </div>
                             </div>
                         </a>
-                        {{ end }}
+                        {{end}}
                     </div>
                     {{if eq (len .LikedPosts) 5}}
                     <button id="show-more-liked-posts-btn" class="show-more-btn" onclick="loadMoreLikedPosts()">Show More</button>
@@ -181,7 +181,7 @@
                 <div class="liked-section">
                     <h2>Liked Answers</h2>
                     <div id="liked-answers">
-                        {{ range .LikedAnswers }}
+                        {{range .LikedAnswers}}
                         <a href="/post/{{.PostID}}" class="post-item">
                             <div class="post-content">
                                 <h3>Answer:</h3>
@@ -203,7 +203,7 @@
                                 </div>
                             </div>
                         </a>
-                        {{ end }}
+                        {{end}}
                     </div>
                     {{if eq (len .LikedAnswers) 5}}
                     <button id="show-more-liked-answers-btn" class="show-more-btn" onclick="loadMoreLikedAnswers()">Show More</button>
