@@ -607,6 +607,7 @@ func GetLikedAnswersByUser(userID string) ([]structs.Answer, error) {
 
 		answer.Likes = likes
 		answer.Dislikes = dislikes
+		answer.PostTitle, _ = GetPostNameByPostID(answer.PostID.String())
 
 		formattedDate, err := answer.FormattedDate()
 		if err != nil {
