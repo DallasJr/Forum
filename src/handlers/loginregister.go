@@ -15,7 +15,6 @@ import (
 	"time"
 )
 
-// Generate a random session ID
 func generateSessionID() string {
 	b := make([]byte, 32)
 	_, err := rand.Read(b)
@@ -27,7 +26,6 @@ func generateSessionID() string {
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		//http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		http.Redirect(w, r, "/error.html", http.StatusSeeOther)
 		return
 	}
@@ -52,16 +50,13 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Authentication successful, generate session ID
 	sessionID := generateSessionID()
 
-	// Store the session ID in the map
 	src.Mutex.Lock()
 	src.Sessions[sessionID] = id
 	fmt.Println("logged: " + id)
 	src.Mutex.Unlock()
 
-	// Set session ID as a cookie
 	http.SetCookie(w, &http.Cookie{
 		Name:     "sessionID",
 		Value:    sessionID,
@@ -141,7 +136,6 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Authentication successful, generate session ID
 	sessionID := generateSessionID()
 
 	// Store the session ID in the map

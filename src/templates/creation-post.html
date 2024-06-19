@@ -9,6 +9,7 @@
     <link rel="stylesheet" type="text/css" href="../static/css/creation-post.css">
     <link rel="stylesheet" type="text/css" href="../static/css/navbar.css">
     <script src="../static/javascript/navbar.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" />
 </head>
 <body>
 
@@ -70,7 +71,10 @@
             <br><br>
 
             <label for="post-images">Upload Image (JPEG, PNG, GIF, max 20MB):</label>
-            <input type="file" id="post-images" name="post-images" accept="image/jpeg, image/png, image/gif" multiple>
+            <div class="file-input-wrapper">
+                <input type="file" id="post-images" name="post-images" accept="image/jpeg, image/png, image/gif" multiple>
+                <button class="delete-btn" type="button"><i class="fas fa-trash"></i></button>
+            </div>
             <br><br>
 
             <span id="error-message" style="color: red;"></span>
@@ -80,6 +84,16 @@
     {{end}}
 </div>
 <script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var deleteBtn = document.querySelector('.delete-btn');
+        var fileInput = document.getElementById('post-images');
+
+        deleteBtn.addEventListener('click', function() {
+            // Clear the file input by resetting its value
+            fileInput.value = '';
+        });
+    });
 
     document.getElementById('create-post-form').addEventListener('submit', function(event) {
         event.preventDefault();

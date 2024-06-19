@@ -224,7 +224,10 @@
         const urlParams = new URLSearchParams(window.location.search);
         const section = urlParams.get('section') || "{{if eq .User.Power 2}}categories-section{{else}}posts-section{{end}}";
         showSection(section);
-
+        const message = urlParams.get('message');
+        if (message) {
+            document.getElementById('category-message').textContent = message;
+        }
         const forms = document.querySelectorAll("form");
         forms.forEach(form => {
             form.addEventListener("submit", function(event) {

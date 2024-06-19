@@ -24,7 +24,6 @@ type administrationPageData struct {
 
 func serveAdministrationPage(w http.ResponseWriter, r *http.Request) {
 
-	// Prevent caching
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 	w.Header().Set("Pragma", "no-cache")
 	w.Header().Set("Expires", "0")
@@ -156,7 +155,6 @@ func deleteCategory(w http.ResponseWriter, r *http.Request) {
 	categoryName := r.URL.Path[len("/delete-category/"):]
 
 	category, _ := src.GetCategory(categoryName)
-	// Delete the category from the database
 	_, err := src.Db.Exec("DELETE FROM categories WHERE name = ?", categoryName)
 	if err != nil {
 		http.Error(w, "Unable to delete category", http.StatusInternalServerError)
@@ -175,7 +173,7 @@ func deleteCategory(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateCategory(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseMultipartForm(10 << 20) // 10 MB limit
+	err := r.ParseMultipartForm(10 << 20)
 	if err != nil {
 		http.Error(w, "Unable to parse form", http.StatusBadRequest)
 		return
@@ -208,20 +206,17 @@ func updateCategory(w http.ResponseWriter, r *http.Request) {
 	}
 	categoryName := r.URL.Path[len("/update-category/"):]
 
-	// Get form values
 	prevName := r.FormValue("prevName")
 	category, _ := src.GetCategory(prevName)
 	newName := r.FormValue("newName")
 	newDescription := r.FormValue("newDescription")
 	newImage := ""
 
-	// Validate form values
 	if newName == "" || newDescription == "" {
 		http.Error(w, "New name and description are required", http.StatusInternalServerError)
 		return
 	}
 
-	// Handle file upload for new image
 	file, header, err := r.FormFile("newImage")
 	if err == nil {
 		defer file.Close()
@@ -262,7 +257,6 @@ func updateCategory(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Update the category in the database
 	query := "UPDATE categories SET name = ?, description = ?"
 	args := []interface{}{newName, newDescription}
 
@@ -290,9 +284,8 @@ func updateCategory(w http.ResponseWriter, r *http.Request) {
 	}
 
 	scrollPos := r.FormValue("scrollPos")
-	redirectURL := fmt.Sprintf("/administration.html?scrollPos=%s", scrollPos)
+	redirectURL := fmt.Sprintf("/administration.html?scrollPos=%s&message=%s", scrollPos, "Category updated successfully.")
 	http.Redirect(w, r, redirectURL, http.StatusFound)
-	//http.Redirect(w, r, "/administration.html?message=Category%20updated%20successfully.", http.StatusSeeOther)
 }
 
 func deletePost(w http.ResponseWriter, r *http.Request) {

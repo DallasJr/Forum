@@ -92,15 +92,6 @@ func SetupDatabase() *sql.DB {
 	if err != nil {
 		log.Fatal(err)
 	}
-	/*_, err = Db.Exec(`
-		ALTER TABLE answers ADD COLUMN dislikes TEXT
-	`)
-	if err != nil {
-		// Check for "duplicate column name" error, which means the column already exists
-		if !strings.Contains(err.Error(), "duplicate column name") {
-			log.Fatalf("Error adding column: %v", err)
-		}
-	}*/
 	return Db
 }
 
@@ -109,7 +100,7 @@ func GetUserFromSessionID(sessionID string) (structs.User, error) {
 	userID, exists := Sessions[sessionID]
 	Mutex.Unlock()
 	if !exists {
-		return structs.User{}, nil // Session found
+		return structs.User{}, nil
 	}
 	var user structs.User
 	query := `SELECT uuid, name, surname, username, email, gender, created_at, power FROM users WHERE uuid = ?`
@@ -119,7 +110,7 @@ func GetUserFromSessionID(sessionID string) (structs.User, error) {
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return structs.User{}, nil // No user found
+			return structs.User{}, nil
 		}
 		fmt.Println("query error:", err)
 		return structs.User{}, err
@@ -136,7 +127,7 @@ func GetUserFromUUID(userID uuid.UUID) (structs.User, error) {
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return structs.User{}, nil // No user found
+			return structs.User{}, nil
 		}
 		fmt.Println("query error:", err)
 		return structs.User{}, err
@@ -165,7 +156,7 @@ func GetCategory(name string) (structs.Category, error) {
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return structs.Category{}, nil // No user found
+			return structs.Category{}, nil
 		}
 		fmt.Println("query error:", err)
 		return structs.Category{}, err
@@ -311,7 +302,7 @@ func GetPost(id string) (structs.Post, error) {
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return structs.Post{}, nil // No user found
+			return structs.Post{}, nil
 		}
 		fmt.Println("query error:", err)
 		return structs.Post{}, err
@@ -793,7 +784,7 @@ func GetAnswer(id string) (structs.Answer, error) {
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return structs.Answer{}, nil // No user found
+			return structs.Answer{}, nil
 		}
 		fmt.Println("query error:", err)
 		return structs.Answer{}, err

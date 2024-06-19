@@ -11,6 +11,16 @@ h2 {
     padding-bottom: 10px;
 }
 
+.delete-btn {
+    max-width: 40px;
+    margin-left: 10px;
+}
+
+.file-input-wrapper {
+    display: flex;
+    align-items: center;
+}
+
 p {
     color: #737373;
     border-bottom: 1px #2c2c31 solid;
@@ -88,6 +98,5 @@ button:hover {
 #error-message {
     color: red;
     font-size: 0.9em;
-    display: none;
     text-align: center;
 }
