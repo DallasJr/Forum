@@ -59,6 +59,7 @@ h1 {
 }
 
 .like-btn,
+.delete-btn,
 .dislike-btn {
     background: none;
     border: 3px solid #232327;
@@ -76,8 +77,17 @@ h1 {
     color: green;
 }
 
+.delete-btn {
+    color: white;
+    padding: 7px 10px;
+}
+
 .dislike-btn {
     color: #C71E1E;
+}
+
+.delete-btn:hover {
+    border-color: white;
 }
 
 .like-btn:hover:not(:disabled) {

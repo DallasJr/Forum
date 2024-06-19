@@ -74,6 +74,13 @@
             {{end}}
         </div>
         <div class="post-actions">
+            {{if eq .User.Uuid .Post.CreatorUUID}}
+                <form action="/delete-own-post/{{.Post.Uuid}}" method="POST">
+                    <button class="delete-btn">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </form>
+            {{end}}
             <div class="like-action">
                 {{if eq .User.Username ""}}
                     <button class="like-btn" data-action="like" disabled>
@@ -137,6 +144,13 @@
                 </div>
                 <div class="answer-right">
                     <div class="post-actions">
+                        {{if eq $.User.Uuid .CreatorUUID}}
+                            <form action="/delete-own-answer/{{.Uuid}}" method="POST">
+                                <button class="delete-btn">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        {{end}}
                         <div class="like-action">
                             {{if eq $.User.Username ""}}
                                 <button class="like-btn" data-action="like" disabled>
@@ -210,16 +224,33 @@
 
         if (amessage) {
             const feedbackElement = document.getElementById('answer-feedback');
-            feedbackElement.textContent = amessage;
+            feedbackElement.textContent = decodeURIComponent(amessage);
             const newUrl = window.location.origin + window.location.pathname;
             window.history.replaceState({}, document.title, newUrl);
         }
         if (pmessage) {
             const feedbackElement = document.getElementById('post-feedback');
-            feedbackElement.textContent = pmessage;
+            feedbackElement.textContent = decodeURIComponent(pmessage);
             feedbackElement.hidden = false;
             const newUrl = window.location.origin + window.location.pathname;
             window.history.replaceState({}, document.title, newUrl);
+        }
+
+        const forms = document.querySelectorAll("form");
+        forms.forEach(form => {
+            form.addEventListener("submit", function(event) {
+                const scrollPosInput = document.createElement('input');
+                scrollPosInput.type = 'hidden';
+                scrollPosInput.name = 'scrollPos';
+                scrollPosInput.value = window.scrollY;
+                form.appendChild(scrollPosInput);
+            });
+        });
+
+        // Ensure scroll restoration on window load
+        const scrollPos = urlParams.get('scrollPos');
+        if (scrollPos) {
+            window.scrollTo(0, parseFloat(scrollPos));
         }
     });
 

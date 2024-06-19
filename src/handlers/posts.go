@@ -355,5 +355,97 @@ func handleAnswerSubmission(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to execute SQL statement", http.StatusInternalServerError)
 		return
 	}
-	http.Redirect(w, r, "/post/"+post.Uuid.String()+"?a-message=Answer%20posted%20successfully%20!", http.StatusSeeOther)
+	scrollPos := r.FormValue("scrollPos")
+	redirectURL := fmt.Sprintf("/post/%s?a-message=Answer%%20posted%%20successfully%%20!&scrollPos=%s", post.Uuid.String(), scrollPos)
+	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+}
+
+func handlePostDelete(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
+
+	if !cookieExists(r, "sessionID") {
+		http.Redirect(w, r, "/login.html", http.StatusFound)
+		return
+	}
+
+	sessionID := src.GetValidSession(r)
+	if sessionID == "" {
+		w, r = removeSession(w, r)
+		http.Redirect(w, r, "/login.html", http.StatusFound)
+		return
+	}
+
+	postID := r.URL.Path[len("/delete-own-post/"):]
+	post, _ := src.GetPost(postID)
+
+	user, _ := src.GetUserFromSessionID(sessionID)
+	if user.Uuid != post.CreatorUUID {
+		http.Error(w, "Unable to delete post", http.StatusInternalServerError)
+		return
+	}
+	// Delete the post from the database
+	_, err := src.Db.Exec("DELETE FROM posts WHERE uuid = ?", postID)
+	if err != nil {
+		http.Error(w, "Unable to delete post", http.StatusInternalServerError)
+		return
+	}
+	if len(post.Images) != 0 {
+		for _, j := range post.Images {
+			oldImagePath := fmt.Sprintf("src%s", j)
+			err := os.Remove(oldImagePath)
+			if err != nil {
+				http.Error(w, "Failed to delete old image", http.StatusInternalServerError)
+				return
+			}
+		}
+	}
+	redirectURL := fmt.Sprintf("/categories/%s", post.Category)
+	http.Redirect(w, r, redirectURL, http.StatusFound)
+}
+
+func handleAnswerDelete(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
+
+	if !cookieExists(r, "sessionID") {
+		http.Redirect(w, r, "/login.html", http.StatusFound)
+		return
+	}
+
+	sessionID := src.GetValidSession(r)
+	if sessionID == "" {
+		w, r = removeSession(w, r)
+		http.Redirect(w, r, "/login.html", http.StatusFound)
+		return
+	}
+
+	answerID := r.URL.Path[len("/delete-own-answer/"):]
+	answer, _ := src.GetAnswer(answerID)
+
+	user, _ := src.GetUserFromSessionID(sessionID)
+	if user.Uuid != answer.CreatorUUID {
+		http.Error(w, "Unable to delete answer", http.StatusInternalServerError)
+		return
+	}
+	// Delete the answer from the database
+	_, err := src.Db.Exec("DELETE FROM answers WHERE uuid = ?", answerID)
+	if err != nil {
+		http.Error(w, "Unable to answer post", http.StatusInternalServerError)
+		return
+	}
+	scrollPos := r.FormValue("scrollPos")
+	redirectURL := fmt.Sprintf("/post/%s?scrollPos=%s", answer.PostID, scrollPos)
+	http.Redirect(w, r, redirectURL, http.StatusFound)
 }
