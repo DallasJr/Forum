@@ -120,10 +120,23 @@
                             </div>
                             <div class="answer-post">
                                 <h3>Post:</h3>
+                                {{if eq .PostTitle ""}}
+                                <p>Deleted Post</p>
+                                {{else}}
                                 <p>{{.PostTitle}}</p>
+                                {{end}}
                             </div>
                             <div class="post-meta">Posted on {{.CreationDate}}</div>
                             <div class="post-actions">
+                                {{if eq $.User.Uuid .CreatorUUID}}
+                                    <form action="/delete-own-answer/{{.Uuid}}" method="POST">
+                                        <input type="hidden" name="profile" value="true">
+                                        <button class="delete-btn" type="submit">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                {{end}}
+
                                 <div class="like-count">
                                     <i class="fas fa-thumbs-up"></i>
                                     <span>{{len .Likes}}</span>
@@ -180,10 +193,22 @@
                             </div>
                             <div class="answer-post">
                                 <h3>Post:</h3>
+                                {{if eq .PostTitle ""}}
+                                    <p>Deleted Post</p>
+                                {{else}}
                                 <p>{{.PostTitle}}</p>
+                                {{end}}
                             </div>
                             <div class="post-meta">Posted on {{.CreationDate}}</div>
                             <div class="post-actions">
+                                {{if eq $.User.Uuid .CreatorUUID}}
+                                <form action="/delete-answer-like/{{.Uuid}}" method="POST">
+                                    <input type="hidden" name="profile" value="true">
+                                    <button class="delete-btn" type="submit">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                                {{end}}
                                 <div class="like-count">
                                     <i class="fas fa-thumbs-up"></i>
                                     <span>{{len .Likes}}</span>
@@ -206,6 +231,27 @@
 </body>
 
 <script>
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+
+        const forms = document.querySelectorAll("form");
+        forms.forEach(form => {
+            form.addEventListener("submit", function(event) {
+                const scrollPosInput = document.createElement('input');
+                scrollPosInput.type = 'hidden';
+                scrollPosInput.name = 'scrollPos';
+                scrollPosInput.value = window.scrollY;
+                form.appendChild(scrollPosInput);
+            });
+        });
+
+        // Ensure scroll restoration on window load
+        const scrollPos = urlParams.get('scrollPos');
+        if (scrollPos) {
+            window.scrollTo(0, parseFloat(scrollPos));
+        }
+    });
 
 </script>
 

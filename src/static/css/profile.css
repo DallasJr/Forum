@@ -140,6 +140,11 @@
     .dislike-count {
         margin-left: 20px;
     }
+
+
+    .like-count {
+        margin-left: 20px;
+    }
 }
 
 .post-item:hover {
@@ -233,6 +238,22 @@
     .dislike-count {
         margin-left: 20px;
     }
+
+    .delete-btn {
+        margin-left: 10px;
+    }
+}
+
+.delete-btn {
+    border: 2px white solid;
+    border-radius: 4px;
+    padding: 5px 4px 5px 9px;
+    background-color: transparent;
+    cursor: pointer;
+}
+.delete-btn i {
+    color: white;
+    margin-right: 5px;
 }
 
 .like-count i,

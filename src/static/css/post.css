@@ -252,3 +252,11 @@ button[type="submit"]:hover {
 .login-btn:hover {
     background-color: #af1b1b;
 }
+
+.answer-header a {
+    text-decoration: none;
+}
+
+.answer-header a:hover {
+    text-decoration: underline white;
+}

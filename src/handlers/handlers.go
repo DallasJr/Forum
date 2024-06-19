@@ -50,6 +50,8 @@ func SetupHandlers() {
 	http.HandleFunc("/delete-own-answer/", handleAnswerDelete)
 	http.HandleFunc("/delete-own-post/", handlePostDelete)
 
+	http.HandleFunc("/likedislike", handleLikeDislike)
+
 	//administration page
 	http.HandleFunc("/administration.html", serveAdministrationPage)
 	http.HandleFunc("/add-category", addCategory)

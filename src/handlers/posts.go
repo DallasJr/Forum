@@ -446,6 +446,184 @@ func handleAnswerDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	scrollPos := r.FormValue("scrollPos")
-	redirectURL := fmt.Sprintf("/post/%s?scrollPos=%s", answer.PostID, scrollPos)
+	profile := r.FormValue("profile")
+
+	var redirectURL string
+
+	if profile == "true" {
+		// Redirect to profile page or another appropriate location
+		redirectURL = "/profile/" + user.Uuid.String()
+		if scrollPos != "" {
+			redirectURL += "?scrollPos=" + scrollPos
+		}
+	} else {
+		// Default redirect to the post page with scroll position
+		redirectURL = fmt.Sprintf("/post/%s", answer.PostID)
+		if scrollPos != "" {
+			redirectURL += "?scrollPos=" + scrollPos
+		}
+	}
 	http.Redirect(w, r, redirectURL, http.StatusFound)
+}
+
+func handleLikeDislike(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if !cookieExists(r, "sessionID") {
+		http.Redirect(w, r, "/login.html", http.StatusFound)
+		return
+	}
+
+	sessionID := src.GetValidSession(r)
+	if sessionID == "" {
+		w, r = removeSession(w, r)
+		http.Redirect(w, r, "/login.html", http.StatusFound)
+		return
+	}
+
+	user, err := src.GetUserFromSessionID(sessionID)
+	if err != nil {
+		http.Error(w, "Invalid session", http.StatusUnauthorized)
+		return
+	}
+
+	// Parse form data
+	err = r.ParseForm()
+	if err != nil {
+		http.Error(w, "Failed to parse form data", http.StatusBadRequest)
+		return
+	}
+	postID := r.Form.Get("postID")
+	answerID := r.Form.Get("answerID")
+	action := r.Form.Get("action")
+
+	var likes []string
+	var likesJSON string
+	if postID != "" {
+		err = src.Db.QueryRow("SELECT likes FROM posts WHERE uuid = ?", postID).Scan(&likesJSON)
+		if err != nil {
+			http.Error(w, "Database error1", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		err = src.Db.QueryRow("SELECT likes FROM answers WHERE uuid = ?", answerID).Scan(&likesJSON)
+		if err != nil {
+			http.Error(w, "Database error2", http.StatusInternalServerError)
+			return
+		}
+	}
+	err = json.Unmarshal([]byte(likesJSON), &likes)
+	if err != nil {
+		http.Error(w, "Failed to parse likes", http.StatusInternalServerError)
+		return
+	}
+
+	var dislikes []string
+	var dislikesJSON string
+	if postID != "" {
+		err = src.Db.QueryRow("SELECT dislikes FROM posts WHERE uuid = ?", postID).Scan(&dislikesJSON)
+		if err != nil {
+			http.Error(w, "Database error3", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		err = src.Db.QueryRow("SELECT dislikes FROM answers WHERE uuid = ?", answerID).Scan(&dislikesJSON)
+		if err != nil {
+			http.Error(w, "Database error4", http.StatusInternalServerError)
+			return
+		}
+	}
+	err = json.Unmarshal([]byte(dislikesJSON), &dislikes)
+	if err != nil {
+		http.Error(w, "Failed to parse likes", http.StatusInternalServerError)
+		return
+	}
+
+	if action == "like" {
+		index := indexOf(likes, user.Uuid.String())
+		if index == -1 {
+			likes = append(likes, user.Uuid.String())
+			index2 := indexOf(dislikes, user.Uuid.String())
+			if index2 != -1 {
+				dislikes = append(dislikes[:index2], dislikes[index2+1:]...)
+			}
+		} else {
+			likes = append(likes[:index], likes[index+1:]...)
+		}
+	} else if action == "dislike" {
+		index := indexOf(dislikes, user.Uuid.String())
+		if index == -1 {
+			dislikes = append(dislikes, user.Uuid.String())
+			index2 := indexOf(likes, user.Uuid.String())
+			if index2 != -1 {
+				likes = append(likes[:index2], likes[index2+1:]...)
+			}
+		} else {
+			dislikes = append(dislikes[:index], dislikes[index+1:]...)
+		}
+	} else {
+		http.Error(w, "Invalid action", http.StatusBadRequest)
+		return
+	}
+
+	// Convert likes, dislikes, and images to JSON
+	updatedLikesJSON, err := json.Marshal(likes)
+	if err != nil {
+		http.Error(w, "Unable to marshal likes", http.StatusInternalServerError)
+		return
+	}
+
+	updatedDislikesJSON, err := json.Marshal(dislikes)
+	if err != nil {
+		http.Error(w, "Unable to marshal dislikes", http.StatusInternalServerError)
+		return
+	}
+
+	// Update likes in the database
+	if postID != "" {
+		_, err = src.Db.Exec("UPDATE posts SET likes = ? WHERE uuid = ?", updatedLikesJSON, postID)
+		if err != nil {
+			http.Error(w, "Database error5", http.StatusInternalServerError)
+			return
+		}
+		_, err = src.Db.Exec("UPDATE posts SET dislikes = ? WHERE uuid = ?", updatedDislikesJSON, postID)
+		if err != nil {
+			http.Error(w, "Database error6", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		_, err = src.Db.Exec("UPDATE answers SET likes = ? WHERE uuid = ?", updatedLikesJSON, answerID)
+		if err != nil {
+			http.Error(w, "Database error7", http.StatusInternalServerError)
+			return
+		}
+		_, err = src.Db.Exec("UPDATE answers SET dislikes = ? WHERE uuid = ?", updatedDislikesJSON, answerID)
+		if err != nil {
+			http.Error(w, "Database error8", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	scrollPos := r.FormValue("scrollPos")
+	var id string
+	if postID != "" {
+		id = postID
+	} else {
+		answer, _ := src.GetAnswer(answerID)
+		id = answer.PostID.String()
+	}
+	redirectURL := fmt.Sprintf("/post/%s?scrollPos=%s", id, scrollPos)
+	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+}
+
+func indexOf(slice []string, val string) int {
+	for i, v := range slice {
+		if v == val {
+			return i
+		}
+	}
+	return -1
 }
