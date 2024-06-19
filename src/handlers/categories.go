@@ -3,10 +3,8 @@ package handlers
 import (
 	"Forum/src"
 	"Forum/src/structs"
-	"encoding/json"
 	"html/template"
 	"net/http"
-	"strconv"
 	"strings"
 )
 
@@ -42,7 +40,7 @@ func serveCategoryPage(w http.ResponseWriter, r *http.Request) {
 	category, _ := src.GetCategory(name)
 	ExportData.Category = category
 
-	posts, _ := src.GetPostsByCategory(name, 0, 5)
+	posts, _ := src.GetPostsByCategory(name)
 
 	for i := range posts {
 		posts[i].Title = structs.Shorten(posts[i].Title, 20)
@@ -55,29 +53,6 @@ func serveCategoryPage(w http.ResponseWriter, r *http.Request) {
 	ExportData.Posts = posts
 
 	tmpl.Execute(w, ExportData)
-}
-
-func showMorePosts(w http.ResponseWriter, r *http.Request) {
-	categoryName := r.URL.Query().Get("category")
-	offset, err := strconv.Atoi(r.URL.Query().Get("offset"))
-	if err != nil {
-		http.Error(w, "Invalid offset", http.StatusBadRequest)
-		return
-	}
-	posts, err := src.GetPostsByCategory(categoryName, offset, 5)
-	if err != nil {
-		http.Error(w, "Unable to retrieve more posts", http.StatusInternalServerError)
-		return
-	}
-	for i := range posts {
-		posts[i].Title = structs.Shorten(posts[i].Title, 20)
-		posts[i].Content = structs.Shorten(posts[i].Content, 20)
-		if posts[i].Creator.Username != "Deleted User" {
-			posts[i].Creator.Username = structs.Shorten(posts[i].Creator.Username, 16)
-		}
-	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(posts)
 }
 
 func categoriesHandler(w http.ResponseWriter, r *http.Request) {

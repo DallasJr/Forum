@@ -22,19 +22,6 @@
     flex: 2;
 }
 
-.show-more-btn {
-    border: none;
-    width: 100%;
-    margin-top: 10px;
-    background-color: transparent;
-    color: white;
-}
-
-.show-more-btn:hover {
-    cursor: pointer;
-    text-decoration: underline;
-}
-
 .username {
     font-size: 2.5em;
     margin-left: 20px;
@@ -130,12 +117,6 @@
 
     .post-item {
         display: block;
-    }
-
-    .show-more-btn {
-        background-color: #232327;
-        border-radius: 8px;
-        padding: 10px;
     }
 
     .post-content {

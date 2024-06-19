@@ -96,9 +96,6 @@
                         </a>
                         {{end}}
                     </div>
-                    {{if eq (len .Posts) 5}}
-                    <button id="show-more-btn" onclick="loadMorePosts()">Show More</button>
-                    {{end}}
                 </div>
                 <div class="sidebar">
                     <div class="category-description">
@@ -116,83 +113,4 @@
     {{end}}
 </div>
 </body>
-
-<script>
-    let offset = 5;
-
-    function loadMorePosts() {
-        const category = "{{.Category.Name}}";
-        fetch(`/more-posts?category=${category}&offset=${offset}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(posts => {
-                if (!posts || posts.length === 0) {
-                    document.getElementById('show-more-btn').style.display = 'none';
-                    return;
-                }
-
-                const postsList = document.getElementById('posts-list');
-                if (!postsList) {
-                    console.error('posts-list element not found');
-                    return;
-                }
-                    posts.forEach(post => {
-                        const postLink = document.createElement('a');
-                        postLink.href = `/post/${post.Uuid}`;
-                        postLink.classList.add('post-item');
-
-                        postLink.innerHTML = `
-                        <div class="post-creator">${post.Creator.Username}</div>
-                        <div class="post-content">
-                            <h3>${post.Title}</h3>
-                            <p>${post.Content}</p>
-                        </div>
-                        <div class="post-answers-count">
-                            <h3>Answers</h3>
-                            <p>${post.AnswersCount}</p>
-                        </div>
-                        <div class="post-meta">Posted on ${post.CreationDate}</div>
-                    `;
-
-                        const postActions = document.createElement('div');
-                        postActions.classList.add('post-actions');
-
-                        const likeCount = document.createElement('div');
-                        likeCount.classList.add('like-count');
-                        likeCount.innerHTML = `
-                        <i class="fas fa-thumbs-up"></i>
-                        <span>${post.Likes ? post.Likes.length : 0}</span>
-                    `;
-                        postActions.appendChild(likeCount);
-
-                        const dislikeCount = document.createElement('div');
-                        dislikeCount.classList.add('dislike-count');
-                        dislikeCount.innerHTML = `
-                        <i class="fas fa-thumbs-down"></i>
-                        <span>${post.Dislikes ? post.Dislikes.length : 0}</span>
-                    `;
-                        postActions.appendChild(dislikeCount);
-
-                        postLink.appendChild(postActions);
-
-                        postsList.appendChild(postLink);
-                    });
-                offset += posts.length;
-
-                if (posts.length < 5) {
-                    document.getElementById('show-more-btn').style.display = 'none';
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching more posts:', error);
-            });
-    }
-
-</script>
-
-
 </html>

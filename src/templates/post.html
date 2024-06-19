@@ -62,7 +62,7 @@
     <div id="post-feedback" class="post-feedback" style="color: green" hidden="hidden"></div>
     <div class="post">
         <h2>{{.Post.Title}}</h2>
-        <p class="post-meta">Posted by {{.Post.Creator.Username}} in <a href="/categories/{{.Post.Category}}">{{.Post.Category}}</a> on {{.Post.CreationDate}}</p>
+        <p class="post-meta">Posted by <a href="/profile/{{.Post.Creator.Uuid}}">{{.Post.Creator.Username}}</a> in <a href="/categories/{{.Post.Category}}">{{.Post.Category}}</a> on {{.Post.CreationDate}}</p>
         <div class="post-content">
             <pre>{{.Post.Content}}</pre>
             {{if .Post.Images}}
@@ -130,7 +130,7 @@
             <div class="answer">
                 <div class="answer-left">
                     <div class="answer-header">
-                        <p class="answer-username">{{.Creator.Username}}</p>
+                        <a href="/profile/{{.Creator.Uuid}}"><p class="answer-username">{{.Creator.Username}}</p></a>
                         <p class="answer-meta">{{.CreationDate}}</p>
                     </div>
                     <pre>{{.Content}}</pre>
@@ -183,9 +183,6 @@
             </div>
         {{end}}
         </div>
-        {{if eq (len .Answers) 5}}
-            <button id="show-more-btn" onclick="loadMoreAnswers()">Show More</button>
-        {{end}}
 
         <!-- Form to post an answer -->
         {{if eq .User.Username ""}}
@@ -205,86 +202,6 @@
 </body>
 
 <script>
-
-    let offset = 5;
-
-    function loadMoreAnswers() {
-        const post = "{{.Post.Uuid}}";
-        fetch(`/more-answers?post=${post}&offset=${offset}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(answers => {
-                if (!answers || answers.length === 0) {
-                    document.getElementById('show-more-btn').style.display = 'none';
-                    return;
-                }
-
-                const answersList = document.getElementById('answers-list');
-                if (!answersList) {
-                    console.error('answers-list element not found');
-                    return;
-                }
-                answers.forEach(answer => {
-                    const answerDiv = document.createElement('div');
-                    answerDiv.classList.add('answer');
-                    const answerLeft = document.createElement('div');
-                    answerLeft.classList.add('answer-left');
-
-                    answerLeft.innerHTML = `
-                        <div class="answer-header">
-                            <p class="answer-username">${answer.Creator.Username}</p>
-                            <p class="answer-meta">${answer.CreationDate}</p>
-                        </div>
-                        <pre class="answer-msg">${answer.Content}</pre>
-                    `;
-
-                    const answerRight = document.createElement('div');
-                    answerRight.classList.add('answer-right');
-
-                    const answerActions = document.createElement('div');
-                    answerActions.classList.add('post-actions');
-
-                    const likeAction = document.createElement('div');
-                    likeAction.classList.add('like-action');
-                    likeAction.innerHTML = `
-                        <button class="like-btn" data-action="like">
-                            <i class="fas fa-thumbs-up"></i>
-                            <span class="like-count">${answer.Likes ? answer.Likes.length : 0}</span>
-                        </button>
-                    `;
-
-                    const dislikeAction = document.createElement('div');
-                    dislikeAction.classList.add('dislike-action');
-                    dislikeAction.innerHTML = `
-                        <button class="dislike-btn" data-action="dislike">
-                            <i class="fas fa-thumbs-down"></i>
-                            <span class="dislike-count">${answer.Dislikes ? answer.Dislikes.length : 0}</span>
-                        </button>
-                    `;
-                    answerActions.appendChild(likeAction);
-                    answerActions.appendChild(dislikeAction);
-                    answerRight.appendChild(answerActions);
-
-                    answerDiv.appendChild(answerLeft);
-                    answerDiv.appendChild(answerRight);
-
-                    answersList.appendChild(answerDiv);
-                });
-
-                offset += answers.length;
-
-                if (answers.length < 5) {
-                    document.getElementById('show-more-btn').style.display = 'none';
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching more answers:', error);
-            });
-    }
 
     document.addEventListener("DOMContentLoaded", function() {
         const urlParams = new URLSearchParams(window.location.search);

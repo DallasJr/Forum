@@ -173,8 +173,8 @@ func GetCategory(name string) (structs.Category, error) {
 	return category, nil
 }
 
-func GetPostsByCategory(categoryName string, offset int, limit int) ([]structs.Post, error) {
-	rows, err := Db.Query("SELECT uuid, title, content, owner_id, category_name, created_at, likes, dislikes FROM posts WHERE category_name = ? ORDER BY created_at DESC LIMIT ? OFFSET ?", categoryName, limit, offset)
+func GetPostsByCategory(categoryName string) ([]structs.Post, error) {
+	rows, err := Db.Query("SELECT uuid, title, content, owner_id, category_name, created_at, likes, dislikes FROM posts WHERE category_name = ? ORDER BY created_at DESC", categoryName)
 	if err != nil {
 		return nil, err
 	}
@@ -357,8 +357,8 @@ func GetPost(id string) (structs.Post, error) {
 	return post, nil
 }
 
-func GetAnswersByPosts(post string, offset int, limit int) ([]structs.Answer, error) {
-	rows, err := Db.Query("SELECT uuid, content, owner_id, post_id, created_at, likes, dislikes FROM answers WHERE post_id = ? ORDER BY created_at LIMIT ? OFFSET ?", post, limit, offset)
+func GetAnswersByPosts(post string) ([]structs.Answer, error) {
+	rows, err := Db.Query("SELECT uuid, content, owner_id, post_id, created_at, likes, dislikes FROM answers WHERE post_id = ? ORDER BY created_at", post)
 	if err != nil {
 		return nil, err
 	}
@@ -417,8 +417,8 @@ func GetAnswersCountByPost(post uuid.UUID) (int, error) {
 	return count, nil
 }
 
-func GetPostsByUser(userID string, offset int, limit int) ([]structs.Post, error) {
-	rows, err := Db.Query("SELECT uuid, title, content, owner_id, category_name, created_at, likes, dislikes FROM posts WHERE owner_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?", userID, limit, offset)
+func GetPostsByUser(userID string) ([]structs.Post, error) {
+	rows, err := Db.Query("SELECT uuid, title, content, owner_id, category_name, created_at, likes, dislikes FROM posts WHERE owner_id = ? ORDER BY created_at DESC", userID)
 	if err != nil {
 		return nil, err
 	}
@@ -467,8 +467,8 @@ func GetPostsByUser(userID string, offset int, limit int) ([]structs.Post, error
 	return posts, nil
 }
 
-func GetLikedPostsByUser(userID string, offset int, limit int) ([]structs.Post, error) {
-	rows, err := Db.Query("SELECT uuid, title, content, owner_id, category_name, created_at, likes, dislikes FROM posts WHERE likes LIKE CONCAT('%', ?, '%') ORDER BY created_at DESC LIMIT ? OFFSET ?", userID, limit, offset)
+func GetLikedPostsByUser(userID string) ([]structs.Post, error) {
+	rows, err := Db.Query("SELECT uuid, title, content, owner_id, category_name, created_at, likes, dislikes FROM posts WHERE likes LIKE CONCAT('%', ?, '%') ORDER BY created_at DESC", userID)
 	if err != nil {
 		return nil, err
 	}
@@ -532,8 +532,8 @@ func GetPostNameByPostID(postID string) (string, error) {
 	return title, nil
 }
 
-func GetAnswersByUser(userID string, offset int, limit int) ([]structs.Answer, error) {
-	rows, err := Db.Query("SELECT uuid, content, owner_id, post_id, created_at, likes, dislikes FROM answers WHERE owner_id = ? ORDER BY created_at LIMIT ? OFFSET ?", userID, limit, offset)
+func GetAnswersByUser(userID string) ([]structs.Answer, error) {
+	rows, err := Db.Query("SELECT uuid, content, owner_id, post_id, created_at, likes, dislikes FROM answers WHERE owner_id = ? ORDER BY created_at", userID)
 	if err != nil {
 		return nil, err
 	}
@@ -581,8 +581,8 @@ func GetAnswersByUser(userID string, offset int, limit int) ([]structs.Answer, e
 	return answers, nil
 }
 
-func GetLikedAnswersByUser(userID string, offset int, limit int) ([]structs.Answer, error) {
-	rows, err := Db.Query("SELECT uuid, content, owner_id, post_id, created_at, likes, dislikes FROM answers WHERE likes LIKE CONCAT('%', ?, '%') ORDER BY created_at LIMIT ? OFFSET ?", userID, limit, offset)
+func GetLikedAnswersByUser(userID string) ([]structs.Answer, error) {
+	rows, err := Db.Query("SELECT uuid, content, owner_id, post_id, created_at, likes, dislikes FROM answers WHERE likes LIKE CONCAT('%', ?, '%') ORDER BY created_at", userID)
 	if err != nil {
 		return nil, err
 	}

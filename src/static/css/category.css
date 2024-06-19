@@ -190,22 +190,6 @@ h1 {
     border: 1px solid #232327;
 }
 
-#show-more-btn {
-    border: none;
-    border-top: 1px #2c2c31 solid;
-    background-color: #18181b;
-    color: white;
-    width: 100%;
-    margin-top: 10px;
-    padding-top: 10px;
-
-}
-
-#show-more-btn:hover {
-    cursor: pointer;
-    text-decoration: underline;
-}
-
 .category-description h3 {
     margin-top: 0;
     color: #C71E1E;

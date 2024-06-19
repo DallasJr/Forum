@@ -119,24 +119,6 @@ h1 {
     margin-bottom: 15px;
 }
 
-#show-more-btn {
-    border: 2px solid #2c2c31;
-    background-color: #18181b;
-    color: white;
-    width: 100%;
-    margin-bottom: 10px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
-}
-
-#show-more-btn:hover {
-    cursor: pointer;
-    text-decoration: underline;
-    border-color: #333336;
-}
-
 .answer:first-child {
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;

@@ -10,7 +10,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -211,23 +210,6 @@ func sendErrorResponse(w http.ResponseWriter, message string, statusCode int) {
 	json.NewEncoder(w).Encode(map[string]string{"error": message})
 }
 
-func showMoreAnswers(w http.ResponseWriter, r *http.Request) {
-	postUuid := r.URL.Query().Get("post")
-	offset, err := strconv.Atoi(r.URL.Query().Get("offset"))
-	if err != nil {
-		http.Error(w, "Invalid offset", http.StatusBadRequest)
-		return
-	}
-	posts, err := src.GetAnswersByPosts(postUuid, offset, 5)
-	if err != nil {
-		http.Error(w, "Unable to retrieve more answers", http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(posts)
-}
-
 func postsHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/post" || r.URL.Path == "/post/" {
 		index(w, r)
@@ -264,7 +246,7 @@ func servePostPage(w http.ResponseWriter, r *http.Request) {
 	ExportData.Post = post
 
 	//Answers
-	answers, _ := src.GetAnswersByPosts(id, 0, 5)
+	answers, _ := src.GetAnswersByPosts(id)
 
 	ExportData.Answers = answers
 

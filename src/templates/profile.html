@@ -108,9 +108,6 @@
                         </a>
                         {{end}}
                     </div>
-                    {{if eq (len .Posts) 5}}
-                    <button id="show-more-posts-btn" class="show-more-btn" onclick="loadMoreCreatedPosts()">Show More</button>
-                    {{end}}
                 </div>
                 <div class="answers-section">
                     <h2>Answers posted</h2>
@@ -139,9 +136,6 @@
                         </a>
                         {{end}}
                     </div>
-                    {{if eq (len .Answers) 5}}
-                    <button id="show-more-answers-btn" class="show-more-btn" onclick="loadMorePostedAnswers()">Show More</button>
-                    {{end}}
                 </div>
                 <div class="liked-section">
                     <h2>Liked Posts</h2>
@@ -174,9 +168,6 @@
                         </a>
                         {{end}}
                     </div>
-                    {{if eq (len .LikedPosts) 5}}
-                    <button id="show-more-liked-posts-btn" class="show-more-btn" onclick="loadMoreLikedPosts()">Show More</button>
-                    {{end}}
                 </div>
                 <div class="liked-section">
                     <h2>Liked Answers</h2>
@@ -205,9 +196,6 @@
                         </a>
                         {{end}}
                     </div>
-                    {{if eq (len .LikedAnswers) 5}}
-                    <button id="show-more-liked-answers-btn" class="show-more-btn" onclick="loadMoreLikedAnswers()">Show More</button>
-                    {{end}}
                 </div>
             </div>
         </div>
@@ -218,297 +206,7 @@
 </body>
 
 <script>
-    const profile = "{{.Profile.Uuid}}";
-    let postsOffset = 5;
-    function loadMoreCreatedPosts() {
-        fetch(`/more-created-posts?profile=${profile}&offset=${postsOffset}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(posts => {
-                if (!posts || posts.length === 0) {
-                    document.getElementById('show-more-posts-btn').style.display = 'none';
-                    return;
-                }
 
-                const postsList = document.getElementById('created-posts');
-                if (!postsList) {
-                    console.error('created-posts element not found');
-                    return;
-                }
-                posts.forEach(post => {
-                    const postLink = document.createElement('a');
-                    postLink.href = `/post/${post.Uuid}`;
-                    postLink.classList.add('post-item');
-
-                    postLink.innerHTML = `
-                        <div class="post-content">
-                            <h3>${post.Title}</h3>
-                            <p>${post.Content}</p>
-                        </div>
-                        <div class="post-category">
-                            <h3>Category:</h3>
-                            <p>${post.Category}</p>
-                        </div>
-                        <div class="post-answers-count">
-                            <h3>Answers</h3>
-                            <p>${post.AnswersCount}</p>
-                        </div>
-                        <div class="post-meta">Posted on ${post.CreationDate}</div>
-                    `;
-
-                    const postActions = document.createElement('div');
-                    postActions.classList.add('post-actions');
-
-                    const likeCount = document.createElement('div');
-                    likeCount.classList.add('like-count');
-                    likeCount.innerHTML = `
-                        <i class="fas fa-thumbs-up"></i>
-                        <span>${post.Likes ? post.Likes.length : 0}</span>
-                    `;
-                    postActions.appendChild(likeCount);
-
-                    const dislikeCount = document.createElement('div');
-                    dislikeCount.classList.add('dislike-count');
-                    dislikeCount.innerHTML = `
-                        <i class="fas fa-thumbs-down"></i>
-                        <span>${post.Dislikes ? post.Dislikes.length : 0}</span>
-                    `;
-                    postActions.appendChild(dislikeCount);
-
-                    postLink.appendChild(postActions);
-
-                    postsList.appendChild(postLink);
-                });
-                postsOffset += posts.length;
-
-                if (posts.length < 5) {
-                    document.getElementById('show-more-posts-btn').style.display = 'none';
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching more posts:', error);
-            });
-    }
-    let answersOffset = 5;
-    function loadMorePostedAnswers() {
-        fetch(`/more-posted-answers?profile=${profile}&offset=${answersOffset}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(answers => {
-                if (!answers || answers.length === 0) {
-                    document.getElementById('show-more-answers-btn').style.display = 'none';
-                    return;
-                }
-
-                const answersList = document.getElementById('posted-answers');
-                if (!answersList) {
-                    console.error('posted-answers element not found');
-                    return;
-                }
-                answers.forEach(answer => {
-                    const postLink = document.createElement('a');
-                    postLink.href = `/post/${answer.PostID}`;
-                    postLink.classList.add('post-item');
-
-                    postLink.innerHTML = `
-                        <div class="post-content">
-                            <h3>Answer:</h3>
-                            <p>${answer.Content}</p>
-                        </div>
-                        <div class="answer-post">
-                            <h3>Post:</h3>
-                            <p>${answer.PostTitle}</p>
-                        </div>
-                        <div class="post-meta">Posted on ${answer.CreationDate}</div>
-                    `;
-
-                    const postActions = document.createElement('div');
-                    postActions.classList.add('post-actions');
-
-                    const likeCount = document.createElement('div');
-                    likeCount.classList.add('like-count');
-                    likeCount.innerHTML = `
-                        <i class="fas fa-thumbs-up"></i>
-                        <span>${answer.Likes ? answer.Likes.length : 0}</span>
-                    `;
-                    postActions.appendChild(likeCount);
-
-                    const dislikeCount = document.createElement('div');
-                    dislikeCount.classList.add('dislike-count');
-                    dislikeCount.innerHTML = `
-                        <i class="fas fa-thumbs-down"></i>
-                        <span>${answer.Dislikes ? answer.Dislikes.length : 0}</span>
-                    `;
-                    postActions.appendChild(dislikeCount);
-
-                    postLink.appendChild(postActions);
-
-                    answersList.appendChild(postLink);
-                });
-
-                answersOffset += answers.length;
-
-                if (answers.length < 5) {
-                    document.getElementById('show-more-answers-btn').style.display = 'none';
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching more answers:', error);
-            });
-    }
-    let likedPostsOffset = 5;
-    function loadMoreLikedPosts() {
-        fetch(`/more-liked-posts?profile=${profile}&offset=${likedPostsOffset}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(posts => {
-                if (!posts || posts.length === 0) {
-                    document.getElementById('show-more-liked-posts-btn').style.display = 'none';
-                    return;
-                }
-
-                const postsList = document.getElementById('liked-posts');
-                if (!postsList) {
-                    console.error('liked-posts element not found');
-                    return;
-                }
-                posts.forEach(post => {
-                    const postLink = document.createElement('a');
-                    postLink.href = `/post/${post.Uuid}`;
-                    postLink.classList.add('post-item');
-
-                    postLink.innerHTML = `
-                        <div class="post-content">
-                            <h3>${post.Title}</h3>
-                            <p>${post.Content}</p>
-                        </div>
-                        <div class="post-category">
-                            <h3>Category:</h3>
-                            <p>${post.Category}</p>
-                        </div>
-                        <div class="post-answers-count">
-                            <h3>Answers</h3>
-                            <p>${post.AnswersCount}</p>
-                        </div>
-                        <div class="post-meta">Posted on ${post.CreationDate}</div>
-                    `;
-
-                    const postActions = document.createElement('div');
-                    postActions.classList.add('post-actions');
-
-                    const likeCount = document.createElement('div');
-                    likeCount.classList.add('like-count');
-                    likeCount.innerHTML = `
-                        <i class="fas fa-thumbs-up"></i>
-                        <span>${post.Likes ? post.Likes.length : 0}</span>
-                    `;
-                    postActions.appendChild(likeCount);
-
-                    const dislikeCount = document.createElement('div');
-                    dislikeCount.classList.add('dislike-count');
-                    dislikeCount.innerHTML = `
-                        <i class="fas fa-thumbs-down"></i>
-                        <span>${post.Dislikes ? post.Dislikes.length : 0}</span>
-                    `;
-                    postActions.appendChild(dislikeCount);
-
-                    postLink.appendChild(postActions);
-
-                    postsList.appendChild(postLink);
-                });
-                likedPostsOffset += posts.length;
-
-                if (posts.length < 5) {
-                    document.getElementById('show-more-liked-posts-btn').style.display = 'none';
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching more posts:', error);
-            });
-    }
-    let likedAnswersOffset = 5;
-    function loadMoreLikedAnswers() {
-        fetch(`/more-liked-answers?profile=${profile}&offset=${likedAnswersOffset}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(answers => {
-                if (!answers || answers.length === 0) {
-                    document.getElementById('show-more-liked-answers-btn').style.display = 'none';
-                    return;
-                }
-
-                const answersList = document.getElementById('liked-answers');
-                if (!answersList) {
-                    console.error('liked-answers element not found');
-                    return;
-                }
-                answers.forEach(answer => {
-                    const postLink = document.createElement('a');
-                    postLink.href = `/post/${answer.PostID}`;
-                    postLink.classList.add('post-item');
-
-                    postLink.innerHTML = `
-                        <div class="post-content">
-                            <h3>Answer:</h3>
-                            <p>${answer.Content}</p>
-                        </div>
-                        <div class="answer-post">
-                            <h3>Post:</h3>
-                            <p>${answer.PostTitle}</p>
-                        </div>
-                        <div class="post-meta">Posted on ${answer.CreationDate}</div>
-                    `;
-
-                    const postActions = document.createElement('div');
-                    postActions.classList.add('post-actions');
-
-                    const likeCount = document.createElement('div');
-                    likeCount.classList.add('like-count');
-                    likeCount.innerHTML = `
-                        <i class="fas fa-thumbs-up"></i>
-                        <span>${answer.Likes ? answer.Likes.length : 0}</span>
-                    `;
-                    postActions.appendChild(likeCount);
-
-                    const dislikeCount = document.createElement('div');
-                    dislikeCount.classList.add('dislike-count');
-                    dislikeCount.innerHTML = `
-                        <i class="fas fa-thumbs-down"></i>
-                        <span>${answer.Dislikes ? answer.Dislikes.length : 0}</span>
-                    `;
-                    postActions.appendChild(dislikeCount);
-
-                    postLink.appendChild(postActions);
-
-                    answersList.appendChild(postLink);
-                });
-
-                likedAnswersOffset += answers.length;
-
-                if (answers.length < 5) {
-                    document.getElementById('show-more-liked-answers-btn').style.display = 'none';
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching more answers:', error);
-            });
-    }
 </script>
 
 
