@@ -28,15 +28,18 @@ type postPageData struct {
 func servePostCreatePage(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("src/templates/creation-post.html"))
 
+	// Empeche la création de cache
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 	w.Header().Set("Pragma", "no-cache")
 	w.Header().Set("Expires", "0")
 
 	ExportData := postCreationPageData{}
+	// S'il n'y a pas de cookie de session, on le redirige vers la page de connexion
 	if !cookieExists(r, "sessionID") {
 		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
+	// Si le backend ne reconnait pas l'ID de la session, on retire le cookie et on le redirige vers la page de connexion
 	sessionID := src.GetValidSession(r)
 	if sessionID == "" {
 		w, r = removeSession(w, r)
@@ -68,10 +71,12 @@ func handleCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// S'il n'y a pas de cookie de session, on le redirige vers la page de connexion
 	if !cookieExists(r, "sessionID") {
 		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
+	// Si le backend ne reconnait pas l'ID de la session, on retire le cookie et on le redirige vers la page de connexion
 	sessionID := src.GetValidSession(r)
 	if sessionID == "" {
 		w, r = removeSession(w, r)
@@ -84,7 +89,7 @@ func handleCreatePost(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Redirect(w, r, "/error.html", http.StatusFound)
 		return
-	} // limit upload size to 32MB
+	}
 
 	categoryString := r.FormValue("category")
 	category, err := src.GetCategory(categoryString)
@@ -95,11 +100,11 @@ func handleCreatePost(w http.ResponseWriter, r *http.Request) {
 	title := r.FormValue("post-title")
 	content := r.FormValue("post-content")
 
-	// Validate title and content
 	if title == "" || content == "" {
 		http.Error(w, "Title and content are required", http.StatusBadRequest)
 		return
 	}
+	// Limite de taille
 	if len(title) > 100 || len(title) < 10 {
 		http.Error(w, "Title incorrect length", http.StatusBadRequest)
 		return
@@ -117,10 +122,11 @@ func handleCreatePost(w http.ResponseWriter, r *http.Request) {
 		Category:     category.Name,
 		CreationDate: time.Now().Format("2006-01-02 15:04:05"),
 	}
-	// Handle file uploads
+	// Récupère les images
 	files := r.MultipartForm.File["post-images"]
 	totalSize := int64(0)
 	uploadedFiles := make([]string, 0)
+	// Vérifie la taille
 	for _, fileHeader := range files {
 		if fileHeader.Size > 20*1024*1024 {
 			sendErrorResponse(w, "Each image should not exceed 20MB", http.StatusBadRequest)
@@ -132,6 +138,7 @@ func handleCreatePost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	// Ajouts des images
 	for _, fileHeader := range files {
 		file, err := fileHeader.Open()
 		if err != nil {
@@ -159,7 +166,6 @@ func handleCreatePost(w http.ResponseWriter, r *http.Request) {
 
 	post.Images = uploadedFiles
 
-	// Save the post in the database
 	likeStrings := make([]string, len(post.Likes))
 	for i, like := range post.Likes {
 		likeStrings[i] = like.String()
@@ -170,7 +176,6 @@ func handleCreatePost(w http.ResponseWriter, r *http.Request) {
 		dislikeStrings[i] = dislike.String()
 	}
 
-	// Convert likes, dislikes, and images to JSON
 	likesJSON, err := json.Marshal(likeStrings)
 	if err != nil {
 		http.Error(w, "Unable to post post", http.StatusInternalServerError)
@@ -200,7 +205,6 @@ func handleCreatePost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to execute SQL statement", http.StatusInternalServerError)
 		return
 	}
-	//http.Redirect(w, r, "/post/"+post.Uuid.String()+"?p-message=Post%20posted%20successfully%20!", http.StatusSeeOther)
 	json.NewEncoder(w).Encode(map[string]string{"redirect": "/post/" + post.Uuid.String() + "?p-message=Post%20posted%20successfully%20!"})
 }
 
@@ -221,18 +225,16 @@ func postsHandler(w http.ResponseWriter, r *http.Request) {
 
 func servePostPage(w http.ResponseWriter, r *http.Request) {
 
+	// Empeche la création de cache
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 	w.Header().Set("Pragma", "no-cache")
 	w.Header().Set("Expires", "0")
 
 	id := strings.TrimPrefix(r.URL.Path, "/post/")
-	/*if id == "" {
-		http.NotFound(w, r)
-		return
-	}*/
 
 	ExportData := postPageData{}
 
+	// S'il y a un cookie de session, s'il n'est pas valide, on le supprime,
 	if cookieExists(r, "sessionID") {
 		sessionID := src.GetValidSession(r)
 		if sessionID == "" {
@@ -245,11 +247,10 @@ func servePostPage(w http.ResponseWriter, r *http.Request) {
 	post, _ := src.GetPost(id)
 	ExportData.Post = post
 
-	//Answers
 	answers, _ := src.GetAnswersByPosts(id)
 
 	ExportData.Answers = answers
-
+	// Ajouts les fonctions userHasLiked et userHasDisliked
 	funcMap := template.FuncMap{
 		"userHasLiked":    userHasLiked,
 		"userHasDisliked": userHasDisliked,
@@ -282,10 +283,12 @@ func handleAnswerSubmission(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// S'il n'y a pas de cookie de session, on le redirige vers la page de connexion
 	if !cookieExists(r, "sessionID") {
 		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
+	// Si le backend ne reconnait pas l'ID de la session, on retire le cookie et on le redirige vers la page de connexion
 	sessionID := src.GetValidSession(r)
 	if sessionID == "" {
 		w, r = removeSession(w, r)
@@ -302,7 +305,6 @@ func handleAnswerSubmission(w http.ResponseWriter, r *http.Request) {
 	}
 	content := r.FormValue("answer-content")
 
-	// Validate title and content
 	if content == "" {
 		http.Error(w, "Content is required", http.StatusBadRequest)
 		return
@@ -330,7 +332,6 @@ func handleAnswerSubmission(w http.ResponseWriter, r *http.Request) {
 		dislikeStrings[i] = dislike.String()
 	}
 
-	// Convert likes, dislikes, and images to JSON
 	likesJSON, err := json.Marshal(likeStrings)
 	if err != nil {
 		http.Error(w, "Unable to post post", http.StatusInternalServerError)
@@ -342,7 +343,7 @@ func handleAnswerSubmission(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unable to post post", http.StatusInternalServerError)
 		return
 	}
-
+	// Ajouts de la réponse/commentaire dans la bdd
 	stmt, err := src.Db.Prepare(`INSERT INTO answers (uuid, content, owner_id, post_id, created_at, likes, dislikes)
                              VALUES (?, ?, ?, ?, ?, ?, ?)`)
 	if err != nil {
@@ -355,6 +356,7 @@ func handleAnswerSubmission(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to execute SQL statement", http.StatusInternalServerError)
 		return
 	}
+	// Récupère la position du scroll pour la restaurer
 	scrollPos := r.FormValue("scrollPos")
 	redirectURL := fmt.Sprintf("/post/%s?a-message=Answer%%20posted%%20successfully%%20!&scrollPos=%s", post.Uuid.String(), scrollPos)
 	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
@@ -366,15 +368,18 @@ func handlePostDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Empeche la création de cache
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 	w.Header().Set("Pragma", "no-cache")
 	w.Header().Set("Expires", "0")
 
+	// S'il n'y a pas de cookie de session, on le redirige vers la page de connexion
 	if !cookieExists(r, "sessionID") {
 		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
 
+	// Si le backend ne reconnait pas l'ID de la session, on retire le cookie et on le redirige vers la page de connexion
 	sessionID := src.GetValidSession(r)
 	if sessionID == "" {
 		w, r = removeSession(w, r)
@@ -390,12 +395,14 @@ func handlePostDelete(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unable to delete post", http.StatusInternalServerError)
 		return
 	}
-	// Delete the post from the database
+
+	// Supprime le post de la bdd
 	_, err := src.Db.Exec("DELETE FROM posts WHERE uuid = ?", postID)
 	if err != nil {
 		http.Error(w, "Unable to delete post", http.StatusInternalServerError)
 		return
 	}
+	// Supprime les images du post
 	if len(post.Images) != 0 {
 		for _, j := range post.Images {
 			oldImagePath := fmt.Sprintf("src%s", j)
@@ -415,15 +422,18 @@ func handleAnswerDelete(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
+	// Empeche la création de cache
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 	w.Header().Set("Pragma", "no-cache")
 	w.Header().Set("Expires", "0")
 
+	// S'il n'y a pas de cookie de session, on le redirige vers la page de connexion
 	if !cookieExists(r, "sessionID") {
 		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
 
+	// Si le backend ne reconnait pas l'ID de la session, on retire le cookie et on le redirige vers la page de connexion
 	sessionID := src.GetValidSession(r)
 	if sessionID == "" {
 		w, r = removeSession(w, r)
@@ -439,25 +449,25 @@ func handleAnswerDelete(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unable to delete answer", http.StatusInternalServerError)
 		return
 	}
-	// Delete the answer from the database
+	// Supprime la réponse/commentaire de la bdd
 	_, err := src.Db.Exec("DELETE FROM answers WHERE uuid = ?", answerID)
 	if err != nil {
 		http.Error(w, "Unable to answer post", http.StatusInternalServerError)
 		return
 	}
+	// Récupère la position du scroll pour la restaurer
 	scrollPos := r.FormValue("scrollPos")
 	profile := r.FormValue("profile")
 
 	var redirectURL string
-
+	// Si c'est supprime depuis son profile, on relance la page,
+	// sinon on relance la page du post
 	if profile == "true" {
-		// Redirect to profile page or another appropriate location
 		redirectURL = "/profile/" + user.Uuid.String()
 		if scrollPos != "" {
 			redirectURL += "?scrollPos=" + scrollPos
 		}
 	} else {
-		// Default redirect to the post page with scroll position
 		redirectURL = fmt.Sprintf("/post/%s", answer.PostID)
 		if scrollPos != "" {
 			redirectURL += "?scrollPos=" + scrollPos
@@ -472,11 +482,13 @@ func handleLikeDislike(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// S'il n'y a pas de cookie de session, on le redirige vers la page de connexion
 	if !cookieExists(r, "sessionID") {
 		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
 
+	// Si le backend ne reconnait pas l'ID de la session, on retire le cookie et on le redirige vers la page de connexion
 	sessionID := src.GetValidSession(r)
 	if sessionID == "" {
 		w, r = removeSession(w, r)
@@ -490,7 +502,6 @@ func handleLikeDislike(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Parse form data
 	err = r.ParseForm()
 	if err != nil {
 		http.Error(w, "Failed to parse form data", http.StatusBadRequest)
@@ -499,7 +510,7 @@ func handleLikeDislike(w http.ResponseWriter, r *http.Request) {
 	postID := r.Form.Get("postID")
 	answerID := r.Form.Get("answerID")
 	action := r.Form.Get("action")
-
+	// Récupère les likes et dislikes dans la bdd 'posts' OU alors 'answers'
 	var likes []string
 	var likesJSON string
 	if postID != "" {
@@ -515,6 +526,7 @@ func handleLikeDislike(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	// Les likes sont stocker en JSON donc on unmarshal
 	err = json.Unmarshal([]byte(likesJSON), &likes)
 	if err != nil {
 		http.Error(w, "Failed to parse likes", http.StatusInternalServerError)
@@ -542,6 +554,7 @@ func handleLikeDislike(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Logique des likes/dislikes
 	if action == "like" {
 		index := indexOf(likes, user.Uuid.String())
 		if index == -1 {
@@ -569,7 +582,7 @@ func handleLikeDislike(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Convert likes, dislikes, and images to JSON
+	// On marshal les nouveaux likes/dislikes pour les envoyés
 	updatedLikesJSON, err := json.Marshal(likes)
 	if err != nil {
 		http.Error(w, "Unable to marshal likes", http.StatusInternalServerError)
@@ -581,8 +594,7 @@ func handleLikeDislike(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unable to marshal dislikes", http.StatusInternalServerError)
 		return
 	}
-
-	// Update likes in the database
+	// Envoyé dans la bdd respectif selon le type de like/dislike
 	if postID != "" {
 		_, err = src.Db.Exec("UPDATE posts SET likes = ? WHERE uuid = ?", updatedLikesJSON, postID)
 		if err != nil {
@@ -607,6 +619,7 @@ func handleLikeDislike(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// Récupère la position du scroll pour la restaurer
 	scrollPos := r.FormValue("scrollPos")
 	var id string
 	if postID != "" {

@@ -16,10 +16,10 @@
 }
 
 .brand img{
-    width: 150px; /* Adjust width as needed */
-    height: auto; /* Maintain aspect ratio */
-    margin-right: 10px; /* Example margin */
-    vertical-align: middle; /* Align vertically */
+    width: 150px;
+    height: auto;
+    margin-right: 10px;
+    vertical-align: middle;
 }
 
 .menu-icon {
@@ -72,7 +72,6 @@
     background-color: #C71E1E;
 }
 
-/* Mobile view */
 @media screen and (max-width: 768px) {
     .navbar-container {
         flex-direction: row;

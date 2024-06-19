@@ -64,6 +64,7 @@ func SetupDatabase() *sql.DB {
 	}
 
 	// Answers
+	// FOREIGN KEY:  assure la cohérence et la validité des données entre différentes tables
 	_, err = Db.Exec(`
 		CREATE TABLE IF NOT EXISTS answers (
 			uuid TEXT PRIMARY KEY,
@@ -96,6 +97,8 @@ func SetupDatabase() *sql.DB {
 }
 
 func GetUserFromSessionID(sessionID string) (structs.User, error) {
+
+	//Mutex évite les lectures/écritures simultanées qui pourraient corrompre les données
 	Mutex.Lock()
 	userID, exists := Sessions[sessionID]
 	Mutex.Unlock()
@@ -137,6 +140,7 @@ func GetUserFromUUID(userID uuid.UUID) (structs.User, error) {
 
 func GetValidSession(r *http.Request) string {
 	c, _ := r.Cookie("sessionID")
+	//Mutex évite les lectures/écritures simultanées qui pourraient corrompre les données
 	Mutex.Lock()
 	_, exists := Sessions[c.Value]
 	Mutex.Unlock()

@@ -2,27 +2,16 @@ package handlers
 
 import (
 	"Forum/src"
-	"crypto/rand"
 	"database/sql"
-	"encoding/base64"
 	"errors"
 	"fmt"
-	"github.com/gofrs/uuid/v5"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"regexp"
 	"strings"
 	"time"
 )
-
-func generateSessionID() string {
-	b := make([]byte, 32)
-	_, err := rand.Read(b)
-	if err != nil {
-		panic(err)
-	}
-	return base64.URLEncoding.EncodeToString(b)
-}
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -33,6 +22,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	password := r.FormValue("password")
 	var id string
 	var hashedPassword string
+	// Récupère l'uuid et le mot de passe de l'utilisateur
 	row := src.Db.QueryRow("SELECT uuid, password FROM users WHERE username = ?", username)
 	err := row.Scan(&id, &hashedPassword)
 	errorMessage := "Invalid username or password"
@@ -44,19 +34,20 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to fetch user data", http.StatusInternalServerError)
 		return
 	}
+	// Compare les 2 mots de passe (comparaison crypté)
 	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	if err != nil {
 		http.Error(w, errorMessage, http.StatusUnauthorized)
 		return
 	}
-
-	sessionID := generateSessionID()
-
-	src.Mutex.Lock()
+	// Génère et ajoute une session
+	sessionID := uuid.New().String()
+	src. //Mutex évite les lectures/écritures simultanées qui pourraient corrompre les données
+		Mutex.Lock()
 	src.Sessions[sessionID] = id
 	fmt.Println("logged: " + id)
 	src.Mutex.Unlock()
-
+	// Crée un cookie sessionID
 	http.SetCookie(w, &http.Cookie{
 		Name:     "sessionID",
 		Value:    sessionID,
@@ -64,10 +55,6 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
-}
-
-func returnError(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "/error.html", http.StatusSeeOther)
 }
 
 func registerHandler(w http.ResponseWriter, r *http.Request) {
@@ -82,7 +69,8 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("email")
 	password := r.FormValue("password")
 	gender := r.FormValue("gender")
-
+	// Vérifie les caractères du nom et prénom
+	// Limite de taille
 	nameOrSurnamePattern := regexp.MustCompile(`^[a-zA-Z-]+$`)
 	if !nameOrSurnamePattern.MatchString(name) || len(name) < 1 || len(name) > 32 {
 		serveRegisterPage(w, r)
@@ -92,11 +80,15 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		serveRegisterPage(w, r)
 		return
 	}
+	// Vérifie les caractères du pseudo
+	// Limite de taille
 	usernamePattern := regexp.MustCompile(`^[a-zA-Z0-9_.-]+$`)
 	if !usernamePattern.MatchString(username) || len(username) < 3 || len(username) > 16 {
 		serveRegisterPage(w, r)
 		return
 	}
+	// Vérifie le mot de passe
+	// Limite de taille
 	if len(password) < 8 || len(password) > 32 {
 		serveRegisterPage(w, r)
 		return
@@ -121,14 +113,16 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uniqueId := uuid.Must(uuid.NewV4())
+	// Génère son identifiant unique
+	uniqueId := uuid.New()
 	userID := uniqueId.String()
-
+	// Crypte le mot de passe
 	hashedPassword, er := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if er != nil {
 		http.Error(w, "Failed to hash password", http.StatusInternalServerError)
 		return
 	}
+	// Ajouts de l'utilisateur
 	_, err := src.Db.Exec("INSERT INTO users (uuid, name, surname, username, created_at, email, password, power, gender) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
 		userID, name, surname, strings.ToLower(username), time.Now().Format("2006-01-02 15:04:05"), email, hashedPassword, 0, gender)
 	if err != nil {
@@ -136,14 +130,14 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sessionID := generateSessionID()
+	// Génère une session et crée le cookie
+	sessionID := uuid.New().String()
 
-	// Store the session ID in the map
-	src.Mutex.Lock()
+	src. //Mutex évite les lectures/écritures simultanées qui pourraient corrompre les données
+		Mutex.Lock()
 	src.Sessions[sessionID] = userID
 	src.Mutex.Unlock()
 
-	// Set session ID as a cookie
 	http.SetCookie(w, &http.Cookie{
 		Name:     "sessionID",
 		Value:    sessionID,
@@ -165,7 +159,7 @@ func serveLoginPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Prevent caching
+	// Empeche la création de cache
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 	w.Header().Set("Pragma", "no-cache")
 	w.Header().Set("Expires", "0")
@@ -180,6 +174,7 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func removeSession(w http.ResponseWriter, r *http.Request) (http.ResponseWriter, *http.Request) {
+	// Retire le cookie de session
 	http.SetCookie(w, &http.Cookie{
 		Name:   "sessionID",
 		Value:  "",
@@ -196,16 +191,16 @@ func serveRegisterPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Empeche la création de cache
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 	w.Header().Set("Pragma", "no-cache")
 	w.Header().Set("Expires", "0")
-	/*tmpl := template.Must(template.ParseFiles("src/templates/register.html"))
-	tmpl.Execute(w, ExportData)*/
 
 	http.ServeFile(w, r, "src/templates/register.html")
 }
 
 func checkUsernameAvailability(w http.ResponseWriter, r *http.Request) {
+	// Vérifie la disponibilité du pseudo
 	username := r.URL.Query().Get("username")
 	var count int
 	err := src.Db.QueryRow("SELECT COUNT(*) FROM users WHERE username = ?", username).Scan(&count)
@@ -221,6 +216,7 @@ func checkUsernameAvailability(w http.ResponseWriter, r *http.Request) {
 }
 
 func checkEmailAvailability(w http.ResponseWriter, r *http.Request) {
+	// Vérifie la disponibilité de l'email
 	email := r.URL.Query().Get("email")
 	var count int
 	err := src.Db.QueryRow("SELECT COUNT(*) FROM users WHERE email = ?", email).Scan(&count)

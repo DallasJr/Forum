@@ -60,13 +60,13 @@
 
 .one-row {
     display: flex;
-    align-items: center; /* Align items vertically in the center */
+    align-items: center;
 }
 
 .one-row select,
 .one-row input {
-    flex: 1; /* Take remaining space */
-    margin-right: 10px; /* Add spacing between input/select and button */
+    flex: 1;
+    margin-right: 10px;
     margin-top: 10px;
     margin-bottom: 20px;
 }
@@ -82,7 +82,7 @@
 }
 .two-row {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Two columns */
+    grid-template-columns: 1fr 1fr;
     gap: 10px;
 }
 
@@ -146,7 +146,6 @@ form label {
     color: #000000;
 }
 
-/* Hover effect should be disabled for active nav item */
 .settings-nav a.active:hover {
     background-color: #af1b1b;
 }

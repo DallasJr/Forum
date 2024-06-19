@@ -9,14 +9,13 @@ h1 {
     color: white;
 }
 
-/* Post styles */
 .post, .post-feedback {
     border: 1px solid #232327;
     padding: 20px;
     margin-bottom: 20px;
     border-radius: 8px;
     background-color: #18181b;
-    word-wrap: break-word; /* Ensure content wraps */
+    word-wrap: break-word;
     overflow-wrap: break-word;
 }
 
@@ -47,7 +46,6 @@ h1 {
     border-radius: 5px;
 }
 
-/* Post actions styles */
 .post-actions {
     display: flex;
     justify-content: flex-end;
@@ -112,7 +110,6 @@ h1 {
     color: #333;
 }
 
-/* Answers section styles */
 .answers {
     margin-top: 30px;
     margin-bottom: 30px;
@@ -165,9 +162,9 @@ h1 {
 .answer-left pre {
     white-space: pre-wrap;
     color: #dddee0;
-    word-wrap: break-word;       /* Ensures content wraps */
-    overflow-wrap: break-word;   /* Ensures content wraps */
-    word-break: break-word;      /* Ensures long words break */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .answer-meta {

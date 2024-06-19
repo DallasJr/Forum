@@ -24,18 +24,16 @@ func serveProfilePage(w http.ResponseWriter, r *http.Request) {
 	}
 	tmpl := template.Must(template.ParseFiles("src/templates/profile.html"))
 
+	// Empeche la création de cache
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 	w.Header().Set("Pragma", "no-cache")
 	w.Header().Set("Expires", "0")
 
 	profileID := strings.TrimPrefix(r.URL.Path, "/profile/")
-	/*if id == "" {
-		http.NotFound(w, r)
-		return
-	}*/
 
 	ExportData := profilePageData{}
 
+	// S'il y a un cookie de session, s'il n'est pas valide, on le supprime,
 	if cookieExists(r, "sessionID") {
 		sessionID := src.GetValidSession(r)
 		if sessionID == "" {
@@ -53,6 +51,7 @@ func serveProfilePage(w http.ResponseWriter, r *http.Request) {
 
 	//Posts
 	posts, _ := src.GetPostsByUser(profileID)
+	// Rétréci le titre et contenu ainsi que le pseudo si trop long à l'affichage
 	for i := range posts {
 		posts[i].Title = structs.Shorten(posts[i].Title, 20)
 		posts[i].Content = structs.Shorten(posts[i].Content, 20)

@@ -19,6 +19,7 @@ func SetupHandlers() {
 	http.Handle("/src/templates/", http.StripPrefix("/src/templates/", http.FileServer(http.Dir("src/templates"))))
 	http.HandleFunc("/", index)
 
+	// login/register page
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/check-username", checkUsernameAvailability)
 	http.HandleFunc("/check-email", checkEmailAvailability)
@@ -27,7 +28,7 @@ func SetupHandlers() {
 	http.HandleFunc("/register.html", serveRegisterPage)
 	http.HandleFunc("/logout", logoutHandler)
 
-	//settings page
+	// settings page
 	http.HandleFunc("/settings.html", serveSettingsPage)
 	http.HandleFunc("/change-password", passwordHandler)
 	http.HandleFunc("/change-email", emailHandler)
@@ -35,13 +36,13 @@ func SetupHandlers() {
 	http.HandleFunc("/change-username", usernameHandler)
 	http.HandleFunc("/change-names", namesHandler)
 
-	//categories page
+	// categories page
 	http.HandleFunc("/categories/", categoriesHandler)
 
-	//profile page
+	// profile page
 	http.HandleFunc("/profile/", profilesHandler)
 
-	//post page
+	// post page
 	http.HandleFunc("/create-post/", servePostCreatePage)
 	http.HandleFunc("/create-post/submit", handleCreatePost)
 	http.HandleFunc("/post/", postsHandler)
@@ -51,7 +52,7 @@ func SetupHandlers() {
 
 	http.HandleFunc("/likedislike", handleLikeDislike)
 
-	//administration page
+	// administration page
 	http.HandleFunc("/administration.html", serveAdministrationPage)
 	http.HandleFunc("/add-category", addCategory)
 	http.HandleFunc("/delete-category/", deleteCategory)
@@ -65,17 +66,20 @@ func SetupHandlers() {
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
+	// Ignore les requêtes double crée par le favicon
 	if strings.Contains(r.URL.Path, "favicon.ico") {
 		return
 	}
 	tmpl := template.Must(template.ParseFiles("src/templates/index.html"))
 
+	// Empeche la création de cache
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 	w.Header().Set("Pragma", "no-cache")
 	w.Header().Set("Expires", "0")
 
 	ExportData := mainPageData{}
 
+	// S'il y a un cookie de session, s'il n'est pas valide, on le supprime,
 	if cookieExists(r, "sessionID") {
 		sessionID := src.GetValidSession(r)
 		if sessionID == "" {
@@ -85,17 +89,20 @@ func index(w http.ResponseWriter, r *http.Request) {
 		ExportData.User = user
 	}
 
+	// Récupère toutes les catégories
 	categories, err := src.GetAllCategories()
 	if err != nil {
 		http.Error(w, "Unable to retrieve categories", http.StatusInternalServerError)
 	}
 	ExportData.Categories = categories
 
+	// Récupère les posts récents (5 derniers)
 	posts, err := src.GetRecentPosts()
 	if err != nil {
 		http.Error(w, "Unable to retrieve recent posts", http.StatusInternalServerError)
 		return
 	}
+	// Rétréci le titre et contenu ainsi que le pseudo si trop long à l'affichage
 	for i := range posts {
 		posts[i].Title = structs.Shorten(posts[i].Title, 20)
 		posts[i].Content = structs.Shorten(posts[i].Content, 20)

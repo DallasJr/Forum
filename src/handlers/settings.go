@@ -17,17 +17,19 @@ type settingsPageData struct {
 
 func serveSettingsPage(w http.ResponseWriter, r *http.Request) {
 
-	// Prevent caching
+	// Empeche la création de cache
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 	w.Header().Set("Pragma", "no-cache")
 	w.Header().Set("Expires", "0")
 
 	ExportData := settingsPageData{}
 
+	// S'il n'y a pas de cookie de session, on le redirige vers la page de connexion
 	if !cookieExists(r, "sessionID") {
 		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
+	// Si le backend ne reconnait pas l'ID de la session, on retire le cookie et on le redirige vers la page de connexion
 	sessionID := src.GetValidSession(r)
 	if sessionID == "" {
 		w, r = removeSession(w, r)
@@ -52,10 +54,12 @@ func passwordHandler(w http.ResponseWriter, r *http.Request) {
 	confirmNewPassword := r.FormValue("confirm-new-password")
 
 	passwordError := "New password isn't compatible"
+	// Limite de taille
 	if len(newPassword) < 8 || len(newPassword) > 32 {
 		http.Error(w, passwordError, http.StatusInternalServerError)
 		return
 	}
+	// Vérifie la difficulté du mot de passe
 	hasNumber := regexp.MustCompile(`\d`)
 	if !hasNumber.MatchString(newPassword) {
 		http.Error(w, passwordError, http.StatusInternalServerError)
@@ -77,10 +81,12 @@ func passwordHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ExportData := settingsPageData{}
+	// S'il n'y a pas de cookie de session, on le redirige vers la page de connexion
 	if !cookieExists(r, "sessionID") {
 		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
+	// Si le backend ne reconnait pas l'ID de la session, on retire le cookie et on le redirige vers la page de connexion
 	sessionID := src.GetValidSession(r)
 	if sessionID == "" {
 		w, r = removeSession(w, r)
@@ -88,7 +94,7 @@ func passwordHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ExportData.User, _ = src.GetUserFromSessionID(sessionID)
-
+	// Récupère le mot de passe pour vérifier et comparer
 	var hashedPassword string
 	row := src.Db.QueryRow("SELECT password FROM users WHERE uuid = ?", ExportData.User.Uuid)
 	err := row.Scan(&hashedPassword)
@@ -107,12 +113,13 @@ func passwordHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Incorrect password", http.StatusInternalServerError)
 		return
 	}
-
+	// On crype le nouveau mot de passe
 	newHashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
 	if err != nil {
 		http.Error(w, "Failed to hash password", http.StatusInternalServerError)
 		return
 	}
+	// Mise à jour du nouveau mot de passe dans la bdd
 	_, err = src.Db.Exec("UPDATE users SET password = ? WHERE uuid = ?", newHashedPassword, ExportData.User.Uuid)
 	if err != nil {
 		http.Error(w, "Failed to update password", http.StatusInternalServerError)
@@ -127,10 +134,12 @@ func emailHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ExportData := settingsPageData{}
+	// S'il n'y a pas de cookie de session, on le redirige vers la page de connexion
 	if !cookieExists(r, "sessionID") {
 		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
+	// Si le backend ne reconnait pas l'ID de la session, on retire le cookie et on le redirige vers la page de connexion
 	sessionID := src.GetValidSession(r)
 	if sessionID == "" {
 		w, r = removeSession(w, r)
@@ -151,6 +160,8 @@ func emailHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No changes detected", http.StatusInternalServerError)
 		return
 	}
+	// Mise à jour du nouveau email dans la bdd
+	// Retourne une erreur s'il n'est pas unique
 	_, err = src.Db.Exec("UPDATE users SET email = ? WHERE uuid = ?", email, ExportData.User.Uuid)
 	if err != nil {
 		http.Error(w, "Failed to update email", http.StatusInternalServerError)
@@ -180,10 +191,12 @@ func namesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ExportData := settingsPageData{}
+	// S'il n'y a pas de cookie de session, on le redirige vers la page de connexion
 	if !cookieExists(r, "sessionID") {
 		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
+	// Si le backend ne reconnait pas l'ID de la session, on retire le cookie et on le redirige vers la page de connexion
 	sessionID := src.GetValidSession(r)
 	if sessionID == "" {
 		w, r = removeSession(w, r)
@@ -219,10 +232,12 @@ func genderHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ExportData := settingsPageData{}
+	// S'il n'y a pas de cookie de session, on le redirige vers la page de connexion
 	if !cookieExists(r, "sessionID") {
 		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
+	// Si le backend ne reconnait pas l'ID de la session, on retire le cookie et on le redirige vers la page de connexion
 	sessionID := src.GetValidSession(r)
 	if sessionID == "" {
 		w, r = removeSession(w, r)
@@ -262,10 +277,12 @@ func usernameHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ExportData := settingsPageData{}
+	// S'il n'y a pas de cookie de session, on le redirige vers la page de connexion
 	if !cookieExists(r, "sessionID") {
 		http.Redirect(w, r, "/login.html", http.StatusFound)
 		return
 	}
+	// Si le backend ne reconnait pas l'ID de la session, on retire le cookie et on le redirige vers la page de connexion
 	sessionID := src.GetValidSession(r)
 	if sessionID == "" {
 		w, r = removeSession(w, r)
